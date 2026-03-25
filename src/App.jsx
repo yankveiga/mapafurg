@@ -169,11 +169,16 @@ function App() {
       {/* ------------------------------------------------------------------------
           Gaveta Inferior (Bottom Sheet)
           ------------------------------------------------------------------------ */}
+      {/* MUDANÇA AQUI:
+        1. max-h-[85vh]: A gaveta não cresce além de 85% da tela.
+        2. A barra de rolagem foi aplicada na div interna, não na gaveta em si.
+      */}
       <div 
-        className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[2000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col ${predioAberto ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[2000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAberto ? 'translate-y-0' : 'translate-y-full'}`}
       >
         {predioAberto && (
-          <div className="p-6 pb-8">
+          // MUDANÇA AQUI: overflow-y-auto para permitir rolar, e as classes que escondem a scrollbar visualmente.
+          <div className="p-6 pb-8 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {/* Cabeçalho com Título e Botão Fechar (X) */}
             <div className="flex justify-between items-start mb-4">
               <div className="pr-4">
