@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* O mapa exige que o corpo ocupe a tela toda */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
