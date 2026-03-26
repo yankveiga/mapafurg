@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { predios } from './data';
-import logoPet from './assets/logopet.png'; 
+import logoPet from './assets/logopetvetorizado.svg';
 
 function Localizador({ focar }) {
   const [posicao, setPosicao] = useState(null);
@@ -170,7 +170,10 @@ function App() {
           </button>
 
           <div className="flex flex-row items-center gap-2 pl-1">
-            <img src={logoPet} alt="Logo PET C3" className="w-14 h-14 object-contain scale-110" onError={(e) => { e.target.style.display = 'none'; }} />
+            {/* O Portal foi inserido aqui */}
+            <a href="https://petc3.vercel.app/" target="_blank" rel="noopener noreferrer" className="cursor-pointer block">
+              <img src={logoPet} alt="Logo PET C3" className="w-14 h-14 object-contain scale-110 hover:scale-125 transition-transform duration-300" onError={(e) => { e.target.style.display = 'none'; }} />
+            </a>
           </div>
           <div className="h-8 w-px bg-slate-300/50" /> 
           <div className="relative flex-grow">
