@@ -59,6 +59,9 @@ function App() {
   const [busca, setBusca] = useState('');
   const [solicitarGps, setSolicitarGps] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
+  
+  // Controle de abertura da barra lateral (Hambúrguer)
+  const [menuAberto, setMenuAberto] = useState(false);
 
   useEffect(() => {
     if (predioAberto) {
@@ -72,6 +75,16 @@ function App() {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [predioAberto]);
+
+  // Lógica para abrir locais direto pelo menu lateral
+  const selecionarItemCurado = (id) => {
+    const predio = predios.find(p => p.id === id);
+    if (predio) {
+      setPredioAberto(predio);
+      setMenuAberto(false); 
+      setBusca(''); 
+    }
+  };
 
   const limitesCampus = [
     [-32.0950, -52.1850], 
@@ -94,26 +107,82 @@ function App() {
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
       
-      {/* Busca Original */}
+      {/* ------------------------------------------------------------------------
+          Overlay do Menu (Camada escura para fechar clicando fora)
+          ------------------------------------------------------------------------ */}
+      {menuAberto && (
+        <div 
+          onClick={() => setMenuAberto(false)} 
+          className="absolute inset-0 bg-black/20 z-[11000] backdrop-blur-sm"
+        ></div>
+      )}
+
+      {/* ------------------------------------------------------------------------
+          Menu Lateral (Sidebar)
+          ------------------------------------------------------------------------ */}
+      <div 
+        className={`absolute left-0 top-0 bottom-0 w-[280px] bg-white/95 backdrop-blur-2xl z-[12000] border-r border-white/50 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${menuAberto ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <div className="p-6 pt-10 flex-grow overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
+            <h3 className="text-xl font-black text-[#003366]">Acesso Rápido</h3>
+            <button onClick={() => setMenuAberto(false)} className="text-slate-400 hover:text-slate-800 font-bold text-2xl">✕</button>
+          </div>
+          
+          <ul className="space-y-3">
+            <li>
+              <button onClick={() => selecionarItemCurado('interno')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                <span className="text-2xl">🚌</span>
+                <span className="text-sm font-bold text-slate-800">Ônibus Interno</span>
+              </button>
+            </li>
+            <li>
+              <button onClick={() => selecionarItemCurado('ru_CC')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                <span className="text-2xl">🍴</span>
+                <span className="text-sm font-bold text-slate-800">RU - Centro de Conv.</span>
+              </button>
+            </li>
+            <li>
+              <button onClick={() => selecionarItemCurado('ru_Lago')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                <span className="text-2xl">🍽️</span>
+                <span className="text-sm font-bold text-slate-800">RU - Lago</span>
+              </button>
+            </li>
+                        <li>
+              <button onClick={() => selecionarItemCurado('sib')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                <span className="text-2xl">📚</span>
+                <span className="text-sm font-bold text-slate-800">Biblioteca Central</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Busca com Hambúrguer Embutido */}
       <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[9999]">
         <div className="flex flex-row items-center gap-3 p-2.5 bg-white/50 backdrop-blur-xl shadow-lg rounded-2xl border border-white/60">
+          
+          <button 
+            onClick={() => setMenuAberto(true)}
+            className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/40 hover:bg-white/60 text-[#003366] text-2xl active:scale-95 transition-all"
+          >
+            ☰
+          </button>
+
           <div className="flex flex-row items-center gap-2 pl-1">
             <img src={logoPet} alt="Logo PET C3" className="w-14 h-14 object-contain scale-110" onError={(e) => { e.target.style.display = 'none'; }} />
-            <div className="flex flex-col">
-              <h1 className="text-lg font-bold text-[#003366] leading-none tracking-tight">Mapa FURG</h1>
-            </div>
           </div>
           <div className="h-8 w-px bg-slate-300/50" /> 
           <div className="relative flex-grow">
             <input 
               type="text" 
-              placeholder="Buscar prédio ou sigla..." 
+              placeholder="Buscar prédio..." 
               value={busca}
               onChange={(e) => {
                 setBusca(e.target.value);
                 setPredioAberto(null);
               }}
-              className="w-full bg-white/40 hover:bg-white/60 text-slate-800 px-4 py-2.5 pr-10 rounded-xl border border-white/50 outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all text-sm"
+              className="w-full bg-white/40 hover:bg-white/60 text-slate-800 px-3 py-2.5 pr-8 rounded-xl border border-white/50 outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all text-sm"
             />
             {busca && (
               <button 
@@ -127,7 +196,7 @@ function App() {
         </div>
       </div>
 
-      {/* GPS Original com Z-index corrigido */}
+      {/* GPS Original */}
       <button 
         onClick={() => setSolicitarGps(prev => prev + 1)}
         className="absolute bottom-12 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-4 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all"
@@ -141,7 +210,7 @@ function App() {
         </div>
       </button>
 
-      {/* Gaveta Original com limite de altura e scroll oculto */}
+      {/* Gaveta Original */}
       <div 
         className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAberto ? 'translate-y-0' : 'translate-y-full'}`}
       >
@@ -159,25 +228,46 @@ function App() {
                 &#x2715;
               </button>
             </div>
-        {/*faz o \n funcionar */}
-        <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAberto.descricao}</p>
-        {/*O bloco de horários entra aqui*/}
-        {predioAberto.horarios && (
-          <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-base">🕒</span>
-              <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horário de Funcionamento</p>
-            </div>
-            <div className="space-y-2.5">
-              {Object.entries(predioAberto.horarios).map(([dia, hora]) => (
-                <div key={dia} className="flex justify-between border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{dia}</span>
-                  <span className="text-xs font-medium text-slate-700 leading-snug">{hora}</span>
+            
+            <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAberto.descricao}</p>
+            
+            {predioAberto.horarios && (
+              <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">🕒</span>
+                  <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horário de Funcionamento</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+                <div className="space-y-2.5">
+                  {Object.entries(predioAberto.horarios).map(([dia, hora]) => (
+                    <div key={dia} className="flex justify-between border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{dia}</span>
+                      <span className="text-xs font-medium text-slate-700 leading-snug">{hora}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {predioAberto.interno && (
+              <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">🚌</span>
+                  <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horários de Partida</p>
+                </div>
+                <div className="space-y-2.5">
+                  {Object.entries(predioAberto.interno).map(([turno, horarios]) => (
+                    <div key={turno} className="flex flex-col border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{turno}</span>
+                      <span className="text-xs font-medium text-slate-700 leading-snug">{horarios}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-[9px] text-slate-400 font-medium italic text-center">
+                  Horários sujeitos a atrasos de acordo com o trânsito do campus.
+                </p>
+              </div>
+            )}
+            
             {predioAberto.cardapio && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100">
                 <div className="flex items-center gap-2 mb-3">

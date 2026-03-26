@@ -11,11 +11,11 @@ export const predios = [
 
 // Restaurante Universitário - Lago - Requer atualização presencial semanal
   { 
-    id: "ru Lago", 
+    id: "ru_Lago", 
     nome: "RU - Restaurante Universitário - Lago", 
     lat: -32.07306634990571,  
     lng: -52.16590916190858, 
-    descricao: "Almoço: 11h00 - 14h00 | Janta: 18h00 - 21h.",
+    descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
       segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Frango Cubos Bovinos ao Molho, Grão de Bico com Molho Vermelho, Ovo Pochê, Parafuso Alho e Óleo, Alface, Cenoura Ralada, Mix de Grãos, Maçã",
       terca: "Arroz Branco, Arroz Integral com Linhaça, Feijão Preto, Strogonoff de Frango, Bife Acebolado, Cogumelos Refogados, Ovo Cozido, Batata Palha, Alface, Repolho, Macarronese, Melão",
@@ -26,11 +26,11 @@ export const predios = [
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
   { 
-    id: "ru CC", 
+    id: "ru_CC", 
     nome: "RU - Restaurante Universitário - Centro de Convivência", 
     lat: -32.075120, 
     lng: -52.166576, 
-    descricao: "Almoço: 11h00 - 14h00 | Janta: 18h00 - 21h.",
+    descricao: "Segunda a Sexta:\n☕ Café: 07h15 às 09h00\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00\n\nSábados, Domingos e Feriados:\n☕ Café: 08h30 às 09h45\n☀️ Almoço: 12h00 às 13h45\n🌙 Jantar: 18h30 às 20h00",
     cardapio: {
       segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Strogonoff de Carne Bovina, Filé de Frango ao Molho Mostarda, PTS com Moranga, Batata Palha, Couve Chinesa, Cenoura Cozida, Pepino, Laranja",
       terca: "Arroz Branco, Arroz Integral com Linhaça, Feijão Preto, Pastel de Carne, Cubos de Frango à Xadrez, Grão de Bico Crocante, Cenoura Sautê, Alface, Maionese de Beterraba, Rabanete em Conserva, Maçã",
@@ -40,8 +40,21 @@ export const predios = [
       sábado: "Arroz Branco, Arroz Integral, Feijão Preto, Bisteca Suína ao Molho Madeira, Cubos de Frango à Xadrez, Bolinho de Grão de Bico, Bolinho de Cenoura, Alface, Berinjela Cozida com Tempero Verde, Tomate com Cebola, Maçã",
       domingo: "Arroz Branco, Arroz Integral, Feijão Carioca, Carne de Panela, Coxa com Sobrecoxa Assada no Forno, Hambúrguer de Lentilha, Farofa com Legumes, Chicória, Beterraba Cozida, Pepino com Cebola, Creme de Baunilha com Calda de Maçã",
     }
-  },
-
+  },     
+    
+  // Horários Interno
+    { 
+      id: "interno", 
+      nome: "Ônibus Interno - FURG", 
+      lat: -32.0755005530394,
+      lng: -52.15362642286624,
+      descricao: "🚌 Transporte circular gratuito dentro do Campus Carreiros.\n\n* Vai até o OCEANTEC (parada de 2 min).\n** Saída da EQA.\n✉️ viaturas@furg.br",
+      interno: {
+        "Manhã": "06:50 • 07:10 • 07:30 • 07:50* • 08:15 • 08:50 • 09:30 • 10:25 • 11:05 • 11:30 • 12:00* • 12:15",
+        "Tarde": "12:45* • 13:15 • 13:40* • 14:00 • 14:50 • 15:30 • 16:00 • 16:50 • 17:30 • 18:05*",
+        "Noite": "18:30 • 18:55* • 19:20 • 20:25 • 20:40 • 21:35** • 22:20** • 22:45** • 23:15**"
+      }
+    },
   // Centro de Ciências Computacionais - Prédio administrativo e acadêmico
   { 
     id: "c3", 
