@@ -1,39 +1,39 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite'; // A importação que mantém a sua interface viva
+import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(), // O CSS de volta ao seu devido lugar
+    tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate', // Atualiza os dados em background sem travar a tela.
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logopet.png'], // Estáticos essenciais para o offline.
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logopet.png'],
       manifest: {
         name: 'Mapa FURG',
         short_name: 'Mapa FURG',
         description: 'Mapa interativo do Campus Carreiros',
-        theme_color: '#003366',
-        background_color: '#f8fafc',
-        display: 'standalone', // Oculta a barra do navegador, simulando um app nativo.
+        theme_color: '#003366', // Cor da barra do navegador (Azul FURG)
+        background_color: '#003366', // Cor de fundo da Splash Screen (Preencha com Azul PET para sumir o branco)
+        display: 'standalone',
         icons: [
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable' // IMPORTANTE: Avisa que o Android pode cortar essa imagem
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable' // IMPORTANTE: Avisa que o Android pode cortar essa imagem
           }
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'], // Faz o cache de toda a estrutura base.
-        
-        // Intercepta as imagens do OpenStreetMap para manter o mapa visualizável sem internet.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/[a-c]\.tile\.openstreetmap\.org\/.*/i,
@@ -42,7 +42,7 @@ export default defineConfig({
               cacheName: 'osm-tiles',
               expiration: {
                 maxEntries: 1000,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // Validade do cache: 30 dias.
+                maxAgeSeconds: 60 * 60 * 24 * 30
               },
               cacheableResponse: {
                 statuses: [0, 200]
