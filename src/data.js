@@ -51,13 +51,19 @@ export const predios = [
     descricao: "Núcleo de tecnologia, salas de aula e laboratórios de informática." 
   },
 
-  // Biblioteca Central - Unidade de acervo e estudo silencioso
-  { 
+{ 
     id: "sib", 
     nome: "Biblioteca Central - FURG", 
     lat: -32.07514,
     lng: -52.16794,
-    descricao: "Espaço para pesquisa, empréstimo de livros e áreas de estudo." 
+    horarios: {
+      "Segunda": "08h às 12h",
+      "Terça": "13h às 17h",
+      "Quarta": "17h às 21h",
+      "Quinta": "14h às 18h",
+      "Sexta": "14h às 18h"
+    },
+    descricao: "⚠️ Operação em horário reduzido devido à greve.\nEspaço para pesquisa e empréstimo de livros.\n📸 @sibfurg \n✉️ sib.direcao@furg.br \n📞 (53) 3293-5388",
   },
 
   // Bolha - Espaço de práticas esportivas e recreativas

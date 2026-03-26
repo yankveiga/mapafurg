@@ -3,15 +3,9 @@ import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-lea
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Base de dados local
 import { predios } from './data';
-
-// Logotipo. Para alterar, substitua o arquivo em src/assets/
 import logoPet from './assets/logopet.png'; 
 
-// ==============================================================================
-// 1. Rastreamento de Geolocalização
-// ==============================================================================
 function Localizador({ focar }) {
   const [posicao, setPosicao] = useState(null);
   const map = useMap();
@@ -27,7 +21,7 @@ function Localizador({ focar }) {
 
   useEffect(() => {
     if (focar) {
-      map.locate();
+      map.locate({ setView: false, enableHighAccuracy: true });
     }
   }, [focar, map]);
     
@@ -37,32 +31,22 @@ function Localizador({ focar }) {
       html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-[0_0_15px_rgba(59,130,246,0.8)] animate-pulse"></div>`,
       iconSize: [16, 16],
       iconAnchor: [8, 8],
-    })} />
+    })} zIndexOffset={1000} />
   );
 }
 
-// ==============================================================================
-// 2. Controlador de Câmera
-// ==============================================================================
 function Bussola({ alvo }) {
   const map = useMap();
   useEffect(() => {
     if (alvo) {
-      // Offset de -0.0005 na latitude joga o pino um pouco para cima na tela,
-      // evitando que ele fique escondido atrás da gaveta inferior.
       map.flyTo([alvo.lat - 0.0005, alvo.lng], 17, { animate: true, duration: 1.2 });
     }
   }, [alvo, map]);
   return null; 
 }
 
-// ==============================================================================
-// 3. Renderização de Marcadores Customizados
-// ==============================================================================
 const criarIcone = (sigla) => {
-  // Lógica para diminuir tamanho da letra se a sigla não couber
   const tamanhoFonte = sigla.length > 4 ? 'text-[7px]' : 'text-[10px]';
-
   return L.divIcon({
     className: 'bg-transparent',
     html: `<div class="bg-[#003366] text-white font-bold ${tamanhoFonte} rounded-full border-2 border-white shadow-md px-2 min-w-[40px] h-6 flex items-center justify-center whitespace-nowrap -translate-x-1/2 -translate-y-1/2">${sigla.toUpperCase()}</div>`,
@@ -71,28 +55,20 @@ const criarIcone = (sigla) => {
   });
 };
 
-// ==============================================================================
-// 4. Estrutura Principal da Interface
-// ==============================================================================
 function App() {
   const [busca, setBusca] = useState('');
   const [solicitarGps, setSolicitarGps] = useState(0);
-  
-  // NOVO: Estado para controlar qual prédio aparece na gaveta
   const [predioAberto, setPredioAberto] = useState(null);
 
-  // Lógica para interceptar o botão "Voltar" do celular e fechar a gaveta
   useEffect(() => {
     if (predioAberto) {
       window.history.pushState({ drawerOpen: true }, "");
     }
-
     const handlePopState = () => {
       if (predioAberto) {
         setPredioAberto(null);
       }
     };
-
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [predioAberto]);
@@ -102,31 +78,32 @@ function App() {
     [-32.0500, -52.1400]  
   ];
 
+  const removerAcentos = (str) => {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  };
+
+  const buscaLimpa = removerAcentos(busca.toLowerCase());
+
   const prediosFiltrados = predios.filter((p) => 
-    p.nome.toLowerCase().includes(busca.toLowerCase()) || 
-    p.id.toLowerCase().includes(busca.toLowerCase())
+    removerAcentos(p.nome.toLowerCase()).includes(buscaLimpa) || 
+    removerAcentos(p.id.toLowerCase()).includes(buscaLimpa)
   );
 
   const predioFocado = prediosFiltrados.length === 1 ? prediosFiltrados[0] : null;
 
   return (
-    <div className="h-screen w-full relative font-sans overflow-hidden bg-slate-50">
+    <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
       
-      {/* ------------------------------------------------------------------------
-          Cabeçalho e Barra de Busca
-          ------------------------------------------------------------------------ */}
-      <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[1000]">
+      {/* Busca Original */}
+      <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[9999]">
         <div className="flex flex-row items-center gap-3 p-2.5 bg-white/50 backdrop-blur-xl shadow-lg rounded-2xl border border-white/60">
-          
           <div className="flex flex-row items-center gap-2 pl-1">
             <img src={logoPet} alt="Logo PET C3" className="w-14 h-14 object-contain scale-110" onError={(e) => { e.target.style.display = 'none'; }} />
             <div className="flex flex-col">
               <h1 className="text-lg font-bold text-[#003366] leading-none tracking-tight">Mapa FURG</h1>
             </div>
           </div>
-
           <div className="h-8 w-px bg-slate-300/50" /> 
-
           <div className="relative flex-grow">
             <input 
               type="text" 
@@ -134,7 +111,7 @@ function App() {
               value={busca}
               onChange={(e) => {
                 setBusca(e.target.value);
-                setPredioAberto(null); // Fecha a gaveta se o usuário começar a buscar outra coisa
+                setPredioAberto(null);
               }}
               className="w-full bg-white/40 hover:bg-white/60 text-slate-800 px-4 py-2.5 pr-10 rounded-xl border border-white/50 outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all text-sm"
             />
@@ -150,12 +127,10 @@ function App() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------------
-          Controle de GPS
-          ------------------------------------------------------------------------ */}
+      {/* GPS Original com Z-index corrigido */}
       <button 
         onClick={() => setSolicitarGps(prev => prev + 1)}
-        className="absolute bottom-8 right-6 z-[1000] bg-white/50 backdrop-blur-xl p-4 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all"
+        className="absolute bottom-12 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-4 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all"
       >
         <div className="w-5 h-5 border-2 border-[#003366] rounded-full flex items-center justify-center relative">
           <div className="w-1.5 h-1.5 bg-[#003366] rounded-full"></div>
@@ -166,20 +141,12 @@ function App() {
         </div>
       </button>
 
-      {/* ------------------------------------------------------------------------
-          Gaveta Inferior (Bottom Sheet)
-          ------------------------------------------------------------------------ */}
-      {/* MUDANÇA AQUI:
-        1. max-h-[85vh]: A gaveta não cresce além de 85% da tela.
-        2. A barra de rolagem foi aplicada na div interna, não na gaveta em si.
-      */}
+      {/* Gaveta Original com limite de altura e scroll oculto */}
       <div 
-        className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[2000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAberto ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAberto ? 'translate-y-0' : 'translate-y-full'}`}
       >
         {predioAberto && (
-          // MUDANÇA AQUI: overflow-y-auto para permitir rolar, e as classes que escondem a scrollbar visualmente.
           <div className="p-6 pb-8 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            {/* Cabeçalho com Título e Botão Fechar (X) */}
             <div className="flex justify-between items-start mb-4">
               <div className="pr-4">
                 <h2 className="text-xl font-black text-[#003366] leading-tight">{predioAberto.nome}</h2>
@@ -192,10 +159,25 @@ function App() {
                 &#x2715;
               </button>
             </div>
-
-            <p className="text-sm text-slate-600 mb-5 leading-relaxed">{predioAberto.descricao}</p>
-
-            {/* Renderiza o cardápio com design focado na gaveta */}
+        {/*faz o \n funcionar */}
+        <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAberto.descricao}</p>
+        {/*O bloco de horários entra aqui*/}
+        {predioAberto.horarios && (
+          <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-base">🕒</span>
+              <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horário de Funcionamento</p>
+            </div>
+            <div className="space-y-2.5">
+              {Object.entries(predioAberto.horarios).map(([dia, hora]) => (
+                <div key={dia} className="flex justify-between border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{dia}</span>
+                  <span className="text-xs font-medium text-slate-700 leading-snug">{hora}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
             {predioAberto.cardapio && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100">
                 <div className="flex items-center gap-2 mb-3">
@@ -219,9 +201,6 @@ function App() {
         )}
       </div>
 
-      {/* ------------------------------------------------------------------------
-          Instância do Leaflet (Mapa Base)
-          ------------------------------------------------------------------------ */}
       <MapContainer 
         center={[-32.0732, -52.1651]} 
         zoom={16} 
@@ -236,7 +215,6 @@ function App() {
           attribution='&copy; OpenStreetMap'
         />
         
-        {/* A câmera foca no prédio buscado OU no prédio clicado para a gaveta */}
         <Bussola alvo={predioAberto || predioFocado} />
         <Localizador focar={solicitarGps} />
 
@@ -245,7 +223,6 @@ function App() {
             key={predio.id} 
             position={[predio.lat, predio.lng]} 
             icon={criarIcone(predio.id)}
-            // Gatilho do Clique: Abre a gaveta e joga os dados para o predioAberto
             eventHandlers={{
               click: () => setPredioAberto(predio),
             }}
