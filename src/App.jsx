@@ -199,18 +199,16 @@ function App() {
         </div>
       </div>
 
-      {/* GPS Original */}
+      {/* GPS com Mira SVG Perfeita */}
       <button 
         onClick={() => setSolicitarGps(prev => prev + 1)}
-        className="absolute bottom-12 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-4 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all"
+        className="absolute bottom-12 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all text-[#003366] hover:bg-white/70"
       >
-        <div className="w-5 h-5 border-2 border-[#003366] rounded-full flex items-center justify-center relative">
-          <div className="w-1.5 h-1.5 bg-[#003366] rounded-full"></div>
-          <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0.5 h-1.5 bg-[#003366]"></div>
-          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0.5 h-1.5 bg-[#003366]"></div>
-          <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-1.5 h-0.5 bg-[#003366]"></div>
-          <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-1.5 h-0.5 bg-[#003366]"></div>
-        </div>
+        <svg viewBox="0 0 24 24" className="w-7 h-7 fill-none stroke-current stroke-2" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="2" className="fill-current" />
+          <path d="M12 2v3m0 14v3M2 12h3m14 0h3" strokeLinecap="round"/>
+        </svg>
       </button>
 
       {/* Gaveta Original */}
