@@ -305,7 +305,7 @@ function App() {
       >
         <TileLayer 
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
-          attribution='&copy; OpenStreetMap | Desenvolvido pelo PET Ciências Computacionais' 
+          attribution='&copy; OpenStreetMap | © PET Ciências Computacionais – FURG' 
         />
         
         <Bussola alvo={predioAberto || predioFocado} />
