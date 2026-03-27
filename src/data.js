@@ -55,13 +55,17 @@ export const predios = [
         "Noite": "18:30 • 18:55* • 19:20 • 20:25 • 20:40 • 21:35** • 22:20** • 22:45** • 23:15**"
       }
     },
-  // Centro de Ciências Computacionais - Prédio administrativo e acadêmico
-  { 
+{ 
     id: "c3", 
     nome: "C3 - Centro de Ciências Computacionais", 
     lat: -32.072865, 
     lng: -52.168750, 
-    descricao: "Núcleo de tecnologia, salas de aula e laboratórios de informática." 
+    descricao: "Núcleo de tecnologia, salas de aula e laboratórios de informática.",
+    projetos: [
+      { nome: "PET C3", sala: "114" },
+      { nome: "LAMSA", sala: "Sala Y" },
+      { nome: "FBOT", sala: "Sala Z" }
+    ]
   },
 
 { 
@@ -143,6 +147,42 @@ export const predios = [
     lng: -52.16118404867057,
     descricao: "Administração central do campus." 
   },
+
+    // PROPLAD - Pró-Reitoria de Planejamento e Desenvolvimento - Coordenação acadêmica e administrativa dos cursos de planejamento e desenvolvimento
+  { 
+    id: "proplad", 
+    nome: "PROPLAD - Pró-Reitoria de Planejamento e Desenvolvimento", 
+    lat: -32.075679184918364,   
+    lng: -52.164463628058506,
+    descricao: "Coordenação acadêmica e administrativa dos cursos de planejamento e desenvolvimento." 
+  },
+
+    // PRAE - Pró-Reitoria de Assuntos Estudantis - Assistência e suporte ao estudante
+  { 
+    id: "prae", 
+    nome: "PRAE - Pró-Reitoria de Assuntos Estudantis", 
+    lat: -32.076585787869675,    
+    lng: -52.16488764742339,    
+    descricao: "Assistência e suporte ao estudante.",
+  },
+
+    // PROINFA - Pró-Reitoria de Infraestrutura
+  { 
+    id: "proinfa", 
+    nome: "PROINFA - Pró-Reitoria de Infraestrutura", 
+    lat: -32.07481441043893,  
+    lng: -52.16456266948454,
+    descricao: "A Pró-Reitoria de Infraestrutura – PROINFRA é o órgão que coordena as ações relativas à implantação, manutenção e ampliação da infraestrutura necessária ao desenvolvimento das atividades de ensino, de pesquisa, de extensão e de administração, conservando e construindo seu patrimônio a partir de processos ambientalmente sustentáveis, em consonância com o disposto no Estatuto, no Regimento Geral e na Política Ambiental da Universidade.",
+  },
+
+    // PROGEP - Pró-Reitoria de Gestão de Pessoas
+  { 
+    id: "progep", 
+    nome: "PROGEP - Pró-Reitoria de Gestão de Pessoas", 
+    lat: -32.0737109147389,   
+    lng: -52.163094213086545,
+    descricao: "A PROGEP - Pró-Reitoria de Gestão de Pessoas.",
+  },
   // Pavilhão 1 - Pavilhão de aulas teóricas
   { 
     id: "pav.1", 
@@ -197,6 +237,25 @@ export const predios = [
     descricao: "Prédio acadêmico e administrativo do Instituto de Ciências Econômicas, Administrativas e Contábeis." 
   },
 
+  // Prédio da Psicologia
+  { 
+    id: "psico", 
+    nome: "Prédio da Psicologia", 
+    lat: -32.07469157334473, 
+    lng: -52.170154775984244,
+    descricao: "Prédio acadêmico e administrativo de Psicologia." 
+  },
+
+ // CEAMECIM - Centro de Educação Ambiental, Ciências e Matemática
+  { 
+    id: "ceamecim", 
+    nome: "CEAMECIM - Centro de Educação Ambiental, Ciências e Matemática", 
+    lat: -32.076140944487726, 
+    lng: -52.17029789473499,
+    descricao: "O CEAMECIM é um centro da FURG que forma professores e desenvolve materiais e projetos para melhorar o ensino de Ciências, Matemática e Educação Ambiental. Ele começou em 1981 como um Clube de Ciências e, ao longo dos anos, virou um centro de pesquisa, extensão e formação, participando de programas nacionais, criando cursos, eventos e recursos didáticos. Hoje segue atuando como referência regional nessas áreas.\n\n🕐Horário de Funcionamento:\nSegunda à sexta-feira: 13h - 17h." 
+  },
+
+
   // Pavilhão 5 - Pavilhão de aulas teóricas
   { 
     id: "pav.5", 
@@ -241,14 +300,67 @@ export const predios = [
     lng: -52.16678003592912  ,
     descricao: "Instituto dedicado às ciências humanas, com salas de aula, laboratórios e administração." 
   },
-
-  // PRAE - Assistência e suporte ao estudante
+    //Centro de Línguas (IsF, CELE, Nutra)
   { 
-    id: "prae", 
-    nome: "PRAE - Assuntos Estudantis", 
-    lat: -32.07656630397785, 
-    lng: -52.1648646495357,
-    descricao: "Gestão de auxílios, bolsas e apoio psicossocial aos alunos." 
+    id: "CELE", 
+    nome: "Centro de Línguas (IsF, CELE, Nutra)", 
+    lat: -32.07649228260792, 
+    lng: -52.1697349491749,
+    descricao: "🕐Horário de Funcionamento:\nQuarta à sexta-feira: 08h - 17h30.\n\nEspanhol, Francês, Inglês, Libras e Português como língua de acolhimento, estrangeira.\n\n📸 @cele.ila.furg" 
+  },
+
+      //ICB Bloco 5 - Botânica, Genética e Ecologia
+
+  { 
+    id: "ICB - 5", 
+    nome: "ICB Bloco 5 - Botânica, Genética e Ecologia", 
+    lat: -32.07700968748661,
+    lng: -52.16949238317977,
+    descricao: "Botânica, Genética e Ecologia" 
+  },
+
+  //CIEFI
+  { 
+    id: "ciefi", 
+    nome: "CIEFI - Comunidade de Indagação em Ensino de Física Interdisciplinar", 
+    lat: -32.07675627738589,  
+    lng: -52.17026078228786,
+    descricao: "O CIEFI é um grupo de pesquisa da FURG que estuda e desenvolve novas formas de ensinar Ciências, especialmente Física, em diálogo com escolas. Trabalha com uma abordagem sociocultural, usando metodologias qualitativas e a ideia de indagação dialógica. Desenvolve formação com professores, cria materiais abertos, apoia projetos colaborativos como a Rede SACCI e o Jardim Maker, e integra universidade e educação básica para fortalecer práticas pedagógicas inovadoras." 
+  },
+
+  //CFOP
+  { 
+    id: "cfop", 
+    nome: "CFOP - Centro de Formação e Orientação Pedagógica", 
+    lat: -32.07695627793926, 
+    lng: -52.17017897491583,
+    descricao: "O CFOP é um centro da FURG que oferece formação e orientação pedagógica para os alunos." 
+  },
+  //CFOP
+  { 
+    id: "cfop", 
+    nome: "CFOP - Centro de Formação e Orientação Pedagógica", 
+    lat: -32.07695627793926, 
+    lng: -52.17017897491583,
+    descricao: "O CFOP é um centro da FURG que oferece formação e orientação pedagógica para os alunos." 
+  },
+
+  // ICB - Instituto de Ciências Biológicas - Prédio acadêmico e laboratorial
+  { 
+    id: "icb", 
+    nome: "ICB - Instituto de Ciências Biológicas", 
+    lat: -32.07599472933909,  
+    lng: -52.16895440683658,
+    descricao: "Instituto dedicado às ciências biológicas, com laboratórios e instalações modernas." 
+  },
+
+  // ICB - ICB Bloco 1 Direção e Secretarias
+  { 
+    id: "icb - 1", 
+    nome: "ICB Bloco 1 Direção e Secretarias", 
+    lat: -32.07576582589792, 
+    lng: -52.16860046068133,
+    descricao: "ICB Bloco 1: Direção, Vice direção, Administração, Secretaria Geral, Secretaria de Pós Graduação, Secretaria de Graduação, sala de reuniões." 
   },
 
   // Casa do Estudante - Hotel de Trânsito e moradia estudantil
@@ -321,6 +433,51 @@ export const predios = [
     lat: -32.0699925825384,   
     lng: -52.161924961616435,
     descricao: "Instituto de Oceanografia" 
+  },
+
+// IO - Laboratório de zooplâncton
+  { 
+    id: "io - lab 1", 
+    nome: "IO - Laboratório de zooplâncton", 
+    lat: -32.0696302305501,    
+    lng: -52.15995989599516,
+    descricao: "Laboratório de zooplâncton" 
+  },
+
+// IO - Laboratório de Ecologia do Ictioplâncton
+  { 
+    id: "io - lab 2 ", 
+    nome: "IO - Laboratório de Ecologia do Ictioplâncton", 
+    lat: -32.069334563641895,    
+    lng: -52.16088363570775,
+    descricao: "Laboratório de Ecologia do Ictioplâncton" 
+  },
+
+// CEOCEAN - Centro de Estudos dos Oceanos e Clima
+  { 
+    id: "ceocean", 
+    nome: "CEOCEAN - Centro de Estudos dos Oceanos e Clima", 
+    lat: -32.068543196414154,  
+    lng: -52.1616756691524,
+    descricao: "Centro de Estudos dos Oceanos e Clima" 
+  },
+
+// ESANTAR 
+  { 
+    id: "esantar", 
+    nome: "ESANTAR - Estação de Apoio Antártico", 
+    lat: -32.06800373667353, 
+    lng: -52.16290834644639,
+    descricao: "Estação de Apoio Antártico" 
+  },
+
+// Galpão Crioulo - Crioulinho
+  { 
+    id: "galpao", 
+    nome: "Galpão Crioulo - Crioulinho", 
+    lat: -32.06608064485465, 
+    lng: -52.16010531104867,
+    descricao: "Galpão Crioulo - Crioulinho" 
   },
 
 // IE - Instituto de Educação - Prédio acadêmico e administrativo

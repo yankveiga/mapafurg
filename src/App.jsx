@@ -233,7 +233,28 @@ function App() {
             </div>
             
             <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAberto.descricao}</p>
-            
+            {predioAberto.projetos && (
+              <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-base">📋</span>
+                  <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Projetos & Laboratórios</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {predioAberto.projetos.map((projeto, index) => (
+                    <div key={index} className="bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-sm flex flex-col hover:border-[#003366]/30 transition-colors">
+                      <span className="text-[11px] font-black text-[#003366] leading-none">
+                        {projeto.nome || projeto}
+                      </span>
+                      {projeto.sala && (
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">
+                          {projeto.sala}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {predioAberto.horarios && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
                 <div className="flex items-center gap-2 mb-3">
