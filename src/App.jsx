@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
+import { traduzirBusca } from './buscas';
 import { predios } from './data';
 import logoPet from './assets/logopetvetorizado.svg';
 
@@ -95,7 +95,7 @@ function App() {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   };
 
-  const buscaLimpa = removerAcentos(busca.toLowerCase());
+  const buscaLimpa = removerAcentos(traduzirBusca(busca));
 
   const prediosFiltrados = predios.filter((p) => 
     removerAcentos(p.nome.toLowerCase()).includes(buscaLimpa) || 
@@ -238,18 +238,38 @@ function App() {
                   <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Projetos & Laboratórios</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {predioAberto.projetos.map((projeto, index) => (
-                    <div key={index} className="bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-sm flex flex-col hover:border-[#003366]/30 transition-colors">
-                      <span className="text-[11px] font-black text-[#003366] leading-none">
-                        {projeto.nome || projeto}
-                      </span>
-                      {projeto.sala && (
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">
-                          {projeto.sala}
+                  {predioAberto.projetos.map((projeto, index) => {
+                    const conteudo = (
+                      <>
+                        <span className="text-[11px] font-black text-[#003366] leading-none">
+                          {projeto.nome || projeto}
                         </span>
-                      )}
-                    </div>
-                  ))}
+                        {projeto.sala && (
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">
+                            {projeto.sala}
+                          </span>
+                        )}
+                      </>
+                    );
+
+                    const estilosBase = "bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-sm flex flex-col transition-all";
+                    
+                    return projeto.link ? (
+                      <a 
+                        key={index} 
+                        href={projeto.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className={`${estilosBase} hover:border-[#003366] hover:shadow-md cursor-pointer`}
+                      >
+                        {conteudo}
+                      </a>
+                    ) : (
+                      <div key={index} className={`${estilosBase} hover:border-[#003366]/30`}>
+                        {conteudo}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

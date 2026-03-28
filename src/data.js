@@ -55,16 +55,17 @@ export const predios = [
         "Noite": "18:30 • 18:55* • 19:20 • 20:25 • 20:40 • 21:35** • 22:20** • 22:45** • 23:15**"
       }
     },
-{ 
+  // C3 - Centro de Ciências Computacionais
+    { 
     id: "c3", 
     nome: "C3 - Centro de Ciências Computacionais", 
     lat: -32.072865, 
     lng: -52.168750, 
     descricao: "Núcleo de tecnologia, salas de aula e laboratórios de informática.",
     projetos: [
-      { nome: "PET C3", sala: "114" },
-      { nome: "LAMSA", sala: "Sala Y" },
-      { nome: "FBOT", sala: "Sala Z" }
+      { nome: "PET C3", sala: "114", link: "https://instagram.com/petc3furg" },
+      { nome: "LAMSA", sala: "Sala Y" }, // Sem link
+      { nome: "FBOT", sala: "Sala Z", link: "https://instagram.com/furgbot" }
     ]
   },
 
