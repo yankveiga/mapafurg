@@ -368,7 +368,7 @@ export const predios = [
 
   // Casa do Estudante 1
   { 
-    id: "ceu 1", 
+    id: "ceu_1", 
     nome: "Casa do Estudante - 1", 
     lat: -32.07769106768267,    
     lng: -52.1701271431193,
@@ -377,7 +377,7 @@ export const predios = [
 
   // Casa do Estudante 2
   { 
-    id: "ceu 2", 
+    id: "ceu_2", 
     nome: "Casa do Estudante - 2", 
     lat: -32.07751698311312,   
     lng: -52.16967316305177,
@@ -386,7 +386,7 @@ export const predios = [
 
   // Casa do Estudante 3
   { 
-    id: "ceu 3", 
+    id: "ceu_3", 
     nome: "Casa do Estudante - 3", 
     lat: -32.07796637853579,   
     lng: -52.170144828788274,
@@ -395,7 +395,7 @@ export const predios = [
 
   // Casa do Estudante 4
   { 
-    id: "ceu 4", 
+    id: "ceu_4", 
     nome: "Casa do Estudante - 4", 
     lat: -32.078259648049354, 
     lng: -52.17003767259812,

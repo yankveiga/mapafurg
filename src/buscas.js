@@ -19,18 +19,26 @@ export const traduzirBusca = (query) => {
   if (!textoLimpo) return { idsExtras: [], termosBusca: [] };
 
   const rotas = {
+    // Restaurantes
     ru: ['ru_CC', 'ru_Lago'],
     rucc: ['ru_CC'],
     rulago: ['ru_Lago'],
     restaurante: ['ru_CC', 'ru_Lago'],
     restauranteuniversitario: ['ru_CC', 'ru_Lago'],
     bandejao: ['ru_CC', 'ru_Lago'],
+    // C3
     c3: ['c3'],
+    computacao: ['c3'],
     petc3: ['c3'],
     petcienciascomputacionais: ['c3'],
     pet: ['c3'],
+    //Bibiloteca
     biblioteca: ['sib'],
     sib: ['sib'],
+    // Casa do estudante
+    casa: ['ceu_1', 'ceu_2', 'ceu_3', 'ceu_4', 'hotel'],
+    ceu: ['ceu_1', 'ceu_2', 'ceu_3', 'ceu_4', 'hotel'],
+    casadoestudante: ['ceu_1', 'ceu_2', 'ceu_3', 'ceu_4', 'hotel'],
   };
 
   let alvos = [];

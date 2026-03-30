@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { normalizarTextoBusca, traduzirBusca } from './buscas';
@@ -55,6 +56,22 @@ const criarIcone = (sigla) => {
   });
 };
 
+// Função que estiliza os agrupamentos (clusters) para manter o padrão visual do app
+const criarIconeCluster = (cluster) => {
+  const quantidade = cluster.getChildCount();
+  
+  // A gravidade: mais prédios, maior a bolinha e menor a borda
+  const tamanho = quantidade > 8 ? 'w-12 h-12 text-base' : 'w-9 h-9 text-sm';
+  const sombra = quantidade > 8 ? 'shadow-[0_0_25px_rgba(0,51,102,0.5)]' : 'shadow-md';
+
+  return L.divIcon({
+    html: `<div class="bg-gradient-to-br from-[#003366] to-blue-800 text-white font-black rounded-full border-2 border-white/90 ${sombra} ${tamanho} flex items-center justify-center -translate-x-1/2 -translate-y-1/2 transition-all hover:scale-110">${quantidade}</div>`,
+    className: 'bg-transparent',
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  });
+};
+
 function App() {
   const [busca, setBusca] = useState('');
   const [solicitarGps, setSolicitarGps] = useState(0);
@@ -89,16 +106,13 @@ function App() {
     [-32.0500, -52.1400]  
   ];
 
-  // A MÁGICA ACONTECE AQUI
   const { idsExtras, termosBusca } = traduzirBusca(busca);
 
   const prediosFiltrados = !busca.trim()
     ? predios
     : predios.filter((p) => {
-        // Se a busca adivinhou o atalho através do dicionário dinâmico, mostre o prédio
         if (idsExtras.includes(p.id)) return true;
 
-        // Se não, caça os termos no corpo da string
         const camposBuscaveis = [
           p.nome,
           p.id,
@@ -120,9 +134,6 @@ function App() {
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
       
-      {/* ------------------------------------------------------------------------
-          Overlay do Menu (Camada escura para fechar clicando fora)
-          ------------------------------------------------------------------------ */}
       {menuAberto && (
         <div 
           onClick={() => setMenuAberto(false)} 
@@ -130,9 +141,6 @@ function App() {
         ></div>
       )}
 
-      {/* ------------------------------------------------------------------------
-          Menu Lateral (Sidebar)
-          ------------------------------------------------------------------------ */}
       <div 
         className={`absolute left-0 top-0 bottom-0 w-[280px] bg-white/95 backdrop-blur-2xl z-[12000] border-r border-white/50 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${menuAberto ? 'translate-x-0' : '-translate-x-full'}`}
       >
@@ -171,7 +179,6 @@ function App() {
         </div>
       </div>
 
-      {/* Busca com Hambúrguer Embutido */}
       <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[9999]">
         <div className="flex flex-row items-center gap-3 p-2.5 bg-white/50 backdrop-blur-xl shadow-lg rounded-2xl border border-white/60">
           
@@ -211,7 +218,6 @@ function App() {
         </div>
       </div>
 
-      {/* GPS com Mira SVG Perfeita */}
       <button 
         onClick={() => setSolicitarGps(prev => prev + 1)}
         className="absolute bottom-12 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all text-[#003366] hover:bg-white/70"
@@ -361,16 +367,23 @@ function App() {
         <Bussola alvo={predioAberto || predioFocado} />
         <Localizador focar={solicitarGps} />
 
-        {prediosFiltrados.map((predio) => (
-          <Marker 
-            key={predio.id} 
-            position={[predio.lat, predio.lng]} 
-            icon={criarIcone(predio.id)}
-            eventHandlers={{
-              click: () => setPredioAberto(predio),
-            }}
-          />
-        ))}
+        <MarkerClusterGroup
+          chunkedLoading
+          iconCreateFunction={criarIconeCluster}
+          maxClusterRadius={40}
+        >
+          {prediosFiltrados.map((predio) => (
+            <Marker 
+              key={predio.id} 
+              position={[predio.lat, predio.lng]} 
+              icon={criarIcone(predio.id)}
+              eventHandlers={{
+                click: () => setPredioAberto(predio),
+              }}
+            />
+          ))}
+        </MarkerClusterGroup>
+
       </MapContainer>
     </div>
   );
