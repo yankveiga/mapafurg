@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { traduzirBusca } from './buscas';
+import { normalizarTextoBusca, traduzirBusca } from './buscas';
 import { predios } from './data';
 import logoPet from './assets/logopetvetorizado.svg';
 
@@ -60,7 +60,6 @@ function App() {
   const [solicitarGps, setSolicitarGps] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
   
-  // Controle de abertura da barra lateral (Hambúrguer)
   const [menuAberto, setMenuAberto] = useState(false);
 
   useEffect(() => {
@@ -76,7 +75,6 @@ function App() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [predioAberto]);
 
-  // Lógica para abrir locais direto pelo menu lateral
   const selecionarItemCurado = (id) => {
     const predio = predios.find(p => p.id === id);
     if (predio) {
@@ -91,16 +89,31 @@ function App() {
     [-32.0500, -52.1400]  
   ];
 
-  const removerAcentos = (str) => {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  };
+  // A MÁGICA ACONTECE AQUI
+  const { idsExtras, termosBusca } = traduzirBusca(busca);
 
-  const buscaLimpa = removerAcentos(traduzirBusca(busca));
+  const prediosFiltrados = !busca.trim()
+    ? predios
+    : predios.filter((p) => {
+        // Se a busca adivinhou o atalho através do dicionário dinâmico, mostre o prédio
+        if (idsExtras.includes(p.id)) return true;
 
-  const prediosFiltrados = predios.filter((p) => 
-    removerAcentos(p.nome.toLowerCase()).includes(buscaLimpa) || 
-    removerAcentos(p.id.toLowerCase()).includes(buscaLimpa)
-  );
+        // Se não, caça os termos no corpo da string
+        const camposBuscaveis = [
+          p.nome,
+          p.id,
+          ...(p.aliases ?? []),
+          ...((p.projetos ?? []).map((projeto) =>
+            typeof projeto === 'string' ? projeto : projeto.nome ?? ''
+          )),
+        ]
+          .map(normalizarTextoBusca)
+          .filter(Boolean);
+
+        return termosBusca.some((termo) =>
+          camposBuscaveis.some((campo) => new RegExp(`\\b${termo}`).test(campo))
+        );
+      });
 
   const predioFocado = prediosFiltrados.length === 1 ? prediosFiltrados[0] : null;
 
@@ -170,7 +183,6 @@ function App() {
           </button>
 
           <div className="flex flex-row items-center gap-2 pl-1">
-            {/* O Portal foi inserido aqui */}
             <a href="https://petc3.vercel.app/" target="_blank" rel="noopener noreferrer" className="cursor-pointer block">
               <img src={logoPet} alt="Logo PET C3" className="w-14 h-14 object-contain scale-110 hover:scale-125 transition-transform duration-300" onError={(e) => { e.target.style.display = 'none'; }} />
             </a>
@@ -211,7 +223,6 @@ function App() {
         </svg>
       </button>
 
-      {/* Gaveta Original */}
       <div 
         className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAberto ? 'translate-y-0' : 'translate-y-full'}`}
       >

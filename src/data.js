@@ -337,14 +337,7 @@ export const predios = [
     lng: -52.17017897491583,
     descricao: "O CFOP é um centro da FURG que oferece formação e orientação pedagógica para os alunos." 
   },
-  //CFOP
-  { 
-    id: "cfop", 
-    nome: "CFOP - Centro de Formação e Orientação Pedagógica", 
-    lat: -32.07695627793926, 
-    lng: -52.17017897491583,
-    descricao: "O CFOP é um centro da FURG que oferece formação e orientação pedagógica para os alunos." 
-  },
+
 
   // ICB - Instituto de Ciências Biológicas - Prédio acadêmico e laboratorial
   { 
