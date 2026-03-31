@@ -65,11 +65,23 @@ export const predios = [
     projetos: [
       { nome: "PET C3", sala: "Sala 114", link: "https://instagram.com/petc3furg" },
       { nome: "LAMSA", sala: "Sala 108" }, // Sem link
-      { nome: "FBOT", sala: "Sala 225", link: "https://instagram.com/furgbot" },
-      { nome: "E-colab", sala: "Sala 117", link: "https://www.instagram.com/ecolab.furg/" },
-      { nome: "NAUTEC", sala: "Sala 117", link: "https://www.instagram.com/nautec.furg/" },
       { nome: "E-colab", sala: "Sala 117", link: "https://www.instagram.com/ecolab.furg/" },// quando tiver sigla
-      { sigla: "LabGeo", nome: "Lab. de Tecnologia de Geoinformação", sala: "122" }, // quando nome for extenso
+      { nome: "FBOT", sala: "Sala 225", link: "https://instagram.com/furgbot" },
+      { nome: "NAUTEC", sala: "Sala 226", link: "https://www.instagram.com/nautec.furg/" },
+      { nome: "REHABOT", sala: "Sala 116", link: "" },
+      { nome: "Safe Eye", sala: "Sala 116", link: "" },
+      { sigla: "DTWIN", nome: "Digital Twin", sala: "Sala 116", link: "" },
+      { nome: "WEARABLE", sala: "Sala 116", link: "" },
+      { nome: "GSDE", sala: "Sala 219", link: "" },
+      { nome: "BEVLOG", sala: "Sala 212", link: "" },
+      { nome: "NAVMS", sala: "Sala 212", link: "" },
+      { nome: "Mão Extra", sala: "Sala 213", link: "" },
+      { nome: "Igapó", sala: "Sala 213", link: "" },
+      { nome: "Saca Agulhas", sala: "Sala 213", link: "" },
+      { nome: "GINFO", sala: "Sala 220", link: "" },
+      { nome: "GFLEX", sala: "Sala 220", link: "" },
+      { sigla: "SYSTEMS", nome: "Lab. Sistemas de Computação", sala: "Sala 219", link: "" },
+      { sigla: "LabDigEmb", nome: "Lab. Sistemas Digitas e Embarcados", sala: "Sala 219", link: "" },
       { sigla: "LabTecEA", nome: "Lab. de Tecnologias Educacionais e Assistidas", sala: "111" },
       { sigla: "LabBioComp", nome: "Lab. de Biologia Computacional", sala: "112" },
     ]
@@ -224,7 +236,53 @@ export const predios = [
     nome: "Pavilhão 2", 
     lat: -32.074486678988016, 
     lng: -52.167919257529874, 
-    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus." 
+    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus.",
+    projetos: [
+      //Primeiro Andar
+      { nome: "Sala 2101", sigla: "" },
+      { nome: "Sala 2102", sigla: "" },
+      { nome: "Sala 2103", sigla: "" },
+      { nome: "Sala 2104", sigla: "" },
+      { nome: "Sala 2105", sigla: "" },
+      { nome: "Sala 2106", sigla: "" },
+      { nome: "2017", sala: "SALAEST" },
+      { nome: "Sala 2108", sala: "EAC - IMEF" },
+      { nome: "Sala 2109", sala: "EAC - IMEF" },
+      { nome: "Sala 2110", sigla: "" },
+      { nome: "Sala 2111", sala: "TEMAT" },
+      { nome: "Sala 2112", sala: "EAC - EQA" },
+      { nome: "Sala 2113", sala: "Matemática Aplicada" },
+      { nome: "Sala 2114", sigla: "" },
+      { nome: "Sala 2115", sigla: "" },
+      { nome: "Sala 2116", sigla: "" },
+      { nome: "Sala 2117", sigla: "" },
+      { nome: "Sala 2118", sigla: "" },
+      { nome: "Sala 2119", sigla: "" },
+      { nome: "Sala 2120", sigla: "" },
+      { nome: "Sala 2121", sigla: "" },
+      { nome: "Sala 2122", sigla: "" },
+      { nome: "Sala 2123", sigla: "" },
+      //Segundo Andar
+      { nome: "Sala 2201", sigla: "" },
+      { nome: "Sala 2202", sigla: "" },
+      { nome: "Sala 2203", sigla: "" },
+      { nome: "Sala 2204", sigla: "" },
+      { nome: "Sala 2205", sigla: "" },
+      { nome: "Sala 2206", sigla: "" },
+      { nome: "Sala 2207", sigla: "" },
+      { nome: "Sala 2208", sigla: "" },
+      { nome: "Sala 2209", sigla: "" },
+      { nome: "Sala 2210", sala: "LCARQ" },
+      { nome: "Sala 2211", sigla: "" },
+      { nome: "Sala 2212", sigla: "" },
+      { nome: "Sala 2213", sala: "DA Física" },
+      { nome: "Sala 2214", sala: "DA ECOMP" },
+      { nome: "Sala 2215", sigla: "" },
+      { nome: "Sala 2216", sigla: "" },
+      { nome: "Sala 2217", sigla: "" },
+      { nome: "Sala 2218", sigla: "" },
+      { nome: "Sala 2219", sigla: "" },
+    ] 
   },
 
   // Pavilhão 3 - Pavilhão de aulas teóricas
@@ -242,7 +300,45 @@ export const predios = [
     nome: "Pavilhão 4", 
     lat: -32.075816497097094, 
     lng: -52.166162588417414, 
-    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus." 
+    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus.", 
+    projetos: [
+      //Primeiro Andar
+      { nome: "Sala 4101", sigla: "" },
+      { nome: "Sala 4102", sigla: "" },
+      { nome: "Sala 4103", sigla: "" },
+      { nome: "Sala 4104", sigla: "" },
+      { nome: "Sala 4105", sigla: "" },
+      { nome: "Sala 4106", sigla: "" },
+      { nome: "Sala 4107", sigla: "" },
+      { nome: "Sala 4108", sigla: "" },
+      { nome: "Sala 4109", sigla: "" },
+      { nome: "Sala 4110", sigla: "" },
+      { nome: "Sala 4111", sigla: "" },
+      { nome: "Sala 4112", sigla: "" },
+      { nome: "Sala 4113", sigla: "" },
+      { nome: "Sala 4114", sigla: "" },
+      { nome: "Sala 4115", sigla: "" },
+      //Segundo Andar
+      { nome: "Sala 4201", sigla: "" },
+      { nome: "Sala 4202", sigla: "" },
+      { nome: "Sala 4203", sigla: "" },
+      { nome: "Sala 4204", sigla: "" },
+      { nome: "Sala 4205", sigla: "" },
+      { nome: "Sala 4206", sigla: "" },
+      { nome: "Sala 4207", sigla: "" },
+      { nome: "Sala 4208", sigla: "" },
+      { nome: "Sala 4209", sigla: "" },
+      { nome: "Sala 4210", sigla: "" },
+      { nome: "Sala 4211", sigla: "" },
+      { nome: "Sala 4212", sigla: "" },
+      { nome: "Sala 4213", sigla: "" },
+      { nome: "Sala 4214", sigla: "" },
+      { nome: "Sala 4215", sigla: "" },
+      { nome: "Sala 4216", sigla: "" },
+      { nome: "Sala 4217", sigla: "" },
+      { nome: "Sala CAHIS", sigla: "" },
+      { nome: "Sala PAIETS", sigla: "" },
+    ]
   },
 
   // FADIR - Faculdade de Direito - Prédio acadêmico e administrativo
@@ -263,13 +359,14 @@ export const predios = [
     descricao: "Prédio acadêmico e administrativo do Instituto de Ciências Econômicas, Administrativas e Contábeis." 
   },
 
-  // Prédio da Psicologia
+  // ICHI - Psicologia
   { 
     id: "psico", 
-    nome: "Prédio da Psicologia", 
+    nome: "ICHI - Psicologia", 
     lat: -32.07469157334473, 
     lng: -52.170154775984244,
     descricao: "Prédio acadêmico e administrativo de Psicologia." 
+    
   },
 
  // CEAMECIM - Centro de Educação Ambiental, Ciências e Matemática
