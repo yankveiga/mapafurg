@@ -102,7 +102,7 @@ function App() {
   };
 
     const limitesCampus = [
-    [-32.07951524265205, -52.17138291262093], // Coordenada Mapa- Canto Sudoeste
+    [-32.078239242336856, -52.16588063740093], // Coordenada Mapa- Canto Sudoeste
     [-32.06538581584017, -52.158486907617224]  // Coordenada Mapa - Canto Nordeste 
   ];
 
