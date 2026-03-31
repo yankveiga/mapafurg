@@ -26,19 +26,26 @@ export const traduzirBusca = (query) => {
     restaurante: ['ru_CC', 'ru_Lago'],
     restauranteuniversitario: ['ru_CC', 'ru_Lago'],
     bandejao: ['ru_CC', 'ru_Lago'],
+    
     // C3
     c3: ['c3'],
     computacao: ['c3'],
     petc3: ['c3'],
     petcienciascomputacionais: ['c3'],
     pet: ['c3'],
+
     //Bibiloteca
     biblioteca: ['sib'],
     sib: ['sib'],
+
     // Casa do estudante
     casa: ['ceu_1', 'ceu_2', 'ceu_3', 'ceu_4', 'hotel'],
     ceu: ['ceu_1', 'ceu_2', 'ceu_3', 'ceu_4', 'hotel'],
     casadoestudante: ['ceu_1', 'ceu_2', 'ceu_3', 'ceu_4', 'hotel'],
+
+    // Pavilhão 1
+    diretoriaacademicoeq: ['pavilhao_1'],
+    diretoriaacademicoengenhariaquimica: ['pavilhao_1'],
   };
 
   let alvos = [];

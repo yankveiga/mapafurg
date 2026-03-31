@@ -258,9 +258,16 @@ function App() {
                   {predioAberto.projetos.map((projeto, index) => {
                     const conteudo = (
                       <>
-                        <span className="text-[11px] font-black text-[#003366] leading-none">
-                          {projeto.nome || projeto}
+                        <span className="text-[12px] font-black text-[#003366] leading-none">
+                          {projeto.sigla || projeto.nome}
                         </span>
+                        
+                        {projeto.sigla && (
+                          <span className="text-[8px] font-medium text-slate-500 mt-1 leading-tight line-clamp-1">
+                            {projeto.nome}
+                          </span>
+                        )}
+                        
                         {projeto.sala && (
                           <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">
                             {projeto.sala}

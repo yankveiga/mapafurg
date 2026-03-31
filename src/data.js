@@ -17,11 +17,11 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Frango Cubos Bovinos ao Molho, Grão de Bico com Molho Vermelho, Ovo Pochê, Parafuso Alho e Óleo, Alface, Cenoura Ralada, Mix de Grãos, Maçã",
-      terca: "Arroz Branco, Arroz Integral com Linhaça, Feijão Preto, Strogonoff de Frango, Bife Acebolado, Cogumelos Refogados, Ovo Cozido, Batata Palha, Alface, Repolho, Macarronese, Melão",
-      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Frango à Xadrez, Carne Moída, PTS ao Molho, Ovo Pochê, Legumes Sauteé, Alface, Beterraba Cozida, Tomate com Cebola, Melancia",
-      quinta: "Arroz Branco, Arroz Integral com Linhaça, Feijão Carioca, Frango ao Molho, Carré Acebolado, Pastel de Brócolis com Cenoura, Ovo Cozido, Farofa Colorida, Alface, Pepino, Cenoura Cozida, Laranja",
-      sexta: "Arroz Branco, Arroz Integral, Feijão Preto, Carne Moída ao Molho, Peixe Empanado, PST ao Molho, Ovo Pochê, Purê de Batata, Alface, Chuchu, Beterraba Ralada, Banana",
+      segunda: "Não divulgado pelo RU Lago",
+      terca: "Não divulgado pelo RU Lago",
+      quarta: "Não divulgado pelo RU Lago",
+      quinta: "Não divulgado pelo RU Lago",
+      sexta: "Não divulgado pelo RU Lago",
     }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
@@ -32,13 +32,13 @@ export const predios = [
     lng: -52.166576, 
     descricao: "Segunda a Sexta:\n☕ Café: 07h15 às 09h00\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00\n\nSábados, Domingos e Feriados:\n☕ Café: 08h30 às 09h45\n☀️ Almoço: 12h00 às 13h45\n🌙 Jantar: 18h30 às 20h00",
     cardapio: {
-      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Strogonoff de Carne Bovina, Filé de Frango ao Molho Mostarda, PTS com Moranga, Batata Palha, Couve Chinesa, Cenoura Cozida, Pepino, Laranja",
-      terca: "Arroz Branco, Arroz Integral com Linhaça, Feijão Preto, Pastel de Carne, Cubos de Frango à Xadrez, Grão de Bico Crocante, Cenoura Sautê, Alface, Maionese de Beterraba, Rabanete em Conserva, Maçã",
-      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Cubos de Suínos ao Molho BBQ, Fricassê de Frango, Legumes Sauteados, Massa Espaguete ao Alho e Óleo, Alface, Chuchu com Milho, Salada Caicó, Melão",
-      quinta: "Arroz Branco, Arroz Integral, Lentilha, Bife Bovino Acebolado, Peixe à Milanesa, Tomate Recheado com PTS, Purê de Batatas Especial, Mix de Folhas, Cenoura Cozida, Rabanete Ralado, Banana",
-      sexta: "Arroz Branco, Arroz Integral, Feijão Carioca, Lasanha à Bolonhesa, Bife de Frango Crocante, Strogonoff de Cogumelos, Jardineira de Legumes, Alface, Soja em Grãos Refogado com Tempero Verde, Salada Naútica, Laranja",
-      sábado: "Arroz Branco, Arroz Integral, Feijão Preto, Bisteca Suína ao Molho Madeira, Cubos de Frango à Xadrez, Bolinho de Grão de Bico, Bolinho de Cenoura, Alface, Berinjela Cozida com Tempero Verde, Tomate com Cebola, Maçã",
-      domingo: "Arroz Branco, Arroz Integral, Feijão Carioca, Carne de Panela, Coxa com Sobrecoxa Assada no Forno, Hambúrguer de Lentilha, Farofa com Legumes, Chicória, Beterraba Cozida, Pepino com Cebola, Creme de Baunilha com Calda de Maçã",
+      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Bife Bovino Acebolado, Iscas de Frango ao Molho Mostarda, Grão de Bico Crocante, Massa ao Sugo, Alface, Chuchu com Milho, Cenoura Ralada, Laranja",
+      terca: "Arroz Branco, Arroz Integral, Feijão Preto, Strogonoff de Carne Bovina, Bife de Frango Grelhado, Bolinho de Lentilha, Batata Palha, Alface, Beterraba Cozida, Tabule, Maçã",
+      quarta: "Arroz Branco, Arroz Integral, Feijão Carioca, Filé de Suínos ao Molho BBQ, Cubos de Frango à Xadrez, Cogumelos Acebolados, Jardineira de Legumes, Alface, Soja em Grãos,Tomate com Cebola e Pimentão, Melão",
+      quinta: "Arroz Branco, Arroz Integral, Feijão Preto, Carne de Panela, Coxa com Sobrecoxa Assada no Forno, PTS Refogado, Farofa com Legumes, Couve Chinesa, Abobrinha Cozida com Milho, Salada Caicó, Banana",
+      sexta: "Arroz Branco, Arroz Integral, Lentilha, Cuoos Suínos ao Molho Madeira, Fricassê de Frango, Grão de Bico Acebolado, Massa Espaguete ao Alho e Óleo, Mix de Folhas, Maionese de Beterraba, Tabule, Laranja",
+      sábado: "Arroz Branco, Arroz Integral, Feijão Preto, Lasanha à Bolonhesa, Bife de Frango à Milanesa, PTS Refogado, Cenoura Sautê, Alface, Cebola Cozida com Shoyu, Salada Nauticá, Maçã",
+      domingo: "Arroz Branco, Arroz Integral, Feijão Preto, Carne Assada no Forno, Coxa com Sobrecoxa Assada no Forno, Linguiça Toscana, PTS Refogado, Pão de Alho com Ervas, Alface, Maionese de Batata com Tempero Verde e Ervilha, Maçã, Chocolate",
     }
   },     
     
@@ -61,11 +61,17 @@ export const predios = [
     nome: "C3 - Centro de Ciências Computacionais", 
     lat: -32.072865, 
     lng: -52.168750, 
-    descricao: "Núcleo de tecnologia, salas de aula e laboratórios de informática.",
+    descricao: "Núcleo de tecnologia, salas de aula e laboratórios de informática.\n📸 @c3.furg \n",
     projetos: [
-      { nome: "PET C3", sala: "114", link: "https://instagram.com/petc3furg" },
-      { nome: "LAMSA", sala: "Sala Y" }, // Sem link
-      { nome: "FBOT", sala: "Sala Z", link: "https://instagram.com/furgbot" }
+      { nome: "PET C3", sala: "Sala 114", link: "https://instagram.com/petc3furg" },
+      { nome: "LAMSA", sala: "Sala 108" }, // Sem link
+      { nome: "FBOT", sala: "Sala 225", link: "https://instagram.com/furgbot" },
+      { nome: "E-colab", sala: "Sala 117", link: "https://www.instagram.com/ecolab.furg/" },
+      { nome: "NAUTEC", sala: "Sala 117", link: "https://www.instagram.com/nautec.furg/" },
+      { nome: "E-colab", sala: "Sala 117", link: "https://www.instagram.com/ecolab.furg/" },// quando tiver sigla
+      { sigla: "LabGeo", nome: "Lab. de Tecnologia de Geoinformação", sala: "122" }, // quando nome for extenso
+      { sigla: "LabTecEA", nome: "Lab. de Tecnologias Educacionais e Assistidas", sala: "111" },
+      { sigla: "LabBioComp", nome: "Lab. de Biologia Computacional", sala: "112" },
     ]
   },
 
@@ -190,7 +196,26 @@ export const predios = [
     nome: "Pavilhão 1", 
     lat: -32.074699393757385, 
     lng: -52.16877498604861, 
-    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus." 
+    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus.",
+    projetos: [
+      { nome: "Sala 1101", sigla: "" },
+      { nome: "Sala 1102", sigla: "" },
+      { nome: "Sala 1103", sigla: "" },
+      { nome: "Sala 1104", sigla: "" },
+      { nome: "Sala 1105", sigla: "" },
+      { nome: "Sala 1106", sigla: "" },
+      { nome: "Sala 1107", sigla: "" },
+      { nome: "Sala 1108", sigla: "" },
+      { nome: "Sala 1201", sigla: "" },
+      { nome: "Sala 1202", sigla: "" },
+      { nome: "Sala 1203", sigla: "" },
+      { nome: "Sala 1204", sigla: "" },
+      { nome: "Sala 1205", sigla: "" },
+      { nome: "Sala 1206", sigla: "" },
+      { nome: "Sala 1207", sigla: "" },
+      { nome: "Sala 1208", sigla: "" },
+      { nome: "Sala DAEQ", sigla: "" },
+    ]
   },
 
   // Pavilhão 2 - Pavilhão de aulas teóricas
