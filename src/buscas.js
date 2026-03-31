@@ -30,9 +30,15 @@ export const traduzirBusca = (query) => {
     // C3
     c3: ['c3'],
     computacao: ['c3'],
+    automacao: ['c3'],
+    robotica: ['c3'],
+    sistemasdeinformacao: ['c3'],
     petc3: ['c3'],
     petcienciascomputacionais: ['c3'],
     pet: ['c3'],
+    furgbot: ['c3'],
+    tecnologiadegeoinformacao: ['c3'],
+    
 
     //Bibiloteca
     biblioteca: ['sib'],
