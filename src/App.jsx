@@ -102,8 +102,8 @@ function App() {
   };
 
   const limitesCampus = [
-  [-32.0798, -52.1740], // Sudoeste expandido
-  [-32.0640, -52.1520]  // Nordeste expandido
+    [-32.0815, -52.1765], // Sudoeste — expandido de verdade
+    [-32.0625, -52.1500]  // Nordeste — bem folgado
   ];
 
   const { idsExtras, termosBusca } = traduzirBusca(busca);
