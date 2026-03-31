@@ -101,9 +101,9 @@ function App() {
     }
   };
 
-  const limitesCampus = [
-    [-32.0950, -52.1850], 
-    [-32.0500, -52.1400]  
+    const limitesCampus = [
+    [-32.07951524265205, -52.17138291262093], // Coordenada Mapa- Canto Sudoeste
+    [-32.06538581584017, -52.158486907617224]  // Coordenada Mapa - Canto Nordeste 
   ];
 
   const { idsExtras, termosBusca } = traduzirBusca(busca);
@@ -360,9 +360,9 @@ function App() {
       <MapContainer 
         center={[-32.0732, -52.1651]} 
         zoom={16} 
-        minZoom={14} 
+        minZoom={15} // Impede que a câmera afaste o suficiente para ver o vazio além das bordas
         maxBounds={limitesCampus} 
-        maxBoundsViscosity={1.0} 
+        maxBoundsViscosity={1.0} // Parede sólida, sem elástico
         className="h-full w-full z-0"
         zoomControl={false} 
       >
