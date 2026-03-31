@@ -101,9 +101,9 @@ function App() {
     }
   };
 
-    const limitesCampus = [
-    [-32.078239242336856, -52.16588063740093], // Coordenada Mapa- Canto Sudoeste
-    [-32.06538581584017, -52.158486907617224]  // Coordenada Mapa - Canto Nordeste 
+  const limitesCampus = [
+    [-32.078239242336856, -52.17239062734332], // Sudoeste (min lat, min lng)
+    [-32.06528682009909, -52.15357808497921]   // Nordeste (max lat, max lng)
   ];
 
   const { idsExtras, termosBusca } = traduzirBusca(busca);
