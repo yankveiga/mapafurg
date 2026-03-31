@@ -102,8 +102,8 @@ function App() {
   };
 
   const limitesCampus = [
-    [-32.078239242336856, -52.17239062734332], // Sudoeste (min lat, min lng)
-    [-32.06528682009909, -52.15357808497921]   // Nordeste (max lat, max lng)
+  [-32.0798, -52.1740], // Sudoeste expandido
+  [-32.0640, -52.1520]  // Nordeste expandido
   ];
 
   const { idsExtras, termosBusca } = traduzirBusca(busca);
