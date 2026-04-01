@@ -19,7 +19,7 @@ export const predios = [
     cardapio: {
       segunda: "Não divulgado pelo RU Lago",
       terca: "Não divulgado pelo RU Lago",
-      quarta: "Não divulgado pelo RU Lago",
+      quarta:  "Arroz branco, Arroz integral, Feijão preto, Lasanha à bolonhesa, Frango com molho, Tomate recheado, Ovo pochê, Virado de repolho, Alface, Chuchu com cenoura, Pepino, Bergamota",
       quinta: "Não divulgado pelo RU Lago",
       sexta: "Não divulgado pelo RU Lago",
     }
