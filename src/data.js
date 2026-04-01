@@ -560,22 +560,41 @@ export const predios = [
     descricao: "Instituto de Oceanografia" 
   },
 
-// IO - Laboratório de zooplâncton
+// IO - Laboratório de Ensino
   { 
-    id: "io - lab 1", 
-    nome: "IO - Laboratório de zooplâncton", 
-    lat: -32.0696302305501,    
-    lng: -52.15995989599516,
-    descricao: "Laboratório de zooplâncton" 
+    id: "io - lab", 
+    nome: "IO - Laboratório de Ensino", 
+    lat: -32.07057040328547, 
+    lng: -52.160024054813086,
+    descricao: "Instituto de Oceanografia - Laboratório de Ensino" 
   },
 
-// IO - Laboratório de Ecologia do Ictioplâncton
+// IO - Oceanografia Biológica
   { 
-    id: "io - lab 2 ", 
-    nome: "IO - Laboratório de Ecologia do Ictioplâncton", 
+    id: "io - OB", 
+    nome: "IO - Oceanografia Biológica", 
+    lat: -32.0696302305501,    
+    lng: -52.15995989599516,
+    descricao: "Instituto de Oceanografia - Oceanografia Biológica", 
+  },
+
+// IO - Recursos Renováveis
+  { 
+    id: "io - RR ", 
+    nome: "IO - Recursos Renováveis", 
     lat: -32.069334563641895,    
     lng: -52.16088363570775,
-    descricao: "Laboratório de Ecologia do Ictioplâncton" 
+    descricao: "Instituto de Oceanografia - Recursos Renováveis" 
+  },
+
+ 
+// IO - Oceanografia Biológica/Oceonagrafia Química
+  { 
+    id: "io - OB/OQ ", 
+    nome: "IO - Oceanografia Biológica/Oceonagrafia Química", 
+    lat: -32.06889135547181,    
+    lng: -52.15991339188701,
+    descricao: "Instituto de Oceanografia - Oceanografia Biológica/Oceonagrafia Química",
   },
 
 // CEOCEAN - Centro de Estudos dos Oceanos e Clima
@@ -603,6 +622,15 @@ export const predios = [
     lat: -32.06608064485465, 
     lng: -52.16010531104867,
     descricao: "Galpão Crioulo - Crioulinho" 
+  },
+
+  // Centro de Biodiversidade Subtropical - CBS
+  { 
+    id: "CBS", 
+    nome: "Centro de Biodiversidade Subtropical - CBS", 
+    lat: -32.07770142546249, 
+    lng: -52.17143196613112,
+    descricao: "Centro de Biodiversidade Subtropical - CBS" 
   },
 
 // IE - Instituto de Educação - Prédio acadêmico e administrativo
