@@ -397,6 +397,15 @@ export const predios = [
     descricao: "Bloco de salas de aula utilizado por diversos cursos do campus." 
   },  
 
+  // CEMESUL
+  { 
+    id: "ceme-sul", 
+    nome: "Centro de Microscopia Eletrônica do Sul - CEMESUL", 
+    lat:  -32.0765851057674, 
+    lng: -52.167390763859046,
+    descricao: "🕐Horário de Funcionamento:\nSegunda à sexta-feira: Das 08h30 às 12h e 13h30 às 17h\n📸 @ceme.sul \n✉️ cemesul@furg.br \n📞 (53) 3293-5312\n🌐 www.cemesul.furg.br\n\nO CEME-SUL é um centro da FURG dedicado ao uso e ao compartilhamento de equipamentos de microscopia eletrônica e técnicas associadas. Ele apoia pesquisas, inovação, ensino e extensão em diversas áreas, oferecendo uma estrutura multiusuária de alta complexidade. Sua missão é impulsionar a produção científica ao facilitar o acesso qualificado a análises avançadas para a comunidade acadêmica." 
+  },
+
   // Instituto de Ciências Humanas e da Informação - Prédio acadêmico e administrativo
   { 
     id: "ICHI", 
@@ -408,8 +417,8 @@ export const predios = [
 
   // ILA - Instituto de Letras e Artes - Prédio acadêmico e administrativo
   { 
-    id: "ILA", 
-    nome: "Instituto de Letras e Artes", 
+    id: "Letras", 
+    nome: "ILA - Prédio Letras", 
     lat: -32.07719400395277,  
     lng: -52.16678479568807, 
     descricao: "Instituto dedicado às ciências humanas, com salas de aula, laboratórios e administração." 
