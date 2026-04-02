@@ -552,7 +552,7 @@ export const predios = [
   },
 
 // Anexo 2
-  { 
+  {
     id: "anexo_2", 
     nome: "Anexo 2", 
     lat: -32.07400202635447,   
@@ -561,8 +561,8 @@ export const predios = [
     projetos: [
       { nome: "PET Civil", sala: "K22", link: "https://instagram.com/petcivilfurg" },
       { nome: "PET SabEst", sala: "J05", link: "https://instagram.com/petsabest" },
-      { nome: "Atena Jr", sala: "J07", link: "https://instagram.com/atenaconsultoriajr" },
       { nome: "Pérola Negra", sala: "Q06", link: "https://instagram.com/perolanegranauti" },
+      { nome: "Atena Jr", sala: "J07", link: "https://instagram.com/atenaconsultoriajr" },
       { nome: "LabEst", sala: "J06", link: "" },
       { nome: "GETrans", sala: "J10", link: "https://instagram.com/getransfurg" },
       { sigla: "GATC", nome: "Grupo de Astrofísica Teórica e Computacional", sala: "J13", link: "" },
