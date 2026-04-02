@@ -551,6 +551,34 @@ export const predios = [
     descricao: "Escola dedicada à formação em engenharia, com laboratórios e instalações modernas." 
   },
 
+// Anexo 2
+  { 
+    id: "anexo_2", 
+    nome: "Anexo 2", 
+    lat: -32.07400202635447,   
+    lng: -52.16734807839626,
+    descricao: "Salas pertencentes aos projetos do IMEF e da EE.",
+    projetos: [
+      { nome: "PET Civil", sala: "K22", link: "https://instagram.com/petcivilfurg" },
+      { nome: "PET SabEst", sala: "J05", link: "https://instagram.com/petsabest" },
+      { nome: "Atena Jr", sala: "J07", link: "https://instagram.com/atenaconsultoriajr" },
+      { nome: "Pérola Negra", sala: "Q06", link: "https://instagram.com/perolanegranauti" },
+      { nome: "LabEst", sala: "J06", link: "" },
+      { nome: "GETrans", sala: "J10", link: "https://instagram.com/getransfurg" },
+      { sigla: "GATC", nome: "Grupo de Astrofísica Teórica e Computacional", sala: "J13", link: "" },
+      { sigla: "C3D", nome: "Ciência 3D Impressa", sala: "J16", link: "" },
+      { nome: "DAECE", sala: "O03", link: "" },
+      { nome: "PH Consultoria Jr.", sala: "O06", link: "" },
+      { nome: "AeroFURG", sala: "O07", link: "https://www.instagram.com/aerofurg" },
+      { sigla: "LST", nome: "Laboratório de Sistemas Térmicos", sala: "O07", link: "" },
+      { nome: "LETRON", sala: "O09", link: "" },
+      { sigla: "ObsAstro", nome: "Observatório Astronômico", sala: "" , link: "" },
+      { nome: "LANSD", sala: "" , link: "" },
+      { sigla: "AstroSul", nome: "Astro e Sul", sala: "P14", link: "" },
+    ]
+  },
+
+
 // IO - Instituto de Oceanografia - Prédio acadêmico e laboratorial
   { 
     id: "io", 

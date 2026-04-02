@@ -35,7 +35,7 @@ export const traduzirBusca = (query) => {
     sistemasdeinformacao: ['c3'],
     petc3: ['c3'],
     petcienciascomputacionais: ['c3'],
-    pet: ['c3'],
+    pet: ['c3', 'anexo_2'],
     furgbot: ['c3'],
     tecnologiadegeoinformacao: ['c3'],
     
@@ -52,7 +52,80 @@ export const traduzirBusca = (query) => {
     // Pavilhão 1
     diretoriaacademicoeq: ['pavilhao_1'],
     diretoriaacademicoengenhariaquimica: ['pavilhao_1'],
-  };
+
+    // Anexo 2
+    // PET Civil — K22
+    petcivil: ["k22"],
+    civil: ["k22"],
+    petciv: ["k22"],
+
+    // PET SabEst — J05
+    petsabest: ["j05"],
+    sabest: ["j05"],
+
+    // Atena Jr — J07
+    atenajr: ["j07"],
+    atena: ["j07"],
+
+    // Pérola Negra — Q06
+    perolanegranautica: ["q06"],
+    perolanegra: ["q06"],
+    perola: ["q06"],
+    pn: ["q06"],
+
+    // LabEst — J06
+    labest: ["j06"],
+    laboratorioestatistica: ["j06"],
+    estatistica: ["j06"],
+
+    // GETrans — J10
+    getrans: ["j10"],
+    geotransportes: ["j10"],
+    transportes: ["j10"],
+
+    // GATC — J13
+    gatc: ["j13"],
+    astrocomputacional: ["j13"],
+    astrofisicateorica: ["j13"],
+    grupoastrofisica: ["j13"],
+    grupoteorica: ["j13"],
+
+    // C3D — J16
+    ciencia3d: ["j16"],
+    impressao3d: ["j16"],
+    // DAECE — O03
+    daece: ["o03"],
+    diretoriodeengenharia: ["o03"],
+    centroestudantilengenharia: ["o03"],
+    // PH Consultoria Jr. — O06
+    phconsultoria: ["o06"],
+    phjr: ["o06"],
+    // AeroFURG — O07
+    aerofurg: ["o07"],
+    aero: ["o07"],
+    aeronautica: ["o07"],
+    // Laboratório de Sistemas Térmicos (LST) — O07
+    lst: ["o07"],
+    sistemastermicos: ["o07"],
+    termicos: ["o07"],
+    // LETRON — O09
+    letron: ["o09"],
+    roboticaletron: ["o09"],
+    robolet: ["o09"],
+    // Observatório Astronômico — sem sala
+    obsastro: [""],
+    observatorioastronomico: [""],
+    astronomia: [""],
+    observatorio: [""],
+    // LANSD — sem sala
+    lansd: [""],
+    nucleodesoftdev: [""], // suposição
+    softwaredevelopment: [""],
+    // AstroSul — P14
+    astrosul: ["p14"],
+    astroesul: ["p14"],
+    astrolab: ["p14"]
+  } 
 
   let alvos = [];
 
