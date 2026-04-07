@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
@@ -6,6 +6,21 @@ import 'leaflet/dist/leaflet.css';
 import { normalizarTextoBusca, traduzirBusca } from './buscas';
 import { predios } from './data';
 import logoPet from './assets/logopetvetorizado.svg';
+
+const ID_ONIBUS = 'interno';
+const POSICAO_INICIAL_ONIBUS = (() => {
+  const onibus = predios.find((predio) => predio.id === ID_ONIBUS);
+  return onibus
+    ? { lat: onibus.lat, lng: onibus.lng, timestamp: null }
+    : { lat: -32.07548437944093, lng: -52.153652687153084, timestamp: null };
+})();
+
+const STATUS_WS = {
+  conectando: 'Conectando...',
+  conectado: 'Ao vivo',
+  erro: 'Erro de conexão',
+  desconectado: 'Offline',
+};
 
 function Localizador({ focar }) {
   const [posicao, setPosicao] = useState(null);
@@ -47,6 +62,15 @@ function Bussola({ alvo }) {
 }
 
 const criarIcone = (sigla) => {
+  if (sigla === ID_ONIBUS) {
+    return L.divIcon({
+      className: 'bg-transparent',
+      html: `<div class="bg-[#0f766e] text-white font-black text-[13px] rounded-full border-2 border-white shadow-lg px-2 min-w-[44px] h-7 flex items-center justify-center whitespace-nowrap -translate-x-1/2 -translate-y-1/2">🚌</div>`,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0],
+    });
+  }
+
   const tamanhoFonte = sigla.length > 4 ? 'text-[7px]' : 'text-[10px]';
   return L.divIcon({
     className: 'bg-transparent',
@@ -76,8 +100,67 @@ function App() {
   const [busca, setBusca] = useState('');
   const [solicitarGps, setSolicitarGps] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
-  
   const [menuAberto, setMenuAberto] = useState(false);
+  const [posicaoOnibus, setPosicaoOnibus] = useState(POSICAO_INICIAL_ONIBUS);
+  const [statusWs, setStatusWs] = useState('desconectado');
+  const reconnectRef = useRef(null);
+
+  const wsUrl = useMemo(() => {
+    if (import.meta.env.VITE_WS_URL) {
+      return import.meta.env.VITE_WS_URL;
+    }
+    const protocolo = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocolo}//${window.location.hostname}:8080`;
+  }, []);
+
+  useEffect(() => {
+    let ws = null;
+    let ativo = true;
+
+    const conectar = () => {
+      if (!ativo) return;
+
+      setStatusWs('conectando');
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => setStatusWs('conectado');
+
+      ws.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type !== 'bus_location') return;
+          if (payload.busId !== ID_ONIBUS) return;
+          if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return;
+
+          setPosicaoOnibus({
+            lat: payload.lat,
+            lng: payload.lng,
+            timestamp: payload.timestamp ?? new Date().toISOString(),
+          });
+        } catch {
+          // Ignora mensagens não-JSON enviadas por clientes externos.
+        }
+      };
+
+      ws.onerror = () => setStatusWs('erro');
+
+      ws.onclose = () => {
+        if (!ativo) return;
+        setStatusWs('desconectado');
+        reconnectRef.current = window.setTimeout(conectar, 3000);
+      };
+    };
+
+    conectar();
+
+    return () => {
+      ativo = false;
+      if (reconnectRef.current) {
+        window.clearTimeout(reconnectRef.current);
+      }
+      ws?.close();
+    };
+  }, [wsUrl]);
 
   useEffect(() => {
     if (predioAberto) {
@@ -129,7 +212,14 @@ function App() {
         );
       });
 
-  const predioFocado = prediosFiltrados.length === 1 ? prediosFiltrados[0] : null;
+  const prediosComPosicaoAoVivo = prediosFiltrados.map((predio) =>
+    predio.id === ID_ONIBUS ? { ...predio, ...posicaoOnibus } : predio
+  );
+
+  const predioFocado = prediosComPosicaoAoVivo.length === 1 ? prediosComPosicaoAoVivo[0] : null;
+  const predioAbertoAtual = predioAberto
+    ? prediosComPosicaoAoVivo.find((predio) => predio.id === predioAberto.id) ?? predioAberto
+    : null;
 
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
@@ -229,15 +319,19 @@ function App() {
         </svg>
       </button>
 
+      <div className="absolute bottom-12 left-6 z-[9999] px-3 py-2 rounded-xl bg-white/70 backdrop-blur-xl border border-white/60 text-[11px] font-bold text-slate-700 shadow-lg">
+        Ônibus: {STATUS_WS[statusWs]}
+      </div>
+
       <div 
-        className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAberto ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAbertoAtual ? 'translate-y-0' : 'translate-y-full'}`}
       >
-        {predioAberto && (
+        {predioAbertoAtual && (
           <div className="p-6 pb-8 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="flex justify-between items-start mb-4">
               <div className="pr-4">
-                <h2 className="text-xl font-black text-[#003366] leading-tight">{predioAberto.nome}</h2>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{predioAberto.id}</span>
+                <h2 className="text-xl font-black text-[#003366] leading-tight">{predioAbertoAtual.nome}</h2>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{predioAbertoAtual.id}</span>
               </div>
               <button 
                 onClick={() => setPredioAberto(null)}
@@ -247,15 +341,15 @@ function App() {
               </button>
             </div>
             
-            <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAberto.descricao}</p>
-            {predioAberto.projetos && (
+            <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAbertoAtual.descricao}</p>
+            {predioAbertoAtual.projetos && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">📋</span>
                   <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Projetos & Laboratórios</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {predioAberto.projetos.map((projeto, index) => {
+                  {predioAbertoAtual.projetos.map((projeto, index) => {
                     const conteudo = (
                       <>
                         <span className="text-[12px] font-black text-[#003366] leading-none">
@@ -297,14 +391,14 @@ function App() {
                 </div>
               </div>
             )}
-            {predioAberto.horarios && (
+            {predioAbertoAtual.horarios && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">🕒</span>
                   <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horário de Funcionamento</p>
                 </div>
                 <div className="space-y-2.5">
-                  {Object.entries(predioAberto.horarios).map(([dia, hora]) => (
+                  {Object.entries(predioAbertoAtual.horarios).map(([dia, hora]) => (
                     <div key={dia} className="flex justify-between border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{dia}</span>
                       <span className="text-xs font-medium text-slate-700 leading-snug">{hora}</span>
@@ -314,34 +408,42 @@ function App() {
               </div>
             )}
             
-            {predioAberto.interno && (
+            {predioAbertoAtual.interno && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">🚌</span>
                   <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horários de Partida</p>
                 </div>
+                <p className="text-[10px] font-semibold text-slate-500 mb-3">
+                  Localização em tempo real: {STATUS_WS[statusWs]}
+                </p>
                 <div className="space-y-2.5">
-                  {Object.entries(predioAberto.interno).map(([turno, horarios]) => (
+                  {Object.entries(predioAbertoAtual.interno).map(([turno, horarios]) => (
                     <div key={turno} className="flex flex-col border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{turno}</span>
                       <span className="text-xs font-medium text-slate-700 leading-snug">{horarios}</span>
                     </div>
                   ))}
                 </div>
+                {posicaoOnibus.timestamp && (
+                  <p className="mt-3 text-[9px] text-slate-500 text-center">
+                    Última atualização: {new Date(posicaoOnibus.timestamp).toLocaleTimeString('pt-BR')}
+                  </p>
+                )}
                 <p className="mt-4 text-[9px] text-slate-400 font-medium italic text-center">
                   Horários sujeitos a atrasos de acordo com o trânsito do campus.
                 </p>
               </div>
             )}
             
-            {predioAberto.cardapio && (
+            {predioAbertoAtual.cardapio && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-base">🍴</span>
                   <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Cardápio da Semana</p>
                 </div>
                 <div className="space-y-2.5">
-                  {Object.entries(predioAberto.cardapio).map(([dia, prato]) => (
+                  {Object.entries(predioAbertoAtual.cardapio).map(([dia, prato]) => (
                     <div key={dia} className="flex flex-col border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{dia}</span>
                       <span className="text-xs font-medium text-slate-700 leading-snug">{prato}</span>
@@ -371,7 +473,7 @@ function App() {
           attribution='&copy; OpenStreetMap | © PET Ciências Computacionais – FURG' 
         />
         
-        <Bussola alvo={predioAberto || predioFocado} />
+        <Bussola alvo={predioAbertoAtual || predioFocado} />
         <Localizador focar={solicitarGps} />
 
         <MarkerClusterGroup
@@ -379,7 +481,7 @@ function App() {
           iconCreateFunction={criarIconeCluster}
           maxClusterRadius={40}
         >
-          {prediosFiltrados.map((predio) => (
+          {prediosComPosicaoAoVivo.map((predio) => (
             <Marker 
               key={predio.id} 
               position={[predio.lat, predio.lng]} 

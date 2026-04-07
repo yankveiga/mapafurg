@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WS Tester - Ônibus Interno</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #f1f5f9;
+        color: #0f172a;
+        margin: 0;
+        padding: 24px;
+      }
+      .card {
+        max-width: 640px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+      }
+      button {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+        background: #003366;
+        color: white;
+      }
+      button[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      pre {
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 10px;
+        padding: 12px;
+        overflow: auto;
+        min-height: 180px;
+      }
+      .status {
+        margin: 10px 0;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>WebSocket Tester - Ônibus Interno</h1>
+      <p>Use esta página para simular o celular enviando localização.</p>
+
+      <label>URL WebSocket</label>
+      <input id="url" value="ws://localhost:8080" />
+
+      <div class="row" style="margin-top: 12px">
+        <div>
+          <label>Latitude</label>
+          <input id="lat" type="number" step="any" value="-32.07548437944093" />
+        </div>
+        <div>
+          <label>Longitude</label>
+          <input id="lng" type="number" step="any" value="-52.153652687153084" />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 14px">
+        <button id="connect">Conectar</button>
+        <button id="send" disabled>Enviar coordenadas</button>
+        <button id="disconnect" disabled>Desconectar</button>
+      </div>
+
+      <p class="status" id="status">Status: desconectado</p>
+      <pre id="log"></pre>
+    </div>
+
+    <script>
+      let ws = null;
+      const $ = (id) => document.getElementById(id);
+      const log = (text) => {
+        $("log").textContent += `${text}\n`;
+        $("log").scrollTop = $("log").scrollHeight;
+      };
+
+      const setStatus = (text) => {
+        $("status").textContent = `Status: ${text}`;
+      };
+
+      $("connect").addEventListener("click", () => {
+        const url = $("url").value.trim();
+        ws = new WebSocket(url);
+
+        ws.onopen = () => {
+          setStatus("conectado");
+          $("send").disabled = false;
+          $("disconnect").disabled = false;
+          log(`[open] conectado em ${url}`);
+        };
+
+        ws.onmessage = (event) => {
+          log(`[recv] ${event.data}`);
+        };
+
+        ws.onerror = () => {
+          log("[error] erro na conexao");
+        };
+
+        ws.onclose = () => {
+          setStatus("desconectado");
+          $("send").disabled = true;
+          $("disconnect").disabled = true;
+          log("[close] conexao encerrada");
+        };
+      });
+
+      $("send").addEventListener("click", () => {
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+        const payload = {
+          type: "bus_location",
+          busId: "interno",
+          lat: Number($("lat").value),
+          lng: Number($("lng").value),
+          timestamp: new Date().toISOString(),
+        };
+
+        ws.send(JSON.stringify(payload));
+        log(`[send] ${JSON.stringify(payload)}`);
+      });
+
+      $("disconnect").addEventListener("click", () => {
+        ws?.close();
+      });
+    </script>
+  </body>
+</html>

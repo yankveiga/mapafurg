@@ -147,7 +147,83 @@ A configuração está em [vite.config.js](./vite.config.js) e inclui:
 
 ## Observações
 
-- Hoje a base de dados é estática e fica no front-end.
-- Não há backend.
+- Hoje a base de dados dos prédios é estática e fica no front-end.
+- O backend WebSocket foi adicionado apenas para posição em tempo real do ônibus.
 - Se mudar nome de `id`, revise a busca e os atalhos do menu.
 - Se adicionar assets do PWA, atualize também o `vite.config.js`.
+
+## Rastreamento em tempo real do ônibus (WebSocket)
+
+O projeto agora suporta posição do `interno` por WebSocket.
+
+### 1. Subir o servidor WebSocket
+
+```bash
+npm run ws:server
+```
+
+Por padrão sobe em `ws://0.0.0.0:8080`.
+
+Variáveis opcionais:
+
+- `WS_PORT` (default: `8080`)
+- `WS_HOST` (default: `0.0.0.0`)
+- `BUS_ID` (default: `interno`)
+
+### Fluxo prático para desenvolvimento local (1 comando)
+
+```bash
+npm run dev:all
+```
+
+Esse comando sobe:
+
+- Frontend Vite em `http://localhost:5173`
+- Servidor WebSocket em `ws://0.0.0.0:8080`
+
+### 2. Formato da mensagem de localização
+
+```json
+{
+  "type": "bus_location",
+  "busId": "interno",
+  "lat": -32.07548,
+  "lng": -52.15365,
+  "heading": 90,
+  "speed": 8.2,
+  "accuracy": 5.4,
+  "timestamp": "2026-04-07T12:00:00.000Z"
+}
+```
+
+Campos obrigatórios: `type`, `lat`, `lng`.
+
+### 3. Testar sem celular
+
+Com o `npm run dev` ativo, abra:
+
+- `http://localhost:5173/ws-tester.html`
+
+Conecte em `ws://localhost:8080` e clique em "Enviar coordenadas".
+
+### 4. Integrar front ao servidor
+
+O front usa:
+
+- `VITE_WS_URL`, se definido
+- fallback automático para `ws://<host-do-site>:8080` (ou `wss://` em HTTPS)
+
+Exemplo:
+
+```bash
+VITE_WS_URL=ws://localhost:8080 npm run dev
+```
+
+## App Android dedicado (auto-start)
+
+Foi adicionada a pasta [`android-bus-location`](./android-bus-location) com um app Android nativo que:
+
+- inicia rastreamento automaticamente ao abrir
+- roda em `Foreground Service`
+- tenta reiniciar após reboot do aparelho
+- envia payload `bus_location` no formato esperado pelo servidor
