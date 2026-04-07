@@ -1,11 +1,24 @@
-import { WebSocketServer, WebSocket } from 'ws';
+import http from 'node:http';
 import process from 'node:process';
+import { WebSocketServer, WebSocket } from 'ws';
 
-const PORT = Number(process.env.WS_PORT ?? 8080);
+const PORT = Number(process.env.PORT ?? process.env.WS_PORT ?? 8080);
 const HOST = process.env.WS_HOST ?? '0.0.0.0';
 const BUS_ID_PADRAO = process.env.BUS_ID ?? 'interno';
+const AUTH_TOKEN = process.env.WS_AUTH_TOKEN ?? '';
 
-const wss = new WebSocketServer({ port: PORT, host: HOST });
+const server = http.createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ ok: true, service: 'bus-ws', time: new Date().toISOString() }));
+    return;
+  }
+
+  res.writeHead(200, { 'content-type': 'text/plain; charset=utf-8' });
+  res.end('Bus location WebSocket server online.');
+});
+
+const wss = new WebSocketServer({ server });
 let ultimaLocalizacao = null;
 
 const enviarJson = (cliente, payload) => {
@@ -17,6 +30,7 @@ const enviarJson = (cliente, payload) => {
 const validarMensagemLocalizacao = (payload) => {
   if (!payload || typeof payload !== 'object') return false;
   if (payload.type !== 'bus_location') return false;
+  if (AUTH_TOKEN && payload.token !== AUTH_TOKEN) return false;
   if (typeof payload.lat !== 'number' || typeof payload.lng !== 'number') return false;
   if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return false;
   if (payload.lat < -90 || payload.lat > 90 || payload.lng < -180 || payload.lng > 180) return false;
@@ -82,10 +96,15 @@ wss.on('connection', (ws, req) => {
   });
 });
 
-wss.on('listening', () => {
-  console.log(`[ws] servidor ouvindo em ws://${HOST}:${PORT}`);
-});
-
 wss.on('error', (error) => {
   console.error('[ws] erro ao iniciar servidor:', error.message);
+});
+
+server.listen(PORT, HOST, () => {
+  console.log(`[ws] servidor ouvindo em ws://${HOST}:${PORT}`);
+  console.log(`[http] healthcheck em http://${HOST}:${PORT}/health`);
+});
+
+server.on('error', (error) => {
+  console.error('[http] erro ao iniciar servidor:', error.message);
 });

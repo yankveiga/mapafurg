@@ -46,6 +46,18 @@ npm run dev
 Sobe o ambiente de desenvolvimento.
 
 ```bash
+npm run ws:server
+```
+
+Sobe o servidor WebSocket de localização do ônibus.
+
+```bash
+npm run dev:all
+```
+
+Sobe frontend (Vite) e WebSocket em paralelo para desenvolvimento local.
+
+```bash
 npm run build
 ```
 
@@ -156,19 +168,21 @@ A configuração está em [vite.config.js](./vite.config.js) e inclui:
 
 O projeto agora suporta posição do `interno` por WebSocket.
 
-### 1. Subir o servidor WebSocket
+### Subir o servidor WebSocket
 
 ```bash
 npm run ws:server
 ```
 
-Por padrão sobe em `ws://0.0.0.0:8080`.
+Por padrão, o servidor escuta em `ws://0.0.0.0:8080`.
 
-Variáveis opcionais:
+Variáveis de ambiente suportadas:
 
+- `PORT` (prioritário em produção)
 - `WS_PORT` (default: `8080`)
 - `WS_HOST` (default: `0.0.0.0`)
 - `BUS_ID` (default: `interno`)
+- `WS_AUTH_TOKEN` (opcional)
 
 ### Fluxo prático para desenvolvimento local (1 comando)
 
@@ -181,7 +195,7 @@ Esse comando sobe:
 - Frontend Vite em `http://localhost:5173`
 - Servidor WebSocket em `ws://0.0.0.0:8080`
 
-### 2. Formato da mensagem de localização
+### Formato da mensagem de localização
 
 ```json
 {
@@ -197,27 +211,6 @@ Esse comando sobe:
 ```
 
 Campos obrigatórios: `type`, `lat`, `lng`.
-
-### 3. Testar sem celular
-
-Com o `npm run dev` ativo, abra:
-
-- `http://localhost:5173/ws-tester.html`
-
-Conecte em `ws://localhost:8080` e clique em "Enviar coordenadas".
-
-### 4. Integrar front ao servidor
-
-O front usa:
-
-- `VITE_WS_URL`, se definido
-- fallback automático para `ws://<host-do-site>:8080` (ou `wss://` em HTTPS)
-
-Exemplo:
-
-```bash
-VITE_WS_URL=ws://localhost:8080 npm run dev
-```
 
 ## App Android dedicado (auto-start)
 
