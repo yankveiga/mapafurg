@@ -2,7 +2,7 @@ package br.furg.buslocation
 
 object AppConfig {
     // Troque para o endpoint publico do seu tunel (zrok/cloudflare), sempre com wss:// em producao.
-    const val WS_URL = "https://mapafurg.onrender.com/"
+    const val WS_URL = "wss://mapafurg.onrender.com/"
 
     // Mesmo ID que o seu front espera no mapa.
     const val BUS_ID = "interno"
