@@ -1,0 +1,200 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="br.furg.buslocation"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:4:5-67
+11-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:4:22-64
+12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+12-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:5:5-79
+12-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:5:22-76
+13    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+13-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:6:5-81
+13-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:6:22-78
+14    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+14-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:7:5-79
+14-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:7:22-76
+15    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+15-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:8:5-85
+15-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:8:22-82
+16    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+16-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:9:5-81
+16-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:9:22-78
+17    <uses-permission android:name="android.permission.WAKE_LOCK" />
+17-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:10:5-68
+17-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:10:22-65
+18    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+18-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:11:5-77
+18-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:11:22-74
+19    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+19-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:12:5-86
+19-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:12:22-83
+20    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+20-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:13:5-77
+20-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:13:22-74
+21
+22    <permission
+22-->[androidx.core:core:1.13.1] /home/ssd/.gradle/caches/9.0.0/transforms/2d9c8b62e5c519d70743fbc3e8483748/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+23        android:name="br.furg.buslocation.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+23-->[androidx.core:core:1.13.1] /home/ssd/.gradle/caches/9.0.0/transforms/2d9c8b62e5c519d70743fbc3e8483748/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+24        android:protectionLevel="signature" />
+24-->[androidx.core:core:1.13.1] /home/ssd/.gradle/caches/9.0.0/transforms/2d9c8b62e5c519d70743fbc3e8483748/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+25
+26    <uses-permission android:name="br.furg.buslocation.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+26-->[androidx.core:core:1.13.1] /home/ssd/.gradle/caches/9.0.0/transforms/2d9c8b62e5c519d70743fbc3e8483748/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+26-->[androidx.core:core:1.13.1] /home/ssd/.gradle/caches/9.0.0/transforms/2d9c8b62e5c519d70743fbc3e8483748/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+27
+28    <application
+28-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:15:5-46:19
+29        android:allowBackup="false"
+29-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:16:9-36
+30        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+30-->[androidx.core:core:1.13.1] /home/ssd/.gradle/caches/9.0.0/transforms/2d9c8b62e5c519d70743fbc3e8483748/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+31        android:debuggable="true"
+32        android:extractNativeLibs="false"
+33        android:icon="@android:drawable/ic_menu_mylocation"
+33-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:17:9-60
+34        android:label="@string/app_name"
+34-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:18:9-41
+35        android:supportsRtl="true"
+35-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:19:9-35
+36        android:theme="@style/Theme.BusLocation" >
+36-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:20:9-49
+37        <activity
+37-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:22:9-29:20
+38            android:name="br.furg.buslocation.MainActivity"
+38-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:23:13-41
+39            android:exported="true" >
+39-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:24:13-36
+40            <intent-filter>
+40-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:25:13-28:29
+41                <action android:name="android.intent.action.MAIN" />
+41-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:26:17-69
+41-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:26:25-66
+42
+43                <category android:name="android.intent.category.LAUNCHER" />
+43-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:27:17-77
+43-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:27:27-74
+44            </intent-filter>
+45        </activity>
+46
+47        <service
+47-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:31:9-35:56
+48            android:name="br.furg.buslocation.GpsForegroundService"
+48-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:32:13-49
+49            android:enabled="true"
+49-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:33:13-35
+50            android:exported="false"
+50-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:34:13-37
+51            android:foregroundServiceType="location" />
+51-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:35:13-53
+52
+53        <receiver
+53-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:37:9-45:20
+54            android:name="br.furg.buslocation.BootReceiver"
+54-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:38:13-41
+55            android:enabled="true"
+55-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:39:13-35
+56            android:exported="true" >
+56-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:40:13-36
+57            <intent-filter>
+57-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:41:13-44:29
+58                <action android:name="android.intent.action.BOOT_COMPLETED" />
+58-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:42:17-79
+58-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:42:25-76
+59                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+59-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:43:17-84
+59-->/home/ssd/Documentos/Github/mapafurg/android-bus-location/app/src/main/AndroidManifest.xml:43:25-81
+60            </intent-filter>
+61        </receiver>
+62
+63        <activity
+63-->[com.google.android.gms:play-services-base:18.5.0] /home/ssd/.gradle/caches/9.0.0/transforms/c8567c44c3e970ce66feb5b6e0d11ec5/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:9-173
+64            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+64-->[com.google.android.gms:play-services-base:18.5.0] /home/ssd/.gradle/caches/9.0.0/transforms/c8567c44c3e970ce66feb5b6e0d11ec5/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:19-85
+65            android:exported="false"
+65-->[com.google.android.gms:play-services-base:18.5.0] /home/ssd/.gradle/caches/9.0.0/transforms/c8567c44c3e970ce66feb5b6e0d11ec5/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:146-170
+66            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+66-->[com.google.android.gms:play-services-base:18.5.0] /home/ssd/.gradle/caches/9.0.0/transforms/c8567c44c3e970ce66feb5b6e0d11ec5/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:86-145
+67
+68        <meta-data
+68-->[com.google.android.gms:play-services-basement:18.4.0] /home/ssd/.gradle/caches/9.0.0/transforms/1b0733469c658bf155186fc9c64bb556/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:9-122
+69            android:name="com.google.android.gms.version"
+69-->[com.google.android.gms:play-services-basement:18.4.0] /home/ssd/.gradle/caches/9.0.0/transforms/1b0733469c658bf155186fc9c64bb556/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:20-65
+70            android:value="@integer/google_play_services_version" />
+70-->[com.google.android.gms:play-services-basement:18.4.0] /home/ssd/.gradle/caches/9.0.0/transforms/1b0733469c658bf155186fc9c64bb556/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:66-119
+71
+72        <provider
+72-->[androidx.emoji2:emoji2:1.3.0] /home/ssd/.gradle/caches/9.0.0/transforms/d0835aabf3db8950d79265c42e596579/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+73            android:name="androidx.startup.InitializationProvider"
+73-->[androidx.emoji2:emoji2:1.3.0] /home/ssd/.gradle/caches/9.0.0/transforms/d0835aabf3db8950d79265c42e596579/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+74            android:authorities="br.furg.buslocation.androidx-startup"
+74-->[androidx.emoji2:emoji2:1.3.0] /home/ssd/.gradle/caches/9.0.0/transforms/d0835aabf3db8950d79265c42e596579/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+75            android:exported="false" >
+75-->[androidx.emoji2:emoji2:1.3.0] /home/ssd/.gradle/caches/9.0.0/transforms/d0835aabf3db8950d79265c42e596579/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+76            <meta-data
+76-->[androidx.emoji2:emoji2:1.3.0] /home/ssd/.gradle/caches/9.0.0/transforms/d0835aabf3db8950d79265c42e596579/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+77                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+77-->[androidx.emoji2:emoji2:1.3.0] /home/ssd/.gradle/caches/9.0.0/transforms/d0835aabf3db8950d79265c42e596579/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+78                android:value="androidx.startup" />
+78-->[androidx.emoji2:emoji2:1.3.0] /home/ssd/.gradle/caches/9.0.0/transforms/d0835aabf3db8950d79265c42e596579/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+79            <meta-data
+79-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/ssd/.gradle/caches/9.0.0/transforms/135442a3e191e15ba52839b5b2ce99b8/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+80                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+80-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/ssd/.gradle/caches/9.0.0/transforms/135442a3e191e15ba52839b5b2ce99b8/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+81                android:value="androidx.startup" />
+81-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/ssd/.gradle/caches/9.0.0/transforms/135442a3e191e15ba52839b5b2ce99b8/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+82            <meta-data
+82-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+83                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+83-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+84                android:value="androidx.startup" />
+84-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+85        </provider>
+86
+87        <receiver
+87-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+88            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+88-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+89            android:directBootAware="false"
+89-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+90            android:enabled="true"
+90-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+91            android:exported="true"
+91-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+92            android:permission="android.permission.DUMP" >
+92-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+93            <intent-filter>
+93-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+94                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+94-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+94-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+95            </intent-filter>
+96            <intent-filter>
+96-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+97                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+97-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+98            </intent-filter>
+99            <intent-filter>
+99-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+100                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+100-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+100-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+101            </intent-filter>
+102            <intent-filter>
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+103                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+103-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+103-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ssd/.gradle/caches/9.0.0/transforms/956eadd96091ed570c61ed094878d1a2/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+104            </intent-filter>
+105        </receiver>
+106    </application>
+107
+108</manifest>

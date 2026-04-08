@@ -1,0 +1,10 @@
+R_DEF: Internal format may change without notice
+local
+id statusText
+id titleText
+layout activity_main
+string app_name
+string status_permissions_missing
+string status_requesting_permissions
+string status_running
+style Theme.BusLocation
