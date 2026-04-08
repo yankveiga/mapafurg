@@ -6,8 +6,13 @@ import App from './App.jsx'
 // Importa o registrador do Service Worker gerado pelo Vite PWA
 import { registerSW } from 'virtual:pwa-register'
 
-// Executa o registro assim que o app carregar
-registerSW({ immediate: true })
+// Registra o SW e aplica atualização automaticamente para evitar cache antigo quebrando o app.
+const updateSW = registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    updateSW(true)
+  },
+})
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

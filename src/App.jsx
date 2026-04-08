@@ -22,6 +22,15 @@ const STATUS_WS = {
   desconectado: 'Offline',
 };
 
+const normalizarWsUrl = (url) => {
+  if (!url) return null;
+  const limpa = url.trim().replace(/\/+$/, '');
+  if (limpa.startsWith('wss://') || limpa.startsWith('ws://')) return limpa;
+  if (limpa.startsWith('https://')) return limpa.replace('https://', 'wss://');
+  if (limpa.startsWith('http://')) return limpa.replace('http://', 'ws://');
+  return null;
+};
+
 function Localizador({ focar }) {
   const [posicao, setPosicao] = useState(null);
   const map = useMap();
@@ -107,7 +116,8 @@ function App() {
 
   const wsUrl = useMemo(() => {
     if (import.meta.env.VITE_WS_URL) {
-      return import.meta.env.VITE_WS_URL;
+      const urlNormalizada = normalizarWsUrl(import.meta.env.VITE_WS_URL);
+      return urlNormalizada;
     }
     const protocolo = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     return `${protocolo}//${window.location.hostname}:8080`;
@@ -119,9 +129,19 @@ function App() {
 
     const conectar = () => {
       if (!ativo) return;
+      if (!wsUrl) {
+        setStatusWs('erro');
+        return;
+      }
 
       setStatusWs('conectando');
-      ws = new WebSocket(wsUrl);
+      try {
+        ws = new WebSocket(wsUrl);
+      } catch {
+        setStatusWs('erro');
+        reconnectRef.current = window.setTimeout(conectar, 3000);
+        return;
+      }
 
       ws.onopen = () => setStatusWs('conectado');
 
