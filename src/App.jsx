@@ -483,8 +483,8 @@ function App() {
         center={[-32.0732, -52.1651]} 
         zoom={16} 
         minZoom={15} // Impede que a câmera afaste o suficiente para ver o vazio além das bordas
-        maxBounds={limitesCampus} 
-        maxBoundsViscosity={1.0} // Parede sólida, sem elástico
+        //maxBounds={limitesCampus} 
+        //maxBoundsViscosity={1.0} // Parede sólida, sem elástico
         className="h-full w-full z-0"
         zoomControl={false} 
       >
