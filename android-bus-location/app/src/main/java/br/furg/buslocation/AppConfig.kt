@@ -10,8 +10,8 @@ object AppConfig {
     // Opcional: use se quiser validar origem no servidor.
     const val AUTH_TOKEN = "SEU_TOKEN_FORTE"
 
-    const val LOCATION_INTERVAL_MS = 5_000L
-    const val LOCATION_FASTEST_INTERVAL_MS = 3_000L
+    const val LOCATION_INTERVAL_MS = 3_000L
+    const val LOCATION_FASTEST_INTERVAL_MS = 2_000L
     const val NOTIFICATION_ID = 1001
     const val NOTIFICATION_CHANNEL_ID = "bus_location_channel"
 }

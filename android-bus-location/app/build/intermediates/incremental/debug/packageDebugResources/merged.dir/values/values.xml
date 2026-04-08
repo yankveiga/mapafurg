@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="http://schemas.android.com/tools">
-    <string name="app_name">Bus Location Tracker</string>
+    <string name="app_name">Interno FURG</string>
     <string name="status_permissions_missing">Permissões não concedidas. Reabra o app e permita localização e notificação.</string>
     <string name="status_requesting_permissions">Solicitando permissões...</string>
     <string name="status_running">Rastreamento ativo automaticamente.</string>

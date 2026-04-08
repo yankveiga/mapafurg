@@ -1,5 +1,9 @@
 [
     {
+        "merged": "/home/ssd/.gradle/daemon/9.0.0/br.furg.buslocation.app-debug-37:/layout_activity_main.xml.flat",
+        "source": "/home/ssd/.gradle/daemon/9.0.0/br.furg.buslocation.app-main-39:/layout/activity_main.xml"
+    },
+    {
         "merged": "br.furg.buslocation.app-debug-37:/layout_activity_main.xml.flat",
         "source": "br.furg.buslocation.app-main-39:/layout/activity_main.xml"
     }

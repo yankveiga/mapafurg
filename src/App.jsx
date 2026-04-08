@@ -8,12 +8,11 @@ import { predios } from './data';
 import logoPet from './assets/logopetvetorizado.svg';
 
 const ID_ONIBUS = 'interno';
-const POSICAO_INICIAL_ONIBUS = (() => {
-  const onibus = predios.find((predio) => predio.id === ID_ONIBUS);
-  return onibus
-    ? { lat: onibus.lat, lng: onibus.lng, timestamp: null }
-    : { lat: -32.07548437944093, lng: -52.153652687153084, timestamp: null };
-})();
+const POSICAO_INICIAL_ONIBUS = {
+  lat: -32.07488993829145,
+  lng: -52.15502479544119,
+  timestamp: null,
+};
 
 const STATUS_WS = {
   conectando: 'Conectando...',
@@ -71,19 +70,25 @@ function Bussola({ alvo }) {
 }
 
 const criarIcone = (sigla) => {
-  if (sigla === ID_ONIBUS) {
-    return L.divIcon({
-      className: 'bg-transparent',
-      html: `<div class="bg-[#0f766e] text-white font-black text-[13px] rounded-full border-2 border-white shadow-lg px-2 min-w-[44px] h-7 flex items-center justify-center whitespace-nowrap -translate-x-1/2 -translate-y-1/2">🚌</div>`,
-      iconSize: [0, 0],
-      iconAnchor: [0, 0],
-    });
-  }
-
   const tamanhoFonte = sigla.length > 4 ? 'text-[7px]' : 'text-[10px]';
   return L.divIcon({
     className: 'bg-transparent',
     html: `<div class="bg-[#003366] text-white font-bold ${tamanhoFonte} rounded-full border-2 border-white shadow-md px-2 min-w-[40px] h-6 flex items-center justify-center whitespace-nowrap -translate-x-1/2 -translate-y-1/2">${sigla.toUpperCase()}</div>`,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  });
+};
+
+const criarIconeOnibusAoVivo = () => {
+  return L.divIcon({
+    className: 'bg-transparent',
+    html: `
+      <div class="-translate-x-1/2 -translate-y-1/2">
+        <div class="w-9 h-9 rounded-full border-2 border-white shadow-md flex items-center justify-center bg-[#003366]">
+          <span class="text-[18px] leading-none">🚌</span>
+        </div>
+      </div>
+    `,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   });
@@ -113,6 +118,10 @@ function App() {
   const [posicaoOnibus, setPosicaoOnibus] = useState(POSICAO_INICIAL_ONIBUS);
   const [statusWs, setStatusWs] = useState('desconectado');
   const reconnectRef = useRef(null);
+  const pontoInterno = useMemo(
+    () => predios.find((predio) => predio.id === ID_ONIBUS) ?? null,
+    []
+  );
 
   const wsUrl = useMemo(() => {
     if (import.meta.env.VITE_WS_URL) {
@@ -232,13 +241,9 @@ function App() {
         );
       });
 
-  const prediosComPosicaoAoVivo = prediosFiltrados.map((predio) =>
-    predio.id === ID_ONIBUS ? { ...predio, ...posicaoOnibus } : predio
-  );
-
-  const predioFocado = prediosComPosicaoAoVivo.length === 1 ? prediosComPosicaoAoVivo[0] : null;
+  const predioFocado = prediosFiltrados.length === 1 ? prediosFiltrados[0] : null;
   const predioAbertoAtual = predioAberto
-    ? prediosComPosicaoAoVivo.find((predio) => predio.id === predioAberto.id) ?? predioAberto
+    ? predios.find((predio) => predio.id === predioAberto.id) ?? predioAberto
     : null;
 
   return (
@@ -501,7 +506,7 @@ function App() {
           iconCreateFunction={criarIconeCluster}
           maxClusterRadius={40}
         >
-          {prediosComPosicaoAoVivo.map((predio) => (
+          {prediosFiltrados.map((predio) => (
             <Marker 
               key={predio.id} 
               position={[predio.lat, predio.lng]} 
@@ -512,6 +517,19 @@ function App() {
             />
           ))}
         </MarkerClusterGroup>
+
+        <Marker
+          position={[posicaoOnibus.lat, posicaoOnibus.lng]}
+          icon={criarIconeOnibusAoVivo()}
+          zIndexOffset={1500}
+          eventHandlers={{
+            click: () => {
+              if (pontoInterno) {
+                setPredioAberto(pontoInterno);
+              }
+            },
+          }}
+        />
 
       </MapContainer>
     </div>
