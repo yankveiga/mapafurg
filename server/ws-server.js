@@ -20,6 +20,15 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({ server });
 let ultimaLocalizacao = null;
+// MODO MULTI-ÔNIBUS (deixe comentado por enquanto):
+// 1) Troque a linha acima por:
+// let ultimasLocalizacoesPorBusId = new Map();
+// 2) Ao conectar cliente, no lugar de enviar `ultimaLocalizacao`, envie:
+// for (const localizacao of ultimasLocalizacoesPorBusId.values()) {
+//   enviarJson(ws, localizacao);
+// }
+// 3) Ao receber mensagem, no lugar de `ultimaLocalizacao = mensagemNormalizada`, use:
+// ultimasLocalizacoesPorBusId.set(mensagemNormalizada.busId, mensagemNormalizada);
 
 const enviarJson = (cliente, payload) => {
   if (cliente.readyState === WebSocket.OPEN) {

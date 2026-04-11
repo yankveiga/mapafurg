@@ -91,7 +91,11 @@ class GpsForegroundService : Service() {
     companion object {
         fun start(context: Context) {
             val intent = Intent(context, GpsForegroundService::class.java)
-            ContextCompat.startForegroundService(context, intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
         }
 
         fun hasLocationPermission(context: Context): Boolean {

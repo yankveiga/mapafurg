@@ -116,6 +116,24 @@ function App() {
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [posicaoOnibus, setPosicaoOnibus] = useState(POSICAO_INICIAL_ONIBUS);
+  // MODO MULTI-ÔNIBUS (deixe comentado por enquanto):
+  // 1) Troque o estado acima por:
+  // const [posicoesOnibus, setPosicoesOnibus] = useState({
+  //   interno: POSICAO_INICIAL_ONIBUS,
+  // });
+  // 2) No onmessage, troque setPosicaoOnibus(...) por:
+  // setPosicoesOnibus((prev) => ({
+  //   ...prev,
+  //   [payload.busId]: {
+  //     lat: payload.lat,
+  //     lng: payload.lng,
+  //     timestamp: payload.timestamp ?? new Date().toISOString(),
+  //   },
+  // }));
+  // 3) Renderize vários marcadores com:
+  // {Object.entries(posicoesOnibus).map(([busId, pos]) => (
+  //   <Marker key={busId} position={[pos.lat, pos.lng]} icon={criarIconeOnibusAoVivo()} />
+  // ))}
   const [statusWs, setStatusWs] = useState('desconectado');
   const reconnectRef = useRef(null);
   const pontoInterno = useMemo(
@@ -158,6 +176,8 @@ function App() {
         try {
           const payload = JSON.parse(event.data);
           if (payload.type !== 'bus_location') return;
+          // MODO MULTI-ÔNIBUS:
+          // remova a linha abaixo para aceitar todos os busId.
           if (payload.busId !== ID_ONIBUS) return;
           if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return;
 
