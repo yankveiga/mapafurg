@@ -46,6 +46,8 @@ class GpsForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        socketClient.connect()
+        startLocationUpdates()
         return START_STICKY
     }
 
@@ -64,6 +66,7 @@ class GpsForegroundService : Service() {
             .setMinUpdateIntervalMillis(AppConfig.LOCATION_FASTEST_INTERVAL_MS)
             .build()
 
+        fusedLocationClient.removeLocationUpdates(locationCallback)
         fusedLocationClient.requestLocationUpdates(request, locationCallback, mainLooper)
     }
 

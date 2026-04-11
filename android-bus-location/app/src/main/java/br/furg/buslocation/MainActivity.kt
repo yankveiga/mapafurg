@@ -52,6 +52,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (hasRequiredPermissions()) {
+            statusText.text = getString(R.string.status_running)
+            GpsForegroundService.start(this)
+        }
+    }
+
     private fun hasRequiredPermissions(): Boolean {
         return requiredPermissions().all { permission ->
             ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
