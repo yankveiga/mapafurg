@@ -1,5 +1,7 @@
 package br.furg.buslocation
 
+import android.os.Handler
+import android.os.Looper
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -10,8 +12,13 @@ import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 class LocationSocketClient {
+    private val reconnectDelayMs = 5_000L
+    private val reconnectHandler = Handler(Looper.getMainLooper())
+    private var shouldReconnect = true
+
     private val client = OkHttpClient.Builder()
         .readTimeout(0, TimeUnit.MILLISECONDS)
+        .pingInterval(20, TimeUnit.SECONDS)
         .build()
 
     @Volatile
@@ -20,33 +27,48 @@ class LocationSocketClient {
     @Volatile
     private var connected = false
 
+    private val reconnectRunnable = Runnable {
+        if (shouldReconnect && webSocket == null) {
+            connect()
+        }
+    }
+
     fun connect() {
+        shouldReconnect = true
         if (webSocket != null) return
+
         val request = Request.Builder().url(AppConfig.WS_URL).build()
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
                 connected = true
+                reconnectHandler.removeCallbacks(reconnectRunnable)
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {}
             override fun onMessage(webSocket: WebSocket, bytes: ByteString) {}
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                connected = false
                 webSocket.close(code, reason)
-                this@LocationSocketClient.webSocket = null
+                markDisconnectedAndScheduleReconnect()
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                connected = false
-                this@LocationSocketClient.webSocket = null
+                markDisconnectedAndScheduleReconnect()
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                connected = false
-                this@LocationSocketClient.webSocket = null
+                markDisconnectedAndScheduleReconnect()
             }
         })
+    }
+
+    private fun markDisconnectedAndScheduleReconnect() {
+        connected = false
+        webSocket = null
+        if (shouldReconnect) {
+            reconnectHandler.removeCallbacks(reconnectRunnable)
+            reconnectHandler.postDelayed(reconnectRunnable, reconnectDelayMs)
+        }
     }
 
     fun sendLocation(
@@ -79,6 +101,8 @@ class LocationSocketClient {
     }
 
     fun close() {
+        shouldReconnect = false
+        reconnectHandler.removeCallbacks(reconnectRunnable)
         webSocket?.close(1000, "Encerrando")
         webSocket = null
         connected = false
