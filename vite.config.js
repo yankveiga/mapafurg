@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'logopet.png'],
       manifest: {
-        name: 'Interno FURG',
-        short_name: 'Interno FURG',
+        name: 'Mapa FURG',
+        short_name: 'Mapa FURG',
         description: 'Mapa interativo do Campus Carreiros',
         theme_color: '#003366', // Cor da barra do navegador (Azul FURG)
         background_color: '#003366', // Cor de fundo da Splash Screen (Preencha com Azul PET para sumir o branco)
