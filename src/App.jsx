@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -13,8 +13,6 @@ const POSICAO_INICIAL_ONIBUS = {
   lng: -52.15502479544119,
   timestamp: null,
 };
-const LIMITE_RASTRO_ONIBUS = 20;
-
 const STATUS_WS = {
   conectando: 'Conectando...',
   conectado: 'Ao vivo',
@@ -144,7 +142,6 @@ function App() {
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [posicaoOnibus, setPosicaoOnibus] = useState(POSICAO_INICIAL_ONIBUS);
-  const [rastroOnibus, setRastroOnibus] = useState([]);
   const [agoraMs, setAgoraMs] = useState(Date.now());
   // MODO MULTI-ÔNIBUS (deixe comentado por enquanto):
   // 1) Troque o estado acima por:
@@ -224,19 +221,6 @@ function App() {
             timestamp: payload.timestamp ?? new Date().toISOString(),
           });
 
-          setRastroOnibus((anterior) => {
-            const ultimo = anterior[anterior.length - 1];
-            if (
-              ultimo &&
-              Math.abs(ultimo.lat - payload.lat) < 0.000005 &&
-              Math.abs(ultimo.lng - payload.lng) < 0.000005
-            ) {
-              return anterior;
-            }
-
-            const proximo = [...anterior, { lat: payload.lat, lng: payload.lng }];
-            return proximo.slice(-LIMITE_RASTRO_ONIBUS);
-          });
         } catch {
           // Ignora mensagens não-JSON enviadas por clientes externos.
         }
@@ -583,19 +567,6 @@ function App() {
         <Bussola alvo={predioAbertoAtual || predioFocado} />
         <Localizador focar={solicitarGps} />
         <CentralizadorOnibus focar={solicitarOnibus} posicao={posicaoOnibus} />
-
-        {rastroOnibus.length > 1 && (
-          <Polyline
-            positions={rastroOnibus.map((ponto) => [ponto.lat, ponto.lng])}
-            pathOptions={{
-              color: '#2563eb',
-              weight: 4,
-              opacity: 0.5,
-              lineCap: 'round',
-              lineJoin: 'round',
-            }}
-          />
-        )}
 
         <MarkerClusterGroup
           chunkedLoading
