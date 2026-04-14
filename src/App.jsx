@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -13,6 +13,7 @@ const POSICAO_INICIAL_ONIBUS = {
   lng: -52.15502479544119,
   timestamp: null,
 };
+const LIMITE_RASTRO_ONIBUS = 20;
 
 const STATUS_WS = {
   conectando: 'Conectando...',
@@ -28,6 +29,21 @@ const normalizarWsUrl = (url) => {
   if (limpa.startsWith('https://')) return limpa.replace('https://', 'wss://');
   if (limpa.startsWith('http://')) return limpa.replace('http://', 'ws://');
   return null;
+};
+
+const formatarTempoDecorrido = (timestamp, agoraMs) => {
+  if (!timestamp) return 'sem atualização';
+  const ms = agoraMs - Date.parse(timestamp);
+  if (!Number.isFinite(ms) || ms < 1000) return 'agora';
+
+  const segundos = Math.floor(ms / 1000);
+  if (segundos < 60) return `há ${segundos}s`;
+
+  const minutos = Math.floor(segundos / 60);
+  if (minutos < 60) return `há ${minutos}min`;
+
+  const horas = Math.floor(minutos / 60);
+  return `há ${horas}h`;
 };
 
 function Localizador({ focar }) {
@@ -128,6 +144,8 @@ function App() {
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [posicaoOnibus, setPosicaoOnibus] = useState(POSICAO_INICIAL_ONIBUS);
+  const [rastroOnibus, setRastroOnibus] = useState([]);
+  const [agoraMs, setAgoraMs] = useState(Date.now());
   // MODO MULTI-ÔNIBUS (deixe comentado por enquanto):
   // 1) Troque o estado acima por:
   // const [posicoesOnibus, setPosicoesOnibus] = useState({
@@ -160,6 +178,13 @@ function App() {
     }
     const protocolo = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     return `${protocolo}//${window.location.hostname}:8080`;
+  }, []);
+
+  useEffect(() => {
+    const intervalo = window.setInterval(() => {
+      setAgoraMs(Date.now());
+    }, 1000);
+    return () => window.clearInterval(intervalo);
   }, []);
 
   useEffect(() => {
@@ -197,6 +222,20 @@ function App() {
             lat: payload.lat,
             lng: payload.lng,
             timestamp: payload.timestamp ?? new Date().toISOString(),
+          });
+
+          setRastroOnibus((anterior) => {
+            const ultimo = anterior[anterior.length - 1];
+            if (
+              ultimo &&
+              Math.abs(ultimo.lat - payload.lat) < 0.000005 &&
+              Math.abs(ultimo.lng - payload.lng) < 0.000005
+            ) {
+              return anterior;
+            }
+
+            const proximo = [...anterior, { lat: payload.lat, lng: payload.lng }];
+            return proximo.slice(-LIMITE_RASTRO_ONIBUS);
           });
         } catch {
           // Ignora mensagens não-JSON enviadas por clientes externos.
@@ -277,6 +316,7 @@ function App() {
   const predioAbertoAtual = predioAberto
     ? predios.find((predio) => predio.id === predioAberto.id) ?? predioAberto
     : null;
+  const ultimaAtualizacao = formatarTempoDecorrido(posicaoOnibus.timestamp, agoraMs);
 
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
@@ -386,7 +426,7 @@ function App() {
       </button>
 
       <div className="absolute bottom-12 left-6 z-[9999] px-3 py-2 rounded-xl bg-white/70 backdrop-blur-xl border border-white/60 text-[11px] font-bold text-slate-700 shadow-lg">
-        Ônibus: {STATUS_WS[statusWs]}
+        Ônibus: {STATUS_WS[statusWs]} • Última: {ultimaAtualizacao}
       </div>
 
       <div 
@@ -493,7 +533,7 @@ function App() {
                 </div>
                 {posicaoOnibus.timestamp && (
                   <p className="mt-3 text-[9px] text-slate-500 text-center">
-                    Última atualização: {new Date(posicaoOnibus.timestamp).toLocaleTimeString('pt-BR')}
+                    Última atualização: {ultimaAtualizacao}
                   </p>
                 )}
                 <p className="mt-4 text-[9px] text-slate-400 font-medium italic text-center">
@@ -543,6 +583,19 @@ function App() {
         <Bussola alvo={predioAbertoAtual || predioFocado} />
         <Localizador focar={solicitarGps} />
         <CentralizadorOnibus focar={solicitarOnibus} posicao={posicaoOnibus} />
+
+        {rastroOnibus.length > 1 && (
+          <Polyline
+            positions={rastroOnibus.map((ponto) => [ponto.lat, ponto.lng])}
+            pathOptions={{
+              color: '#2563eb',
+              weight: 4,
+              opacity: 0.5,
+              lineCap: 'round',
+              lineJoin: 'round',
+            }}
+          />
+        )}
 
         <MarkerClusterGroup
           chunkedLoading
