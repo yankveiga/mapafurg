@@ -75,7 +75,7 @@ function CentralizadorOnibus({ focar, posicao }) {
   useEffect(() => {
     if (!focar || !posicao) return;
     map.flyTo([posicao.lat, posicao.lng], 18, { animate: true, duration: 1.1 });
-  }, [focar, posicao, map]);
+  }, [focar, map]);
 
   return null;
 }
