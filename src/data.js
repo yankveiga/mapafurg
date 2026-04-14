@@ -17,11 +17,11 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-      segunda: "Não informado pelo RU Lago até a última atualização",
-      terca: "Não informado pelo RU Lago até a última atualização",
-      quarta: "Não informado pelo RU Lago até a última atualização",
-      quinta: "Não informado pelo RU Lago até a última atualização",
-      sexta: "Não informado pelo RU Lago até a última atualização"
+      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Carne Moída ao Molho, Peixe Empanado, Proteína de Soja Refogada, Ovo Pochê, Polenta, Alface, Repolho Misto, Mista de Grãos, Melão",
+      terca: "Arroz Branco, Arroz Integral com Linhaça, Feijão Preto, Strogonoff de Carne, Frango Assado, Grão de Bico ao Sugo, Ovo Cozido, Batata Palha, Alface, Pepino, Cenoura Cozida, Mamão com Laranja",
+      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Bife ao Molho, Frango com Alho Poró, Hamburguer de Lentilha, Ovo Pochê, Espaguete a Primavera, Alface, Abobrinha, Beterraba Ralada, Banana",
+      quinta: "Arroz Branco, Arroz Integral com Linhaça, Feijão Carioca, Frango ao Molho, Carré Acebolado, Cogumelos Refogados, Ovo Cozido, Espaguete Alho Óleo, Alface, Repolho Roxo, Cenoura Cozida, Laranja",
+      sexta: "Arroz Branco, Arroz Integral, Feijão Preto, Frango ao Molho, Pastel de Carne com Ovos, Pastel de PTS, Ovo Pochê, Virado de Couve, Alface, Macarronese, Pepino, Maçã"
     }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
