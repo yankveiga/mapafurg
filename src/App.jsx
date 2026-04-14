@@ -69,6 +69,17 @@ function Bussola({ alvo }) {
   return null; 
 }
 
+function CentralizadorOnibus({ focar, posicao }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!focar || !posicao) return;
+    map.flyTo([posicao.lat, posicao.lng], 18, { animate: true, duration: 1.1 });
+  }, [focar, posicao, map]);
+
+  return null;
+}
+
 const criarIcone = (sigla) => {
   const tamanhoFonte = sigla.length > 4 ? 'text-[7px]' : 'text-[10px]';
   return L.divIcon({
@@ -113,6 +124,7 @@ const criarIconeCluster = (cluster) => {
 function App() {
   const [busca, setBusca] = useState('');
   const [solicitarGps, setSolicitarGps] = useState(0);
+  const [solicitarOnibus, setSolicitarOnibus] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [posicaoOnibus, setPosicaoOnibus] = useState(POSICAO_INICIAL_ONIBUS);
@@ -364,6 +376,15 @@ function App() {
         </svg>
       </button>
 
+      <button
+        onClick={() => setSolicitarOnibus(prev => prev + 1)}
+        className="absolute bottom-28 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all text-[#003366] hover:bg-white/70"
+        aria-label="Centralizar no ônibus"
+        title="Centralizar no ônibus"
+      >
+        <span className="text-[22px] leading-none">🚌</span>
+      </button>
+
       <div className="absolute bottom-12 left-6 z-[9999] px-3 py-2 rounded-xl bg-white/70 backdrop-blur-xl border border-white/60 text-[11px] font-bold text-slate-700 shadow-lg">
         Ônibus: {STATUS_WS[statusWs]}
       </div>
@@ -520,6 +541,7 @@ function App() {
         
         <Bussola alvo={predioAbertoAtual || predioFocado} />
         <Localizador focar={solicitarGps} />
+        <CentralizadorOnibus focar={solicitarOnibus} posicao={posicaoOnibus} />
 
         <MarkerClusterGroup
           chunkedLoading
