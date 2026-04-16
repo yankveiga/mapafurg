@@ -107,6 +107,8 @@ Variáveis de ambiente suportadas pelo servidor:
 - `WS_PORT`
 - `WS_HOST`
 - `BUS_ID`
+- `BUS_ID_PREFIX`
+- `AUTO_ASSIGN_BUS_ID` (default: `true`)
 - `WS_AUTH_TOKEN`
 
 O frontend pode consumir um endpoint WebSocket externo por meio de `VITE_WS_URL`. Quando essa variável não é definida, o projeto usa fallback para `ws://<host>:8080` em ambiente local.

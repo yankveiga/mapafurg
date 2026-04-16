@@ -6,11 +6,20 @@ const PORT = Number(process.env.PORT ?? process.env.WS_PORT ?? 8080);
 const HOST = process.env.WS_HOST ?? '0.0.0.0';
 const BUS_ID_PADRAO = process.env.BUS_ID ?? 'interno';
 const AUTH_TOKEN = process.env.WS_AUTH_TOKEN ?? '';
+const BUS_ID_PREFIX = process.env.BUS_ID_PREFIX ?? 'bus';
+const AUTO_ASSIGN_BUS_ID = (process.env.AUTO_ASSIGN_BUS_ID ?? 'true').toLowerCase() !== 'false';
 
 const server = http.createServer((req, res) => {
   if (req.url === '/health') {
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify({ ok: true, service: 'bus-ws', time: new Date().toISOString() }));
+    res.end(JSON.stringify({
+      ok: true,
+      service: 'bus-ws',
+      autoAssignBusId: AUTO_ASSIGN_BUS_ID,
+      activeConnections: wss.clients.size,
+      activeBuses: ultimasLocalizacoesPorBusId.size,
+      time: new Date().toISOString(),
+    }));
     return;
   }
 
@@ -19,16 +28,24 @@ const server = http.createServer((req, res) => {
 });
 
 const wss = new WebSocketServer({ server });
-let ultimaLocalizacao = null;
-// MODO MULTI-ÔNIBUS (deixe comentado por enquanto):
-// 1) Troque a linha acima por:
-// let ultimasLocalizacoesPorBusId = new Map();
-// 2) Ao conectar cliente, no lugar de enviar `ultimaLocalizacao`, envie:
-// for (const localizacao of ultimasLocalizacoesPorBusId.values()) {
-//   enviarJson(ws, localizacao);
-// }
-// 3) Ao receber mensagem, no lugar de `ultimaLocalizacao = mensagemNormalizada`, use:
-// ultimasLocalizacoesPorBusId.set(mensagemNormalizada.busId, mensagemNormalizada);
+const ultimasLocalizacoesPorBusId = new Map();
+const metaPorConexao = new WeakMap();
+const slotsEmUso = new Set();
+
+const alocarSlot = () => {
+  let slot = 1;
+  while (slotsEmUso.has(slot)) {
+    slot += 1;
+  }
+  slotsEmUso.add(slot);
+  return slot;
+};
+
+const liberarSlot = (slot) => {
+  if (Number.isInteger(slot)) {
+    slotsEmUso.delete(slot);
+  }
+};
 
 const enviarJson = (cliente, payload) => {
   if (cliente.readyState === WebSocket.OPEN) {
@@ -46,9 +63,11 @@ const validarMensagemLocalizacao = (payload) => {
   return true;
 };
 
-const normalizarMensagemLocalizacao = (payload) => ({
+const normalizarMensagemLocalizacao = (payload, busIdConexao) => ({
   type: 'bus_location',
-  busId: typeof payload.busId === 'string' && payload.busId.trim() ? payload.busId : BUS_ID_PADRAO,
+  busId: AUTO_ASSIGN_BUS_ID
+    ? busIdConexao
+    : (typeof payload.busId === 'string' && payload.busId.trim() ? payload.busId : BUS_ID_PADRAO),
   lat: payload.lat,
   lng: payload.lng,
   heading: Number.isFinite(payload.heading) ? payload.heading : null,
@@ -65,22 +84,32 @@ const broadcast = (payload) => {
 };
 
 wss.on('connection', (ws, req) => {
-  console.log(`[ws] cliente conectado: ${req.socket.remoteAddress}`);
+  let busIdConexao = BUS_ID_PADRAO;
+  let slotConexao = null;
+  if (AUTO_ASSIGN_BUS_ID) {
+    slotConexao = alocarSlot();
+    busIdConexao = `${BUS_ID_PREFIX}-${slotConexao}`;
+  }
+  metaPorConexao.set(ws, { busId: busIdConexao, slot: slotConexao });
+
+  console.log(`[ws] cliente conectado: ${req.socket.remoteAddress} -> ${busIdConexao}`);
 
   enviarJson(ws, {
     type: 'hello',
     message: 'Conectado ao servidor de localizacao',
+    assignedBusId: busIdConexao,
+    autoAssignBusId: AUTO_ASSIGN_BUS_ID,
     expectedFormat: {
       type: 'bus_location',
-      busId: BUS_ID_PADRAO,
+      busId: AUTO_ASSIGN_BUS_ID ? '(ignorado; servidor atribui automaticamente)' : BUS_ID_PADRAO,
       lat: -32.0754,
       lng: -52.1536,
       timestamp: new Date().toISOString(),
     },
   });
 
-  if (ultimaLocalizacao) {
-    enviarJson(ws, ultimaLocalizacao);
+  for (const localizacao of ultimasLocalizacoesPorBusId.values()) {
+    enviarJson(ws, localizacao);
   }
 
   ws.on('message', (raw) => {
@@ -92,8 +121,9 @@ wss.on('connection', (ws, req) => {
         return;
       }
 
-      const mensagemNormalizada = normalizarMensagemLocalizacao(payload);
-      ultimaLocalizacao = mensagemNormalizada;
+      const meta = metaPorConexao.get(ws);
+      const mensagemNormalizada = normalizarMensagemLocalizacao(payload, meta?.busId ?? BUS_ID_PADRAO);
+      ultimasLocalizacoesPorBusId.set(mensagemNormalizada.busId, mensagemNormalizada);
       broadcast(mensagemNormalizada);
     } catch {
       enviarJson(ws, { type: 'error', message: 'Mensagem nao eh JSON valido.' });
@@ -101,7 +131,18 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', () => {
-    console.log('[ws] cliente desconectado');
+    const meta = metaPorConexao.get(ws);
+    if (AUTO_ASSIGN_BUS_ID && meta?.busId) {
+      ultimasLocalizacoesPorBusId.delete(meta.busId);
+      broadcast({
+        type: 'bus_disconnected',
+        busId: meta.busId,
+        timestamp: new Date().toISOString(),
+      });
+    }
+    liberarSlot(meta?.slot);
+    metaPorConexao.delete(ws);
+    console.log(`[ws] cliente desconectado: ${meta?.busId ?? 'desconhecido'}`);
   });
 });
 

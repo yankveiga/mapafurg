@@ -578,8 +578,8 @@ export const predios = [
     ]
   },
 
-
-// IO - Instituto de Oceanografia - Prédio acadêmico e laboratorial
+//IO COMPLETO
+// 
   { 
     id: "io", 
     nome: "IO - Instituto de Oceanografia", 
@@ -587,6 +587,35 @@ export const predios = [
     lng: -52.161924961616435,
     descricao: "Instituto de Oceanografia" 
   },
+
+
+  // Auditório João Rocha
+  { 
+    id: "io - aud", 
+    nome: "Auditório João Rocha", 
+    lat: -32.07016308222871,   
+    lng: -52.162053601864784,
+    descricao: "Auditório João Rocha" 
+  },
+
+// Coordenação / Secretaria / PPGO de Oceano e Gestão
+  { 
+    id: "coordenacao_ppgo_gestao", 
+    nome: "Coordenação / Secretaria / PPGO de Oceano e Gestão", 
+    lat: -32.06988879085762,   
+    lng: -52.161779724161526,
+    descricao: "Coordenação, Secretaria e PPGO de Oceano e Gestão"
+  },
+
+  //PROJETOS
+  { 
+  id: "NGC", 
+  nome: "Núcleo de Gerenciamento Costeiro", 
+  lat: -32.07014035068941,   
+  lng: -52.161688931675805,
+  descricao: "Lab. de Gerenciamento Costeiro / Lab. de Sustentabilidade Ambiental Corporativa / Lab. de Mapeamento em Ambientes, Resistência, Sociedade e Solidariedade / Lab. de Ensino e Extensão em Ecodesenvolvimento / Futuro CALO + Sala de Estudos / Futuro DAGA + Sala de Estudos" ,
+  },
+// TCHAU
 
 // IO - Laboratório de Ensino
   { 
@@ -597,32 +626,68 @@ export const predios = [
     descricao: "Instituto de Oceanografia - Laboratório de Ensino" 
   },
 
-// IO - Oceanografia Biológica
+
+// IO - NUCLEO DE OCEANOGRAFIA BIOLOGICA
   { 
     id: "io - OB", 
-    nome: "IO - Oceanografia Biológica", 
+    nome: "IO - Núcleo de Oceanografia Biológica", 
     lat: -32.0696302305501,    
     lng: -52.15995989599516,
     descricao: "Instituto de Oceanografia - Oceanografia Biológica", 
+    projetos: [
+      { sigla: "ECOMEGA", nome: "ECOMEGA", sala: "" },
+      { sigla: "LEIB", nome: "Lab. de Ecologia de Invertebrados Bentônicos", sala: "", link: ""},
+      { sigla: "LEVC", nome: "Lab. de Ecologia Vegetal Costeira", sala: "" },
+      { sigla: "LFMM", nome: "Laboratório de Fitoplâncton e Microorganismos Marinhos", sala: "", link: "" },   
+      { sigla: "Biblio", nome: "Biblioteca Setorial Futuro NIO", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/149-laboratorio-de-dinamica-populacional-pesqueira-ladipp" },
+      { sigla: "Zooplancton", nome: "Lab. de Zooplancton", sala: "" },
+    ]
   },
 
-// IO - Recursos Renováveis
+// IO - NÚCLEO DE RECURSOS RENOVAVEIS
   { 
     id: "io - RR ", 
-    nome: "IO - Recursos Renováveis", 
+    nome: "IO - Núcleo de Recursos Renováveis", 
     lat: -32.069334563641895,    
     lng: -52.16088363570775,
-    descricao: "Instituto de Oceanografia - Recursos Renováveis" 
+    descricao: "Instituto de Oceanografia - Recursos Renováveis",
+    projetos: [
+      { sigla: "LRPAME", nome: "Lab. de Recursos Pesqueiros Artesanais e Modelagem Ecológica", sala: "" },
+      { sigla: "LADIPP", nome: "Lab. de Dinâmica Populacional Pesqueira", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/149-laboratorio-de-dinamica-populacional-pesqueira-ladipp" },
+      { sigla: "LRPAME", nome: "Lab. de Hidroacústica Aplicada", sala: "" },
+      { sigla: "LEPR", nome: "Lab. de Estudos para a Pesca Responsável", sala: "", link: "" },   
+      { sigla: "Biblio", nome: "Biblioteca Setorial Futuro NIO", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/149-laboratorio-de-dinamica-populacional-pesqueira-ladipp" },
+      { sigla: "LICTIO", nome: "Lab. de Ictioplâncton", sala: "" },
+      { sigla: "LECMM", nome: "Lab. de Ecologia e Conservação da Megafauna Marinha", sala: "", link: "" },
+    ]
   },
 
+  // IO - NÚCLEO DE OCEANOGRAFIA BIOLOGICA (Outro)
+  {
+    id: "io - Biol", 
+    nome: "IO - Núcleo de Oceonagrafia Biológica", 
+    lat: -32.068706894264906,   
+    lng: -52.16015767854299,
+    descricao: "Instituto de Oceanografia - Oceanografia Biológica",
+    projetos: [
+      { sigla: "ICTIO", nome: "Lab. Ictiologia", sala: "" },
+      { sigla: "Crust", nome: "Lab. de Crustáceos Decápodes", sala: "", link: "" },
+    ]
+  },
  
-// IO - Oceanografia Biológica/Oceonagrafia Química
+// IO - Oceonagrafia Química
   { 
-    id: "io - OB/OQ ", 
-    nome: "IO - Oceanografia Biológica/Oceonagrafia Química", 
-    lat: -32.06889135547181,    
-    lng: -52.15991339188701,
-    descricao: "Instituto de Oceanografia - Oceanografia Biológica/Oceonagrafia Química",
+    id: "io - OQ ", 
+    nome: "IO - Oceonagrafia Química", 
+    lat: -32.06897117603596,   
+    lng: -52.15982509046444,  
+    descricao: "Instituto de Oceanografia - Oceonagrafia Química",
+    projetos: [
+      { sigla: "Lab. Hidroq", nome: "Laboratório de Hidroquímica 1 e 2", sala: "", link: "" },
+      { sigla: "CONECO", nome: "CONECO", sala: "", link: "" },
+      { sigla: "LMOEA", nome: "Laboratório de Microcontaminantes Orgânicos e Ecotoxicologia Aquática", sala: "", link: "" },
+      { sigla: "LCF", nome: "Laboratório de Cianobactérias e Ficotoxinas", sala: "", link: "" }
+    ]
   },
 
 // CEOCEAN - Centro de Estudos dos Oceanos e Clima
