@@ -615,8 +615,8 @@ export const predios = [
   lng: -52.161688931675805,
   descricao: "" ,
   projetos: [
-    { sigla: "CALO", nome: "Futuro CALO + Sala de Estudos", sala: "", link: "" },
-    { sigla: "DAGA", nome: "Futuro DAGA + Sala de Estudos", sala: "", link: "" },
+    //{ sigla: "CALO", nome: "Sala de Estudos", sala: "", link: "" },
+    //{ sigla: "DAGA", nome: "Sala de Estudos", sala: "", link: "" },
     { sigla: "LabGerco", nome: "Lab. de Gerenciamento Costeiro", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/153-labgerco" },
     { sigla: "LEES", nome: "Lab. de Ensino e Extensão em Ecodesenvolvimento", sala: "", link: "" },
     { sigla: "LMASS", nome: "Lab. de Mapeamento em Ambientes, Resistência, Sociedade e Solidariedade", sala: "", link: "" },
