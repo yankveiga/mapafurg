@@ -578,7 +578,7 @@ export const predios = [
     ]
   },
 
-//IO COMPLETO
+//INÍCIO DOS PRÉDIOS DO INSTITUTO DE OCEANOLOGIA
 // 
   { 
     id: "io", 
@@ -591,7 +591,7 @@ export const predios = [
 
   // Auditório João Rocha
   { 
-    id: "io - aud", 
+    id: "io_aud", 
     nome: "Auditório João Rocha", 
     lat: -32.07016308222871,   
     lng: -52.162053601864784,
@@ -600,26 +600,34 @@ export const predios = [
 
 // Coordenação / Secretaria / PPGO de Oceano e Gestão
   { 
-    id: "coordenacao_ppgo_gestao", 
+    id: "coord", 
     nome: "Coordenação / Secretaria / PPGO de Oceano e Gestão", 
     lat: -32.06988879085762,   
     lng: -52.161779724161526,
     descricao: "Coordenação, Secretaria e PPGO de Oceano e Gestão"
   },
 
-  //PROJETOS
+  //IO- Núcleo de Gerenciamento Costeiro
   { 
-  id: "NGC", 
+  id: "ngc", 
   nome: "Núcleo de Gerenciamento Costeiro", 
   lat: -32.07014035068941,   
   lng: -52.161688931675805,
-  descricao: "Lab. de Gerenciamento Costeiro / Lab. de Sustentabilidade Ambiental Corporativa / Lab. de Mapeamento em Ambientes, Resistência, Sociedade e Solidariedade / Lab. de Ensino e Extensão em Ecodesenvolvimento / Futuro CALO + Sala de Estudos / Futuro DAGA + Sala de Estudos" ,
+  descricao: "" ,
+  projetos: [
+    { sigla: "LabGerco", nome: "Lab. de Gerenciamento Costeiro", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/153-labgerco" },
+    { sigla: "LSAC", nome: "Lab. de Sustentabilidade Ambiental Corporativa", sala: "", link: "" },
+    { sigla: "LMASS", nome: "Lab. de Mapeamento em Ambientes, Resistência, Sociedade e Solidariedade", sala: "", link: "" },
+    { sigla: "LEES", nome: "Lab. de Ensino e Extensão em Ecodesenvolvimento", sala: "", link: "" },
+    { sigla: "CALO", nome: "Futuro CALO + Sala de Estudos", sala: "", link: "" },
+    { sigla: "DAGA", nome: "Futuro DAGA + Sala de Estudos", sala: "", link: "" }
+  ]
   },
-// TCHAU
+
 
 // IO - Laboratório de Ensino
   { 
-    id: "io - lab", 
+    id: "io_lab", 
     nome: "IO - Laboratório de Ensino", 
     lat: -32.07057040328547, 
     lng: -52.160024054813086,
@@ -629,24 +637,31 @@ export const predios = [
 
 // IO - NUCLEO DE OCEANOGRAFIA BIOLOGICA
   { 
-    id: "io - OB", 
+    id: "io_obio", 
     nome: "IO - Núcleo de Oceanografia Biológica", 
-    lat: -32.0696302305501,    
-    lng: -52.15995989599516,
+    lat: -32.06958998304264,     
+    lng: -52.15990325314154,
     descricao: "Instituto de Oceanografia - Oceanografia Biológica", 
     projetos: [
       { sigla: "ECOMEGA", nome: "ECOMEGA", sala: "" },
       { sigla: "LEIB", nome: "Lab. de Ecologia de Invertebrados Bentônicos", sala: "", link: ""},
       { sigla: "LEVC", nome: "Lab. de Ecologia Vegetal Costeira", sala: "" },
-      { sigla: "LFMM", nome: "Laboratório de Fitoplâncton e Microorganismos Marinhos", sala: "", link: "" },   
-      { sigla: "Biblio", nome: "Biblioteca Setorial Futuro NIO", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/149-laboratorio-de-dinamica-populacional-pesqueira-ladipp" },
+      { sigla: "LFMM", nome: "Laboratório de Fitoplâncton e Microorganismos Marinhos", sala: "", link: "" },  
       { sigla: "Zooplancton", nome: "Lab. de Zooplancton", sala: "" },
     ]
+  },
+  // IO - ANEXO NUCLEO DE OCEANOGRAFIA BIOLOGICA
+  { 
+    id: "ceilors", 
+    nome: "IO - Núcleo de Oceanografia Biológica", 
+    lat: -32.0693346526857, 
+    lng: -52.15939218754685,
+    descricao: "Amostras e Equipamentos", 
   },
 
 // IO - NÚCLEO DE RECURSOS RENOVAVEIS
   { 
-    id: "io - RR ", 
+    id: "io_rr ", 
     nome: "IO - Núcleo de Recursos Renováveis", 
     lat: -32.069334563641895,    
     lng: -52.16088363570775,
@@ -654,7 +669,7 @@ export const predios = [
     projetos: [
       { sigla: "LRPAME", nome: "Lab. de Recursos Pesqueiros Artesanais e Modelagem Ecológica", sala: "" },
       { sigla: "LADIPP", nome: "Lab. de Dinâmica Populacional Pesqueira", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/149-laboratorio-de-dinamica-populacional-pesqueira-ladipp" },
-      { sigla: "LRPAME", nome: "Lab. de Hidroacústica Aplicada", sala: "" },
+      { sigla: "LHA", nome: "Lab. de Hidroacústica Aplicada", sala: "" },
       { sigla: "LEPR", nome: "Lab. de Estudos para a Pesca Responsável", sala: "", link: "" },   
       { sigla: "Biblio", nome: "Biblioteca Setorial Futuro NIO", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/149-laboratorio-de-dinamica-populacional-pesqueira-ladipp" },
       { sigla: "LICTIO", nome: "Lab. de Ictioplâncton", sala: "" },
@@ -662,33 +677,42 @@ export const predios = [
     ]
   },
 
-  // IO - NÚCLEO DE OCEANOGRAFIA BIOLOGICA (Outro)
-  {
-    id: "io - Biol", 
-    nome: "IO - Núcleo de Oceonagrafia Biológica", 
-    lat: -32.068706894264906,   
-    lng: -52.16015767854299,
-    descricao: "Instituto de Oceanografia - Oceanografia Biológica",
-    projetos: [
-      { sigla: "ICTIO", nome: "Lab. Ictiologia", sala: "" },
-      { sigla: "Crust", nome: "Lab. de Crustáceos Decápodes", sala: "", link: "" },
-    ]
+  //INÍCIO DO PRÉDIO GIGANTE DA OCEANO
+  // IO - NÚCLEO DE OCEANOGRAFIA BIOLOGICA (Gigante)
+    {
+    id: "io_ict", 
+    nome: "IO - Laboratório de Ictiologia", 
+    lat: -32.068462734007305,
+    lng: -52.160284542925595,
+    descricao: "Instituto de Oceanografia - Laboratório de Ictiologia",
   },
  
+    {
+      id: "io_lcd", 
+      nome: "IO - Laboratório de Crustáceos Decápodes", 
+      lat: -32.068795443394066,   
+      lng: -52.16004714607903,
+      descricao: "Instituto de Oceanografia - Laboratório de Crustáceos Decápodes",
+    },
+  
 // IO - Oceonagrafia Química
   { 
-    id: "io - OQ ", 
+    id: "io_oq", 
     nome: "IO - Oceonagrafia Química", 
-    lat: -32.06897117603596,   
-    lng: -52.15982509046444,  
+    lat: -32.06903917159527,  
+    lng: -52.15993073031773,  
     descricao: "Instituto de Oceanografia - Oceonagrafia Química",
     projetos: [
-      { sigla: "Lab. Hidroq", nome: "Laboratório de Hidroquímica 1 e 2", sala: "", link: "" },
+      { sigla: "Lab. Hidroq 1", nome: "Lab. de Hidroquímica 1", sala: "", link: "" },
+      { sigla: "Lab. Hidroq 2", nome: "Lab. de Hidroquímica 2", sala: "", link: "" },
       { sigla: "CONECO", nome: "CONECO", sala: "", link: "" },
-      { sigla: "LMOEA", nome: "Laboratório de Microcontaminantes Orgânicos e Ecotoxicologia Aquática", sala: "", link: "" },
-      { sigla: "LCF", nome: "Laboratório de Cianobactérias e Ficotoxinas", sala: "", link: "" }
+      { sigla: "LMOEA", nome: "Lab. de Microcontaminantes Orgânicos e Ecotoxicologia Aquática", sala: "", link: "" },
+      { sigla: "LCF", nome: "Lab. de Cianobactérias e Ficotoxinas", sala: "", link: "" }
     ]
   },
+
+
+  //FIM DO PRÉDIO GIGANTE DA OCEANO
 
 // CEOCEAN - Centro de Estudos dos Oceanos e Clima
   { 
@@ -696,7 +720,13 @@ export const predios = [
     nome: "CEOCEAN - Centro de Estudos dos Oceanos e Clima", 
     lat: -32.068543196414154,  
     lng: -52.1616756691524,
-    descricao: "Centro de Estudos dos Oceanos e Clima" 
+    descricao: "Centro de Estudos dos Oceanos e Clima" ,
+    projetos: [
+      { sigla: "LEOC", nome: "Lab. de Estudos de Oceanos e Clima", sala: "", link: "" },
+      { sigla: "LDMO", nome: "Lab. de Dinâmica e Modelagem Oceânica", sala: "", link: "" },
+      { sigla: "LODS", nome: "⁠Lab. de Oceanografia Dinâmica e por Satélites", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/146-laboratorio-de-oceanografia-dinamica-e-por-satelites-lods" },
+      { sigla: "LMC", nome: "⁠Lab. de Monitoramento da Criosfera", sala: "", link: "" },
+    ]
   },
 
 // ESANTAR 
@@ -707,6 +737,41 @@ export const predios = [
     lng: -52.16290834644639,
     descricao: "Estação de Apoio Antártico" 
   },
+
+  // IO - NÚCLEO DE OCEANOGRAFIA GEOLÓGICA
+  { 
+    id: "io_og", 
+    nome: "IO - Oceonagrafia Geológica", 
+    lat: -32.06880852223249,  
+    lng: -52.16278122635756,  
+    descricao: "Instituto de Oceanografia - Oceonagrafia Geológica",
+    projetos: [
+      { sigla: "LGeoQ", nome: "Lab. de Geoquímica", sala: "", link: "https://io.furg.br/pesquisa/laboratoriosio/laboratorios/147-laboratorio-de-geoquimica-oceanografia-geologica" },
+      { sigla: "LGeopro", nome: "Lab. de Geoprocessamento", sala: "", link: "" },
+      { sigla: "LGeof", nome: "Lab. de Geofísica", sala: "", link: "" },
+      { sigla: "LSedim", nome: "Lab. de Sedimentologia", sala: "", link: "" },
+      { sigla: "LMC", nome: "Lab. de Morfodinâmica Costeira", sala: "", link: "" },
+      { sigla: "LPP", nome: "Lab. de Paleoceanografia e Palinologia", sala: "", link: "" },
+      { sigla: "LMet", nome: "Lab. de Meteorologia", sala: "", link: "" }
+    ]
+  },
+
+    // IO - NÚCLEO DE OCEANOGRAFIA FÍSICA
+  { 
+    id: "io_of", 
+    nome: "IO - Oceonagrafia Física", 
+    lat: -32.06909198142869,  
+    lng: -52.163256996820074,  
+    descricao: "Instituto de Oceanografia - Oceonagrafia Física",
+    projetos: [
+      { sigla: "LOCOSTE", nome: "Lab. de Oceanografia Costeira e Estuarina", sala: "", link: "" },
+      { sigla: "CEILORS_2", nome: "CEILORS 2", sala: "", link: "" },
+    ]
+  },
+
+
+
+  // FIM DOS PRÉDIOS DO INSTITUTO DE OCEANOLOGIA
 
 // Galpão Crioulo - Crioulinho
   { 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
@@ -56,6 +56,15 @@ const obterOnibusPrincipal = (onibusPorId) => {
     if (!Number.isFinite(maisRecenteMs)) return atual;
     return atualMs > maisRecenteMs ? atual : maisRecente;
   }, entradas[0][1]);
+};
+
+const abrirClusterSemZoom = (event) => {
+  event?.originalEvent?.preventDefault?.();
+  event?.originalEvent?.stopPropagation?.();
+  const cluster = event?.layer ?? event?.propagatedFrom ?? event?.target;
+  if (cluster && typeof cluster.spiderfy === 'function') {
+    cluster.spiderfy();
+  }
 };
 
 function Localizador({ focar }) {
@@ -148,6 +157,37 @@ const criarIconeCluster = (cluster) => {
     iconAnchor: [0, 0],
   });
 };
+
+const PrediosCluster = memo(function PrediosCluster({ prediosFiltrados, onSelecionarPredio }) {
+  return (
+    <MarkerClusterGroup
+      chunkedLoading
+      iconCreateFunction={criarIconeCluster}
+      maxClusterRadius={40}
+      disableClusteringAtZoom={18}
+      zoomToBoundsOnClick={false}
+      spiderfyOnMaxZoom={false}
+      spiderfyDistanceMultiplier={1.8}
+      showCoverageOnHover={false}
+      animate={false}
+      onClick={abrirClusterSemZoom}
+    >
+      {prediosFiltrados.map((predio) => (
+        <Marker
+          key={predio.id}
+          position={[predio.lat, predio.lng]}
+          icon={criarIcone(predio.id)}
+          eventHandlers={{
+            click: () => onSelecionarPredio(predio),
+          }}
+        />
+      ))}
+    </MarkerClusterGroup>
+  );
+}, (anterior, proximo) => (
+  anterior.prediosFiltrados === proximo.prediosFiltrados
+  && anterior.onSelecionarPredio === proximo.onSelecionarPredio
+));
 
 function App() {
   const [busca, setBusca] = useState('');
@@ -307,30 +347,35 @@ function App() {
     [-32.0625, -52.1500]  // Nordeste — bem folgado
   ];
 
-  const { idsExtras, termosBusca } = traduzirBusca(busca);
+  const { idsExtras, termosBusca } = useMemo(() => traduzirBusca(busca), [busca]);
 
-  const prediosFiltrados = !busca.trim()
-    ? predios
-    : predios.filter((p) => {
-        if (idsExtras.includes(p.id)) return true;
+  const prediosFiltrados = useMemo(() => {
+    if (!busca.trim()) return predios;
 
-        const camposBuscaveis = [
-          p.nome,
-          p.id,
-          ...(p.aliases ?? []),
-          ...((p.projetos ?? []).map((projeto) =>
-            typeof projeto === 'string' ? projeto : projeto.nome ?? ''
-          )),
-        ]
-          .map(normalizarTextoBusca)
-          .filter(Boolean);
+    return predios.filter((p) => {
+      if (idsExtras.includes(p.id)) return true;
 
-        return termosBusca.some((termo) =>
-          camposBuscaveis.some((campo) => new RegExp(`\\b${termo}`).test(campo))
-        );
-      });
+      const camposBuscaveis = [
+        p.nome,
+        p.id,
+        ...(p.aliases ?? []),
+        ...((p.projetos ?? []).map((projeto) =>
+          typeof projeto === 'string' ? projeto : projeto.nome ?? ''
+        )),
+      ]
+        .map(normalizarTextoBusca)
+        .filter(Boolean);
 
-  const predioFocado = prediosFiltrados.length === 1 ? prediosFiltrados[0] : null;
+      return termosBusca.some((termo) =>
+        camposBuscaveis.some((campo) => new RegExp(`\\b${termo}`).test(campo))
+      );
+    });
+  }, [busca, idsExtras, termosBusca]);
+
+  const predioFocado = useMemo(
+    () => (prediosFiltrados.length === 1 ? prediosFiltrados[0] : null),
+    [prediosFiltrados]
+  );
   const predioAbertoAtual = predioAberto
     ? predios.find((predio) => predio.id === predioAberto.id) ?? predioAberto
     : null;
@@ -621,22 +666,10 @@ function App() {
           );
         })}
 
-        <MarkerClusterGroup
-          chunkedLoading
-          iconCreateFunction={criarIconeCluster}
-          maxClusterRadius={40}
-        >
-          {prediosFiltrados.map((predio) => (
-            <Marker 
-              key={predio.id} 
-              position={[predio.lat, predio.lng]} 
-              icon={criarIcone(predio.id)}
-              eventHandlers={{
-                click: () => setPredioAberto(predio),
-              }}
-            />
-          ))}
-        </MarkerClusterGroup>
+        <PrediosCluster
+          prediosFiltrados={prediosFiltrados}
+          onSelecionarPredio={setPredioAberto}
+        />
 
         {onibusAtivos.length === 0 ? (
           <Marker
