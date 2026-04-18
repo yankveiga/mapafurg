@@ -285,6 +285,7 @@ function App() {
           if (payload.type === 'bus_disconnected') {
             if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
             setOnibusPorId((anterior) => {
+              if (!(payload.busId in anterior)) return anterior;
               const proximo = { ...anterior };
               delete proximo[payload.busId];
               return proximo;
@@ -304,10 +305,23 @@ function App() {
           const busId = payload.busId.trim();
 
           // Atualiza posicao do onibus por ID em estrutura de dicionario.
-          setOnibusPorId((anterior) => ({
-            ...anterior,
-            [busId]: posicaoAtualizada,
-          }));
+          setOnibusPorId((anterior) => {
+            const anteriorDoBus = anterior[busId];
+            // Evita re-render em mensagens duplicadas.
+            if (
+              anteriorDoBus
+              && anteriorDoBus.lat === posicaoAtualizada.lat
+              && anteriorDoBus.lng === posicaoAtualizada.lng
+              && anteriorDoBus.timestamp === posicaoAtualizada.timestamp
+            ) {
+              return anterior;
+            }
+
+            return {
+              ...anterior,
+              [busId]: posicaoAtualizada,
+            };
+          });
 
         } catch {
           // Ignora mensagens fora do contrato JSON esperado.

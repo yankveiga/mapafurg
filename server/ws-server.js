@@ -32,6 +32,10 @@ const ENFORCE_ORIGIN = (process.env.WS_ENFORCE_ORIGIN ?? 'true').toLowerCase() !
 const RATE_LIMIT_WINDOW_MS = Number(process.env.WS_RATE_LIMIT_WINDOW_MS ?? 60_000);
 const RATE_LIMIT_MAX_MSG_PER_SOCKET = Number(process.env.WS_RATE_LIMIT_MAX_MSG_PER_SOCKET ?? 120);
 const RATE_LIMIT_MAX_MSG_PER_IP = Number(process.env.WS_RATE_LIMIT_MAX_MSG_PER_IP ?? 600);
+const MAX_ACCURACY_METERS = Number(process.env.WS_MAX_ACCURACY_METERS ?? 50);
+const MIN_MOVE_METERS = Number(process.env.WS_MIN_MOVE_METERS ?? 10);
+const HEARTBEAT_MS = Number(process.env.WS_HEARTBEAT_MS ?? 10_000);
+const MIN_HEADING_DELTA_DEG = Number(process.env.WS_MIN_HEADING_DELTA_DEG ?? 15);
 
 // Fail-fast: evita subir o servico sem autenticacao habilitada.
 if (!AUTH_TOKEN) {
@@ -51,6 +55,26 @@ if (!Number.isFinite(RATE_LIMIT_MAX_MSG_PER_SOCKET) || RATE_LIMIT_MAX_MSG_PER_SO
 
 if (!Number.isFinite(RATE_LIMIT_MAX_MSG_PER_IP) || RATE_LIMIT_MAX_MSG_PER_IP <= 0) {
   console.error('[fatal] WS_RATE_LIMIT_MAX_MSG_PER_IP invalido.');
+  process.exit(1);
+}
+
+if (!Number.isFinite(MAX_ACCURACY_METERS) || MAX_ACCURACY_METERS <= 0) {
+  console.error('[fatal] WS_MAX_ACCURACY_METERS invalido.');
+  process.exit(1);
+}
+
+if (!Number.isFinite(MIN_MOVE_METERS) || MIN_MOVE_METERS <= 0) {
+  console.error('[fatal] WS_MIN_MOVE_METERS invalido.');
+  process.exit(1);
+}
+
+if (!Number.isFinite(HEARTBEAT_MS) || HEARTBEAT_MS <= 0) {
+  console.error('[fatal] WS_HEARTBEAT_MS invalido.');
+  process.exit(1);
+}
+
+if (!Number.isFinite(MIN_HEADING_DELTA_DEG) || MIN_HEADING_DELTA_DEG < 0 || MIN_HEADING_DELTA_DEG > 180) {
+  console.error('[fatal] WS_MIN_HEADING_DELTA_DEG invalido.');
   process.exit(1);
 }
 
@@ -77,6 +101,7 @@ const wss = new WebSocketServer({ server });
 
 // Estado em memoria (sem persistencia em banco): ultimo ponto por onibus.
 const ultimasLocalizacoesPorBusId = new Map();
+const estadoFiltroPorBusId = new Map();
 
 // Metadados de cada conexao e controle de limites por IP.
 const metaPorConexao = new WeakMap();
@@ -139,19 +164,76 @@ const validarMensagemLocalizacao = (payload) => {
 };
 
 // Normaliza o payload para o contrato unico consumido pelo frontend.
-const normalizarMensagemLocalizacao = (payload, busIdConexao) => ({
-  type: 'bus_location',
-  busId: AUTO_ASSIGN_BUS_ID
-    ? busIdConexao
-    : (typeof payload.busId === 'string' && payload.busId.trim() ? payload.busId : BUS_ID_PADRAO),
-  lat: payload.lat,
-  lng: payload.lng,
-  heading: Number.isFinite(payload.heading) ? payload.heading : null,
-  speed: Number.isFinite(payload.speed) ? payload.speed : null,
-  accuracy: Number.isFinite(payload.accuracy) ? payload.accuracy : null,
-  timestamp: typeof payload.timestamp === 'string' ? payload.timestamp : new Date().toISOString(),
-  serverReceivedAt: new Date().toISOString(),
-});
+const normalizarMensagemLocalizacao = (payload, busIdConexao) => {
+  const mensagem = {
+    type: 'bus_location',
+    busId: AUTO_ASSIGN_BUS_ID
+      ? busIdConexao
+      : (typeof payload.busId === 'string' && payload.busId.trim() ? payload.busId : BUS_ID_PADRAO),
+    lat: payload.lat,
+    lng: payload.lng,
+    timestamp: typeof payload.timestamp === 'string' ? payload.timestamp : new Date().toISOString(),
+  };
+
+  // Campos opcionais so sao enviados quando realmente existem.
+  if (Number.isFinite(payload.heading)) mensagem.heading = payload.heading;
+  if (Number.isFinite(payload.speed)) mensagem.speed = payload.speed;
+  if (Number.isFinite(payload.accuracy)) mensagem.accuracy = payload.accuracy;
+
+  return mensagem;
+};
+
+const paraRad = (valor) => (valor * Math.PI) / 180;
+
+const distanciaEmMetros = (latA, lngA, latB, lngB) => {
+  const raioTerra = 6371000;
+  const dLat = paraRad(latB - latA);
+  const dLng = paraRad(lngB - lngA);
+  const latAEmRad = paraRad(latA);
+  const latBEmRad = paraRad(latB);
+
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(latAEmRad) * Math.cos(latBEmRad) * Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return raioTerra * c;
+};
+
+const deltaAngulo = (atual, anterior) => {
+  const bruto = Math.abs(atual - anterior) % 360;
+  return bruto > 180 ? 360 - bruto : bruto;
+};
+
+const deveRepassarAtualizacao = ({ atual, anterior, agoraMs }) => {
+  // Leituras muito imprecisas ficam de fora para evitar salto no mapa.
+  if (Number.isFinite(atual.accuracy) && atual.accuracy > MAX_ACCURACY_METERS) {
+    return false;
+  }
+
+  if (!anterior) return true;
+
+  const msDesdeUltimoEnvio = agoraMs - anterior.lastBroadcastMs;
+  if (msDesdeUltimoEnvio >= HEARTBEAT_MS) {
+    return true;
+  }
+
+  const deslocamento = distanciaEmMetros(anterior.lat, anterior.lng, atual.lat, atual.lng);
+  if (deslocamento >= MIN_MOVE_METERS) {
+    return true;
+  }
+
+  // Mudanca de heading so conta em velocidade real, evitando ruído parado.
+  if (
+    Number.isFinite(atual.heading)
+    && Number.isFinite(anterior.heading)
+    && Number.isFinite(atual.speed)
+    && atual.speed > 1.2
+    && deltaAngulo(atual.heading, anterior.heading) >= MIN_HEADING_DELTA_DEG
+  ) {
+    return true;
+  }
+
+  return false;
+};
 
 const broadcast = (payload) => {
   for (const cliente of wss.clients) {
@@ -250,6 +332,17 @@ wss.on('connection', (ws, req) => {
 
       // 6) Atualiza estado e notifica observadores.
       const mensagemNormalizada = normalizarMensagemLocalizacao(payload, meta?.busId ?? BUS_ID_PADRAO);
+      const filtroAnterior = estadoFiltroPorBusId.get(mensagemNormalizada.busId);
+      if (!deveRepassarAtualizacao({ atual: mensagemNormalizada, anterior: filtroAnterior, agoraMs })) {
+        return;
+      }
+
+      estadoFiltroPorBusId.set(mensagemNormalizada.busId, {
+        lat: mensagemNormalizada.lat,
+        lng: mensagemNormalizada.lng,
+        heading: mensagemNormalizada.heading,
+        lastBroadcastMs: agoraMs,
+      });
       ultimasLocalizacoesPorBusId.set(mensagemNormalizada.busId, mensagemNormalizada);
       broadcast(mensagemNormalizada);
     } catch {
@@ -263,6 +356,7 @@ wss.on('connection', (ws, req) => {
     // Remove onibus desconectado para evitar marcador "fantasma" no mapa.
     if (AUTO_ASSIGN_BUS_ID && meta?.busId) {
       ultimasLocalizacoesPorBusId.delete(meta.busId);
+      estadoFiltroPorBusId.delete(meta.busId);
       broadcast({
         type: 'bus_disconnected',
         busId: meta.busId,
@@ -283,6 +377,7 @@ server.listen(PORT, HOST, () => {
   console.log(`[ws] servidor ouvindo em ws://${HOST}:${PORT}`);
   console.log(`[http] healthcheck em http://${HOST}:${PORT}/health`);
   console.log(`[ws] enforce origin: ${ENFORCE_ORIGIN ? 'on' : 'off'}`);
+  console.log(`[ws] filtro: move>=${MIN_MOVE_METERS}m | heartbeat=${HEARTBEAT_MS}ms | maxAccuracy=${MAX_ACCURACY_METERS}m | headingDelta>=${MIN_HEADING_DELTA_DEG}deg`);
   if (ENFORCE_ORIGIN) {
     console.log(`[ws] allowed origins: ${ALLOWED_ORIGINS.length > 0 ? ALLOWED_ORIGINS.join(', ') : '(nenhum configurado; apenas clientes sem Origin)'}`);
   }

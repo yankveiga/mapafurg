@@ -115,6 +115,10 @@ Variáveis de ambiente suportadas pelo servidor:
 - `WS_RATE_LIMIT_WINDOW_MS` (default: `60000`)
 - `WS_RATE_LIMIT_MAX_MSG_PER_SOCKET` (default: `120`)
 - `WS_RATE_LIMIT_MAX_MSG_PER_IP` (default: `600`)
+- `WS_MAX_ACCURACY_METERS` (default: `50`)
+- `WS_MIN_MOVE_METERS` (default: `10`)
+- `WS_HEARTBEAT_MS` (default: `10000`)
+- `WS_MIN_HEADING_DELTA_DEG` (default: `15`)
 
 O frontend pode consumir um endpoint WebSocket externo por meio de `VITE_WS_URL`. Quando essa variável não é definida, o projeto usa fallback para `ws://<host>:8080` em ambiente local.
 
