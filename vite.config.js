@@ -1,3 +1,11 @@
+/**
+ * Configuracao de build do frontend (Vite + React + Tailwind + PWA).
+ *
+ * Este arquivo centraliza:
+ * - plugins de desenvolvimento/compilacao;
+ * - manifesto da PWA;
+ * - politica de cache offline para tiles do OpenStreetMap.
+ */
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -14,21 +22,24 @@ export default defineConfig({
         name: 'Mapa FURG',
         short_name: 'Mapa FURG',
         description: 'Mapa interativo do Campus Carreiros',
-        theme_color: '#003366', // Cor da barra do navegador (Azul FURG)
-        background_color: '#003366', // Cor de fundo da Splash Screen (Preencha com Azul PET para sumir o branco)
+        // Cor da barra do navegador/tema do app instalado.
+        theme_color: '#003366',
+        // Cor usada na splash screen durante abertura da PWA.
+        background_color: '#003366',
         display: 'standalone',
         icons: [
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable' // IMPORTANTE: Avisa que o Android pode cortar essa imagem
+            // "maskable" melhora recorte em launchers Android.
+            purpose: 'any maskable'
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable' // IMPORTANTE: Avisa que o Android pode cortar essa imagem
+            purpose: 'any maskable'
           }
         ]
       },
@@ -39,6 +50,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/[a-c]\.tile\.openstreetmap\.org\/.*/i,
             handler: 'CacheFirst',
             options: {
+              // Cache dedicado para tiles, reduzindo consumo de rede.
               cacheName: 'osm-tiles',
               expiration: {
                 maxEntries: 1000,

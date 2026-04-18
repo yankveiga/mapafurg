@@ -109,7 +109,12 @@ Variáveis de ambiente suportadas pelo servidor:
 - `BUS_ID`
 - `BUS_ID_PREFIX`
 - `AUTO_ASSIGN_BUS_ID` (default: `true`)
-- `WS_AUTH_TOKEN`
+- `WS_AUTH_TOKEN` (obrigatório)
+- `WS_ALLOWED_ORIGINS` (lista separada por vírgula)
+- `WS_ENFORCE_ORIGIN` (default: `true`)
+- `WS_RATE_LIMIT_WINDOW_MS` (default: `60000`)
+- `WS_RATE_LIMIT_MAX_MSG_PER_SOCKET` (default: `120`)
+- `WS_RATE_LIMIT_MAX_MSG_PER_IP` (default: `600`)
 
 O frontend pode consumir um endpoint WebSocket externo por meio de `VITE_WS_URL`. Quando essa variável não é definida, o projeto usa fallback para `ws://<host>:8080` em ambiente local.
 

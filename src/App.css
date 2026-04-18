@@ -1,3 +1,11 @@
+/*
+ * Estilos utilitarios/legados.
+ *
+ * Observacao:
+ * - Parte deste arquivo vem do template inicial do Vite.
+ * - O layout principal atual do projeto esta concentrado em `App.jsx` + Tailwind.
+ * - Mantido para compatibilidade e reaproveitamento de componentes antigos.
+ */
 .counter {
   font-size: 16px;
   padding: 5px 10px;

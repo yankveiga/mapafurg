@@ -1,6 +1,13 @@
+/*
+ * Estilos globais do frontend.
+ *
+ * Responsabilidade:
+ * - carregar Tailwind;
+ * - garantir altura total para html/body/root (requisito do Leaflet MapContainer).
+ */
 @import "tailwindcss";
 
-/* O mapa exige que o corpo ocupe a tela toda */
+/* O mapa exige que os containers raiz ocupem toda a viewport. */
 html, body, #root {
   height: 100%;
   margin: 0;

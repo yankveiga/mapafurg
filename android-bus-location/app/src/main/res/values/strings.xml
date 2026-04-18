@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">Interno FURG</string>
-    <string name="status_running">Rastreamento ativo automaticamente.</string>
-    <string name="status_requesting_permissions">Solicitando permissões...</string>
-    <string name="status_permissions_missing">Permissões não concedidas. Reabra o app e permita localização e notificação.</string>
-</resources>

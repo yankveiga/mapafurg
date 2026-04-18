@@ -1,3 +1,18 @@
+/**
+ * ============================================================================
+ * Mapa FURG - Componente principal da interface
+ * ============================================================================
+ *
+ * Responsabilidades deste arquivo:
+ * - Renderizar o mapa base do campus com Leaflet.
+ * - Manter fluxo de busca e foco em predios.
+ * - Consumir localizacao do onibus por WebSocket em tempo real.
+ * - Exibir painel de detalhes (drawer) e atalhos de navegacao.
+ *
+ * Observacao arquitetural:
+ * - A camada de dados estaticos vem de `src/data.js`.
+ * - A camada de eventos em tempo real vem do `server/ws-server.js`.
+ */
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -7,12 +22,17 @@ import { normalizarTextoBusca, traduzirBusca } from './buscas';
 import { predios } from './data';
 import logoPet from './assets/logopetvetorizado.svg';
 
+// ID de referencia do ponto "onibus interno" na base estatic a.
 const ID_ONIBUS = 'interno';
+
+// Posicao de fallback quando nao ha nenhum onibus ativo no websocket.
 const POSICAO_INICIAL_ONIBUS = {
   lat: -32.07488993829145,
   lng: -52.15502479544119,
   timestamp: null,
 };
+
+// Dicionario de status de conexao para exibicao no badge da interface.
 const STATUS_WS = {
   conectando: 'Conectando...',
   conectado: 'Ao vivo',
@@ -20,6 +40,7 @@ const STATUS_WS = {
   desconectado: 'Offline',
 };
 
+// Normaliza entradas de URL WS aceitando ws/wss/http/https.
 const normalizarWsUrl = (url) => {
   if (!url) return null;
   const limpa = url.trim().replace(/\/+$/, '');
@@ -29,6 +50,7 @@ const normalizarWsUrl = (url) => {
   return null;
 };
 
+// Transforma timestamp ISO em string amigavel para o usuario final.
 const formatarTempoDecorrido = (timestamp, agoraMs) => {
   if (!timestamp) return 'sem atualização';
   const ms = agoraMs - Date.parse(timestamp);
@@ -44,6 +66,7 @@ const formatarTempoDecorrido = (timestamp, agoraMs) => {
   return `há ${horas}h`;
 };
 
+// Em modo multi-onibus, define "principal" como o com timestamp mais recente.
 const obterOnibusPrincipal = (onibusPorId) => {
   const entradas = Object.entries(onibusPorId);
   if (entradas.length === 0) return POSICAO_INICIAL_ONIBUS;
@@ -57,6 +80,7 @@ const obterOnibusPrincipal = (onibusPorId) => {
   }, entradas[0][1]);
 };
 
+// Clique em cluster abre opcoes sem alterar zoom atual do usuario.
 const abrirClusterSemZoom = (event) => {
   event?.originalEvent?.preventDefault?.();
   event?.originalEvent?.stopPropagation?.();
@@ -66,6 +90,7 @@ const abrirClusterSemZoom = (event) => {
   }
 };
 
+// Marcador da posicao do proprio usuario (dispositivo atual).
 function Localizador({ focar }) {
   const [posicao, setPosicao] = useState(null);
   const map = useMap();
@@ -95,6 +120,7 @@ function Localizador({ focar }) {
   );
 }
 
+// Move camera para ponto de interesse selecionado no drawer/busca.
 function Bussola({ alvo }) {
   const map = useMap();
   useEffect(() => {
@@ -105,6 +131,7 @@ function Bussola({ alvo }) {
   return null; 
 }
 
+// Move camera para o onibus apenas quando o botao dedicado e acionado.
 function CentralizadorOnibus({ focar, posicao }) {
   const map = useMap();
 
@@ -116,6 +143,7 @@ function CentralizadorOnibus({ focar, posicao }) {
   return null;
 }
 
+// Icone dos predios (sigla em bolha azul).
 const criarIcone = (sigla) => {
   const tamanhoFonte = sigla.length > 4 ? 'text-[7px]' : 'text-[10px]';
   return L.divIcon({
@@ -126,6 +154,7 @@ const criarIcone = (sigla) => {
   });
 };
 
+// Icone do onibus em tempo real.
 const criarIconeOnibusAoVivo = () => {
   return L.divIcon({
     className: 'bg-transparent',
@@ -141,7 +170,7 @@ const criarIconeOnibusAoVivo = () => {
   });
 };
 
-// Função que estiliza os agrupamentos (clusters) para manter o padrão visual do app
+// Estilo dos clusters de predios.
 const criarIconeCluster = (cluster) => {
   const quantidade = cluster.getChildCount();
   
@@ -157,6 +186,7 @@ const criarIconeCluster = (cluster) => {
   });
 };
 
+// Cluster memoizado para evitar reinicializacao em atualizacoes frequentes do websocket.
 const PrediosCluster = memo(function PrediosCluster({ prediosFiltrados, onSelecionarPredio }) {
   return (
     <MarkerClusterGroup
@@ -189,6 +219,7 @@ const PrediosCluster = memo(function PrediosCluster({ prediosFiltrados, onSeleci
 ));
 
 function App() {
+  // Estado de busca, navegacao e UI.
   const [busca, setBusca] = useState('');
   const [solicitarGps, setSolicitarGps] = useState(0);
   const [solicitarOnibus, setSolicitarOnibus] = useState(0);
@@ -198,12 +229,15 @@ function App() {
   const [agoraMs, setAgoraMs] = useState(Date.now());
   const [statusWs, setStatusWs] = useState('desconectado');
   const reconnectRef = useRef(null);
+
+  // Referencia do ponto estatico "interno" para fallback e clique.
   const pontoInterno = useMemo(
     () => predios.find((predio) => predio.id === ID_ONIBUS) ?? null,
     []
   );
 
   const wsUrl = useMemo(() => {
+    // Em producao, prioriza VITE_WS_URL. Em dev local, usa host atual:8080.
     if (import.meta.env.VITE_WS_URL) {
       const urlNormalizada = normalizarWsUrl(import.meta.env.VITE_WS_URL);
       return urlNormalizada;
@@ -213,6 +247,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Atualiza relogio local para texto "ultima atualizacao ha Xs".
     const intervalo = window.setInterval(() => {
       setAgoraMs(Date.now());
     }, 1000);
@@ -220,6 +255,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Mantem conexao WS viva com reconexao automatica.
     let ws = null;
     let ativo = true;
 
@@ -244,6 +280,8 @@ function App() {
       ws.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
+
+          // Evento de remocao de onibus desconectado.
           if (payload.type === 'bus_disconnected') {
             if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
             setOnibusPorId((anterior) => {
@@ -265,13 +303,14 @@ function App() {
           };
           const busId = payload.busId.trim();
 
+          // Atualiza posicao do onibus por ID em estrutura de dicionario.
           setOnibusPorId((anterior) => ({
             ...anterior,
             [busId]: posicaoAtualizada,
           }));
 
         } catch {
-          // Ignora mensagens não-JSON enviadas por clientes externos.
+          // Ignora mensagens fora do contrato JSON esperado.
         }
       };
 
@@ -287,6 +326,7 @@ function App() {
     conectar();
 
     return () => {
+      // Cleanup: cancela timer de reconexao e fecha socket na desmontagem.
       ativo = false;
       if (reconnectRef.current) {
         window.clearTimeout(reconnectRef.current);
@@ -296,6 +336,7 @@ function App() {
   }, [wsUrl]);
 
   useEffect(() => {
+    // Permite fechar o drawer pelo "voltar" do navegador.
     if (predioAberto) {
       window.history.pushState({ drawerOpen: true }, "");
     }
@@ -317,6 +358,7 @@ function App() {
     }
   };
 
+  // Limites do campus (desativados no momento, preservados para testes futuros).
   const limitesCampus = [
     [-32.0815, -52.1765], // Sudoeste — expandido de verdade
     [-32.0625, -52.1500]  // Nordeste — bem folgado
@@ -324,6 +366,7 @@ function App() {
 
   const { idsExtras, termosBusca } = useMemo(() => traduzirBusca(busca), [busca]);
 
+  // Filtro principal de predios por busca textual e rotas semanticas.
   const prediosFiltrados = useMemo(() => {
     if (!busca.trim()) return predios;
 
@@ -361,6 +404,7 @@ function App() {
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
       
+      {/* Overlay de fundo quando menu lateral estiver aberto */}
       {menuAberto && (
         <div 
           onClick={() => setMenuAberto(false)} 
@@ -368,6 +412,7 @@ function App() {
         ></div>
       )}
 
+      {/* Menu lateral de atalhos rapidos */}
       <div 
         className={`absolute left-0 top-0 bottom-0 w-[280px] bg-white/95 backdrop-blur-2xl z-[12000] border-r border-white/50 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${menuAberto ? 'translate-x-0' : '-translate-x-full'}`}
       >
@@ -406,6 +451,7 @@ function App() {
         </div>
       </div>
 
+      {/* Barra superior: menu, logo e campo de busca */}
       <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[9999]">
         <div className="flex flex-row items-center gap-3 p-2.5 bg-white/50 backdrop-blur-xl shadow-lg rounded-2xl border border-white/60">
           
@@ -445,6 +491,7 @@ function App() {
         </div>
       </div>
 
+      {/* Botao de centralizacao no usuario local */}
       <button 
         onClick={() => setSolicitarGps(prev => prev + 1)}
         className="absolute bottom-12 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all text-[#003366] hover:bg-white/70"
@@ -456,6 +503,7 @@ function App() {
         </svg>
       </button>
 
+      {/* Botao de centralizacao no onibus principal */}
       <button
         onClick={() => setSolicitarOnibus(prev => prev + 1)}
         className="absolute bottom-28 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all text-[#003366] hover:bg-white/70"
@@ -465,10 +513,12 @@ function App() {
         <span className="text-[22px] leading-none">🚌</span>
       </button>
 
+      {/* Badge de status operacional do websocket/onibus */}
       <div className="absolute bottom-12 left-6 z-[9999] px-3 py-2 rounded-xl bg-white/70 backdrop-blur-xl border border-white/60 text-[11px] font-bold text-slate-700 shadow-lg">
         Ônibus: {STATUS_WS[statusWs]} • Ativos: {onibusAtivos.length} • Última: {ultimaAtualizacao}
       </div>
 
+      {/* Drawer inferior com detalhes do ponto selecionado */}
       <div 
         className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAbertoAtual ? 'translate-y-0' : 'translate-y-full'}`}
       >
@@ -606,7 +656,7 @@ function App() {
       </div>
       
       <MapContainer 
-      // tranca o mapa
+        // Centro inicial padrão do campus.
         center={[-32.0732, -52.1651]} 
         zoom={16} 
         minZoom={15} // Impede que a câmera afaste o suficiente para ver o vazio além das bordas
@@ -624,12 +674,14 @@ function App() {
         <Localizador focar={solicitarGps} />
         <CentralizadorOnibus focar={solicitarOnibus} posicao={onibusPrincipal} />
 
+        {/* Camada de predios com clusterizacao */}
         <PrediosCluster
           prediosFiltrados={prediosFiltrados}
           onSelecionarPredio={setPredioAberto}
         />
 
         {onibusAtivos.length === 0 ? (
+          // Sem onibus online: mostra marcador de fallback.
           <Marker
             position={[POSICAO_INICIAL_ONIBUS.lat, POSICAO_INICIAL_ONIBUS.lng]}
             icon={criarIconeOnibusAoVivo()}
@@ -643,6 +695,7 @@ function App() {
             }}
           />
         ) : (
+          // Multi-onibus: renderiza um marcador por busId ativo.
           onibusAtivos.map(([busId, posicao]) => (
             <Marker
               key={busId}

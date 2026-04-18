@@ -1,15 +1,25 @@
+/**
+ * Motor de busca e traducao semantica do Mapa FURG.
+ *
+ * Objetivo:
+ * - Normalizar texto digitado pelo usuario (acentos, caixa, pontuacao).
+ * - Traduzir palavras-chave para IDs de pontos especificos.
+ * - Permitir busca por atalhos (ex.: "ru", "c3", "pavilhao1", "1101").
+ */
 const removerAcentos = (texto = '') =>
   texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 export const normalizarTextoBusca = (texto = '') =>
   removerAcentos(texto.toLowerCase())
-    .replace(/[^a-z0-9\s]/g, '') // AQUI: o \s preserva os espaços
+    // Nesta etapa preservamos espacos para melhorar a busca por termos compostos.
+    .replace(/[^a-z0-9\s]/g, '')
     .trim();
 
 const normalizarConsulta = (texto = '') =>
   removerAcentos(texto.toLowerCase())
     .replace(/\b(sala|predio|pavilhao)\b/g, '')
-    .replace(/[^a-z0-9]/g, '') // AQUI: sem o \s para garantir chaves exatas no dicionário
+    // Aqui removemos espacos para casar chaves "compactas" no dicionario de rotas.
+    .replace(/[^a-z0-9]/g, '')
     .trim();
 
 export const traduzirBusca = (query) => {
@@ -129,7 +139,7 @@ export const traduzirBusca = (query) => {
 
   let alvos = [];
 
-  // Checagem parcial: previne o sumiço enquanto o usuário digita
+  // Busca parcial: permite feedback imediato durante digitacao.
   for (const chave in rotas) {
     if (chave.includes(textoLimpo)) {
       alvos = [...alvos, ...rotas[chave]];
@@ -157,6 +167,7 @@ export const traduzirBusca = (query) => {
 
   return {
     idsExtras: [...new Set(alvos)],
-    termosBusca: [textoNormalizado], // AQUI: Retornamos o texto com os espaços de volta para a busca do App.jsx
+    // O App.jsx usa os termos normalizados para filtro textual nos campos dos predios.
+    termosBusca: [textoNormalizado],
   };
 };
