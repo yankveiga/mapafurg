@@ -8,7 +8,7 @@ object AppConfig {
     const val BUS_ID = "interno"
 
     // Opcional: use se quiser validar origem no servidor.
-    const val AUTH_TOKEN = "SEU_TOKEN_FORTE"
+    const val AUTH_TOKEN = "token_aqui"
 
     const val LOCATION_INTERVAL_MS = 3_000L
     const val LOCATION_FASTEST_INTERVAL_MS = 2_000L

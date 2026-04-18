@@ -1,5 +1,5 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -13,7 +13,6 @@ const POSICAO_INICIAL_ONIBUS = {
   lng: -52.15502479544119,
   timestamp: null,
 };
-const LIMITE_RASTRO_ONIBUS = 20;
 const STATUS_WS = {
   conectando: 'Conectando...',
   conectado: 'Ao vivo',
@@ -196,7 +195,6 @@ function App() {
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [onibusPorId, setOnibusPorId] = useState({});
-  const [rastrosPorId, setRastrosPorId] = useState({});
   const [agoraMs, setAgoraMs] = useState(Date.now());
   const [statusWs, setStatusWs] = useState('desconectado');
   const reconnectRef = useRef(null);
@@ -253,11 +251,6 @@ function App() {
               delete proximo[payload.busId];
               return proximo;
             });
-            setRastrosPorId((anterior) => {
-              const proximo = { ...anterior };
-              delete proximo[payload.busId];
-              return proximo;
-            });
             return;
           }
 
@@ -276,24 +269,6 @@ function App() {
             ...anterior,
             [busId]: posicaoAtualizada,
           }));
-
-          setRastrosPorId((anterior) => {
-            const rastroAtual = anterior[busId] ?? [];
-            const ultimo = rastroAtual[rastroAtual.length - 1];
-            if (
-              ultimo &&
-              Math.abs(ultimo.lat - posicaoAtualizada.lat) < 0.000005 &&
-              Math.abs(ultimo.lng - posicaoAtualizada.lng) < 0.000005
-            ) {
-              return anterior;
-            }
-
-            const proximoRastro = [...rastroAtual, posicaoAtualizada].slice(-LIMITE_RASTRO_ONIBUS);
-            return {
-              ...anterior,
-              [busId]: proximoRastro,
-            };
-          });
 
         } catch {
           // Ignora mensagens não-JSON enviadas por clientes externos.
@@ -648,23 +623,6 @@ function App() {
         <Bussola alvo={predioAbertoAtual || predioFocado} />
         <Localizador focar={solicitarGps} />
         <CentralizadorOnibus focar={solicitarOnibus} posicao={onibusPrincipal} />
-
-        {Object.entries(rastrosPorId).map(([busId, rastro]) => {
-          if (!Array.isArray(rastro) || rastro.length < 2) return null;
-          return (
-            <Polyline
-              key={`rastro-${busId}`}
-              positions={rastro.map((ponto) => [ponto.lat, ponto.lng])}
-              pathOptions={{
-                color: '#2563eb',
-                weight: 4,
-                opacity: 0.45,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
-          );
-        })}
 
         <PrediosCluster
           prediosFiltrados={prediosFiltrados}
