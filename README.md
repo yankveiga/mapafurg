@@ -122,18 +122,6 @@ Variáveis de ambiente suportadas pelo servidor:
 
 O frontend pode consumir um endpoint WebSocket externo por meio de `VITE_WS_URL`. Quando essa variável não é definida, o projeto usa fallback para `ws://<host>:8080` em ambiente local.
 
-## Teste do WebSocket
-
-Para validar o fluxo sem celular, use o arquivo:
-
-- `public/ws-tester.html`
-
-Com o projeto rodando localmente, abra:
-
-- `http://localhost:5173/ws-tester.html`
-
-Esse utilitário permite conectar ao servidor WebSocket e enviar coordenadas de teste no formato esperado pelo mapa.
-
 ## Aplicativo Android
 
 O repositório inclui a pasta [`android-bus-location`](./android-bus-location), com um aplicativo Android dedicado ao envio contínuo de localização.
@@ -158,7 +146,6 @@ src/
   index.css        estilos globais
 
 public/
-  ws-tester.html   cliente simples para teste do WebSocket
   ...              ícones e assets do PWA
 
 server/
