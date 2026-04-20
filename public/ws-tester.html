@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
+    <!-- Página utilitária para validar o servidor WebSocket sem app Android. -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WS Tester - Ônibus Interno</title>
@@ -89,13 +90,17 @@
     </div>
 
     <script>
+      // Referência da conexão ativa.
       let ws = null;
+      // Atalho para localizar elementos por id.
       const $ = (id) => document.getElementById(id);
+      // Escrita simples no painel de logs.
       const log = (text) => {
         $("log").textContent += `${text}\n`;
         $("log").scrollTop = $("log").scrollHeight;
       };
 
+      // Atualiza rótulo de status da conexão.
       const setStatus = (text) => {
         $("status").textContent = `Status: ${text}`;
       };
@@ -104,6 +109,7 @@
         const url = $("url").value.trim();
         ws = new WebSocket(url);
 
+        // Ciclo de vida padrão da conexão WebSocket.
         ws.onopen = () => {
           setStatus("conectado");
           $("send").disabled = false;
@@ -130,6 +136,7 @@
       $("send").addEventListener("click", () => {
         if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
+        // Payload mínimo compatível com o servidor de localização.
         const payload = {
           type: "bus_location",
           busId: "interno",

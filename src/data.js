@@ -1,11 +1,16 @@
 /**
- * Base de dados dos pontos de interesse do Campus Carreiros.
- * Estrutura:
- * - id: Identificador único (usado para busca e ícones).
- * - nome: Título exibido no mapa e nos detalhes.
- * - lat/lng: Coordenadas geográficas decimais.
- * - descricao: Texto informativo sobre o local.
- * - cardapio: (Opcional) Objeto contendo os pratos da semana para RUs.
+ * Base estática de pontos de interesse do Campus Carreiros (FURG).
+ *
+ * Contrato mínimo de cada item:
+ * - `id`: identificador único usado em busca e atalhos.
+ * - `nome`: texto exibido no marcador e no painel de detalhes.
+ * - `lat`/`lng`: coordenadas geográficas em graus decimais.
+ * - `descricao`: conteúdo informativo apresentado ao usuário final.
+ *
+ * Campos opcionais:
+ * - `aliases`: termos alternativos para o mecanismo de busca.
+ * - `projetos`: lista de laboratórios/projetos/salas relacionadas.
+ * - `horarios`, `cardapio`, `interno`: blocos de informação específicos.
  */
 export const predios = [
 

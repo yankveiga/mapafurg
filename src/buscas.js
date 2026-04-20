@@ -1,15 +1,25 @@
+/**
+ * Módulo de busca semântica do mapa.
+ *
+ * Este arquivo:
+ * - normaliza entradas digitadas pelo usuário;
+ * - traduz apelidos/atalhos para IDs de pontos;
+ * - retorna termos para filtro textual complementar no App.jsx.
+ */
 const removerAcentos = (texto = '') =>
   texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 export const normalizarTextoBusca = (texto = '') =>
   removerAcentos(texto.toLowerCase())
-    .replace(/[^a-z0-9\s]/g, '') // AQUI: o \s preserva os espaços
+    // Mantém espaços para permitir busca por termos compostos.
+    .replace(/[^a-z0-9\s]/g, '')
     .trim();
 
 const normalizarConsulta = (texto = '') =>
   removerAcentos(texto.toLowerCase())
     .replace(/\b(sala|predio|pavilhao)\b/g, '')
-    .replace(/[^a-z0-9]/g, '') // AQUI: sem o \s para garantir chaves exatas no dicionário
+    // Remove separadores para bater com as chaves "compactas" do dicionário.
+    .replace(/[^a-z0-9]/g, '')
     .trim();
 
 export const traduzirBusca = (query) => {
@@ -129,7 +139,7 @@ export const traduzirBusca = (query) => {
 
   let alvos = [];
 
-  // Checagem parcial: previne o sumiço enquanto o usuário digita
+  // Busca parcial: evita "sumiço" de resultados durante a digitação.
   for (const chave in rotas) {
     if (chave.includes(textoLimpo)) {
       alvos = [...alvos, ...rotas[chave]];
@@ -157,6 +167,7 @@ export const traduzirBusca = (query) => {
 
   return {
     idsExtras: [...new Set(alvos)],
-    termosBusca: [textoNormalizado], // AQUI: Retornamos o texto com os espaços de volta para a busca do App.jsx
+    // `termosBusca` é usado no filtro textual do App.jsx.
+    termosBusca: [textoNormalizado],
   };
 };

@@ -1,3 +1,10 @@
+/*
+ * Estilos legados do template inicial do projeto.
+ *
+ * Observação:
+ * - o layout principal atual está em `src/App.jsx` com Tailwind;
+ * - este arquivo é mantido para compatibilidade e possíveis reusos.
+ */
 .counter {
   font-size: 16px;
   padding: 5px 10px;

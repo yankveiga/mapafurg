@@ -1,5 +1,14 @@
+/**
+ * Mapa FURG - Componente principal da aplicação.
+ *
+ * Responsabilidades:
+ * - Renderizar mapa, marcadores e painel de detalhes.
+ * - Aplicar busca de pontos do campus.
+ * - Consumir atualizações do WebSocket de localização do ônibus.
+ * - Controlar ações de foco (usuário e ônibus).
+ */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -7,13 +16,15 @@ import { normalizarTextoBusca, traduzirBusca } from './buscas';
 import { predios } from './data';
 import logoPet from './assets/logopetvetorizado.svg';
 
+// Ponto estático usado para fallback e referência no menu.
 const ID_ONIBUS = 'interno';
+// Coordenada inicial exibida quando não há ônibus online.
 const POSICAO_INICIAL_ONIBUS = {
   lat: -32.07488993829145,
   lng: -52.15502479544119,
   timestamp: null,
 };
-const LIMITE_RASTRO_ONIBUS = 20;
+// Rótulos de estado de conexão WebSocket para a interface.
 const STATUS_WS = {
   conectando: 'Conectando...',
   conectado: 'Ao vivo',
@@ -21,6 +32,7 @@ const STATUS_WS = {
   desconectado: 'Offline',
 };
 
+// Aceita ws:// e wss:// e converte http/https para o protocolo WebSocket.
 const normalizarWsUrl = (url) => {
   if (!url) return null;
   const limpa = url.trim().replace(/\/+$/, '');
@@ -30,6 +42,7 @@ const normalizarWsUrl = (url) => {
   return null;
 };
 
+// Formata o "tempo desde a última atualização" para exibição no badge.
 const formatarTempoDecorrido = (timestamp, agoraMs) => {
   if (!timestamp) return 'sem atualização';
   const ms = agoraMs - Date.parse(timestamp);
@@ -45,6 +58,7 @@ const formatarTempoDecorrido = (timestamp, agoraMs) => {
   return `há ${horas}h`;
 };
 
+// Em cenário de múltiplos ônibus, define como principal o mais recente.
 const obterOnibusPrincipal = (onibusPorId) => {
   const entradas = Object.entries(onibusPorId);
   if (entradas.length === 0) return POSICAO_INICIAL_ONIBUS;
@@ -58,6 +72,7 @@ const obterOnibusPrincipal = (onibusPorId) => {
   }, entradas[0][1]);
 };
 
+// Marcador da localização do usuário no dispositivo atual.
 function Localizador({ focar }) {
   const [posicao, setPosicao] = useState(null);
   const map = useMap();
@@ -87,6 +102,7 @@ function Localizador({ focar }) {
   );
 }
 
+// Move o mapa para o prédio selecionado (busca ou menu).
 function Bussola({ alvo }) {
   const map = useMap();
   useEffect(() => {
@@ -97,6 +113,7 @@ function Bussola({ alvo }) {
   return null; 
 }
 
+// Move o mapa para o ônibus somente quando o botão é acionado.
 function CentralizadorOnibus({ focar, posicao }) {
   const map = useMap();
 
@@ -108,6 +125,7 @@ function CentralizadorOnibus({ focar, posicao }) {
   return null;
 }
 
+// Ícone padrão dos prédios, com sigla em destaque.
 const criarIcone = (sigla) => {
   const tamanhoFonte = sigla.length > 4 ? 'text-[7px]' : 'text-[10px]';
   return L.divIcon({
@@ -118,6 +136,7 @@ const criarIcone = (sigla) => {
   });
 };
 
+// Ícone do ônibus em tempo real.
 const criarIconeOnibusAoVivo = () => {
   return L.divIcon({
     className: 'bg-transparent',
@@ -133,11 +152,11 @@ const criarIconeOnibusAoVivo = () => {
   });
 };
 
-// Função que estiliza os agrupamentos (clusters) para manter o padrão visual do app
+// Estilo visual dos clusters para manter legibilidade com muitos pontos.
 const criarIconeCluster = (cluster) => {
   const quantidade = cluster.getChildCount();
   
-  // A gravidade: mais prédios, maior a bolinha e menor a borda
+  // Ajusta tamanho e sombra conforme a quantidade de itens no cluster.
   const tamanho = quantidade > 8 ? 'w-12 h-12 text-base' : 'w-9 h-9 text-sm';
   const sombra = quantidade > 8 ? 'shadow-[0_0_25px_rgba(0,51,102,0.5)]' : 'shadow-md';
 
@@ -150,13 +169,13 @@ const criarIconeCluster = (cluster) => {
 };
 
 function App() {
+  // Estados principais de interface e dados em tempo real.
   const [busca, setBusca] = useState('');
   const [solicitarGps, setSolicitarGps] = useState(0);
   const [solicitarOnibus, setSolicitarOnibus] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [onibusPorId, setOnibusPorId] = useState({});
-  const [rastrosPorId, setRastrosPorId] = useState({});
   const [agoraMs, setAgoraMs] = useState(Date.now());
   const [statusWs, setStatusWs] = useState('desconectado');
   const reconnectRef = useRef(null);
@@ -166,6 +185,7 @@ function App() {
   );
 
   const wsUrl = useMemo(() => {
+    // Em produção, prioriza URL configurada via variável de ambiente.
     if (import.meta.env.VITE_WS_URL) {
       const urlNormalizada = normalizarWsUrl(import.meta.env.VITE_WS_URL);
       return urlNormalizada;
@@ -175,6 +195,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Atualiza relógio local para o texto "Última: há Xs".
     const intervalo = window.setInterval(() => {
       setAgoraMs(Date.now());
     }, 1000);
@@ -182,6 +203,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // Fluxo de conexão WebSocket com tentativa de reconexão automática.
     let ws = null;
     let ativo = true;
 
@@ -206,6 +228,8 @@ function App() {
       ws.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
+
+          // Remove marcador do ônibus quando o servidor informa desconexão.
           if (payload.type === 'bus_disconnected') {
             if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
             setOnibusPorId((anterior) => {
@@ -213,14 +237,10 @@ function App() {
               delete proximo[payload.busId];
               return proximo;
             });
-            setRastrosPorId((anterior) => {
-              const proximo = { ...anterior };
-              delete proximo[payload.busId];
-              return proximo;
-            });
             return;
           }
 
+          // Ignora mensagens fora do contrato esperado.
           if (payload.type !== 'bus_location') return;
           if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
           if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return;
@@ -232,28 +252,11 @@ function App() {
           };
           const busId = payload.busId.trim();
 
+          // Atualiza posição do ônibus por identificador.
           setOnibusPorId((anterior) => ({
             ...anterior,
             [busId]: posicaoAtualizada,
           }));
-
-          setRastrosPorId((anterior) => {
-            const rastroAtual = anterior[busId] ?? [];
-            const ultimo = rastroAtual[rastroAtual.length - 1];
-            if (
-              ultimo &&
-              Math.abs(ultimo.lat - posicaoAtualizada.lat) < 0.000005 &&
-              Math.abs(ultimo.lng - posicaoAtualizada.lng) < 0.000005
-            ) {
-              return anterior;
-            }
-
-            const proximoRastro = [...rastroAtual, posicaoAtualizada].slice(-LIMITE_RASTRO_ONIBUS);
-            return {
-              ...anterior,
-              [busId]: proximoRastro,
-            };
-          });
 
         } catch {
           // Ignora mensagens não-JSON enviadas por clientes externos.
@@ -265,6 +268,7 @@ function App() {
       ws.onclose = () => {
         if (!ativo) return;
         setStatusWs('desconectado');
+        // Retenta conexão após breve espera para reduzir efeito de oscilação.
         reconnectRef.current = window.setTimeout(conectar, 3000);
       };
     };
@@ -281,6 +285,7 @@ function App() {
   }, [wsUrl]);
 
   useEffect(() => {
+    // Permite fechar o drawer com o botão "voltar" do navegador.
     if (predioAberto) {
       window.history.pushState({ drawerOpen: true }, "");
     }
@@ -294,6 +299,7 @@ function App() {
   }, [predioAberto]);
 
   const selecionarItemCurado = (id) => {
+    // Abre ponto pré-definido do menu lateral.
     const predio = predios.find(p => p.id === id);
     if (predio) {
       setPredioAberto(predio);
@@ -302,6 +308,7 @@ function App() {
     }
   };
 
+  // Limites geográficos reservados para testes de navegação do mapa.
   const limitesCampus = [
     [-32.0815, -52.1765], // Sudoeste — expandido de verdade
     [-32.0625, -52.1500]  // Nordeste — bem folgado
@@ -309,6 +316,7 @@ function App() {
 
   const { idsExtras, termosBusca } = traduzirBusca(busca);
 
+  // Aplica busca textual + atalhos semânticos definidos em buscas.js.
   const prediosFiltrados = !busca.trim()
     ? predios
     : predios.filter((p) => {
@@ -586,7 +594,7 @@ function App() {
       </div>
       
       <MapContainer 
-      // tranca o mapa
+      // Centro inicial do campus.
         center={[-32.0732, -52.1651]} 
         zoom={16} 
         minZoom={15} // Impede que a câmera afaste o suficiente para ver o vazio além das bordas
@@ -603,23 +611,6 @@ function App() {
         <Bussola alvo={predioAbertoAtual || predioFocado} />
         <Localizador focar={solicitarGps} />
         <CentralizadorOnibus focar={solicitarOnibus} posicao={onibusPrincipal} />
-
-        {Object.entries(rastrosPorId).map(([busId, rastro]) => {
-          if (!Array.isArray(rastro) || rastro.length < 2) return null;
-          return (
-            <Polyline
-              key={`rastro-${busId}`}
-              positions={rastro.map((ponto) => [ponto.lat, ponto.lng])}
-              pathOptions={{
-                color: '#2563eb',
-                weight: 4,
-                opacity: 0.45,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
-          );
-        })}
 
         <MarkerClusterGroup
           chunkedLoading

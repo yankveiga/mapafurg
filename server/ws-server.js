@@ -1,7 +1,17 @@
+/**
+ * Servidor WebSocket de localização em tempo real.
+ *
+ * Funções principais:
+ * - Receber payloads `bus_location` enviados pelos apps móveis.
+ * - Validar autenticação e formato dos dados.
+ * - Manter último estado de cada ônibus em memória.
+ * - Repassar atualizações para todos os clientes conectados no mapa.
+ */
 import http from 'node:http';
 import process from 'node:process';
 import { WebSocketServer, WebSocket } from 'ws';
 
+// Configurações base por ambiente.
 const PORT = Number(process.env.PORT ?? process.env.WS_PORT ?? 8080);
 const HOST = process.env.WS_HOST ?? '0.0.0.0';
 const BUS_ID_PADRAO = process.env.BUS_ID ?? 'interno';
@@ -9,6 +19,7 @@ const AUTH_TOKEN = process.env.WS_AUTH_TOKEN ?? '';
 const BUS_ID_PREFIX = process.env.BUS_ID_PREFIX ?? 'bus';
 const AUTO_ASSIGN_BUS_ID = (process.env.AUTO_ASSIGN_BUS_ID ?? 'true').toLowerCase() !== 'false';
 
+// HTTP simples para healthcheck e identificação do serviço.
 const server = http.createServer((req, res) => {
   if (req.url === '/health') {
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
@@ -28,10 +39,14 @@ const server = http.createServer((req, res) => {
 });
 
 const wss = new WebSocketServer({ server });
+// Última localização válida por ônibus (sem persistência em banco).
 const ultimasLocalizacoesPorBusId = new Map();
+// Metadados de conexão por socket.
 const metaPorConexao = new WeakMap();
+// Controle de slots para IDs sequenciais bus-1, bus-2, ...
 const slotsEmUso = new Set();
 
+// Reserva o primeiro slot disponível.
 const alocarSlot = () => {
   let slot = 1;
   while (slotsEmUso.has(slot)) {
@@ -41,18 +56,21 @@ const alocarSlot = () => {
   return slot;
 };
 
+// Libera slot de conexão encerrada.
 const liberarSlot = (slot) => {
   if (Number.isInteger(slot)) {
     slotsEmUso.delete(slot);
   }
 };
 
+// Envia payload JSON apenas para clientes com conexão aberta.
 const enviarJson = (cliente, payload) => {
   if (cliente.readyState === WebSocket.OPEN) {
     cliente.send(JSON.stringify(payload));
   }
 };
 
+// Valida contrato mínimo de mensagem recebida.
 const validarMensagemLocalizacao = (payload) => {
   if (!payload || typeof payload !== 'object') return false;
   if (payload.type !== 'bus_location') return false;
@@ -63,6 +81,7 @@ const validarMensagemLocalizacao = (payload) => {
   return true;
 };
 
+// Padroniza payload para o formato consumido pelo frontend.
 const normalizarMensagemLocalizacao = (payload, busIdConexao) => ({
   type: 'bus_location',
   busId: AUTO_ASSIGN_BUS_ID
@@ -77,6 +96,7 @@ const normalizarMensagemLocalizacao = (payload, busIdConexao) => ({
   serverReceivedAt: new Date().toISOString(),
 });
 
+// Distribui atualização para todos os clientes conectados.
 const broadcast = (payload) => {
   for (const cliente of wss.clients) {
     enviarJson(cliente, payload);
@@ -84,6 +104,7 @@ const broadcast = (payload) => {
 };
 
 wss.on('connection', (ws, req) => {
+  // Define identidade da conexão atual.
   let busIdConexao = BUS_ID_PADRAO;
   let slotConexao = null;
   if (AUTO_ASSIGN_BUS_ID) {
@@ -94,6 +115,7 @@ wss.on('connection', (ws, req) => {
 
   console.log(`[ws] cliente conectado: ${req.socket.remoteAddress} -> ${busIdConexao}`);
 
+  // Mensagem inicial para facilitar depuração de clientes.
   enviarJson(ws, {
     type: 'hello',
     message: 'Conectado ao servidor de localizacao',
@@ -108,6 +130,7 @@ wss.on('connection', (ws, req) => {
     },
   });
 
+  // Ao conectar, entrega último estado conhecido para sincronizar o mapa.
   for (const localizacao of ultimasLocalizacoesPorBusId.values()) {
     enviarJson(ws, localizacao);
   }
@@ -116,11 +139,13 @@ wss.on('connection', (ws, req) => {
     try {
       const payload = JSON.parse(raw.toString());
 
+      // Mensagens inválidas são rejeitadas explicitamente.
       if (!validarMensagemLocalizacao(payload)) {
         enviarJson(ws, { type: 'error', message: 'Formato invalido para bus_location.' });
         return;
       }
 
+      // Atualiza memória e retransmite para observadores.
       const meta = metaPorConexao.get(ws);
       const mensagemNormalizada = normalizarMensagemLocalizacao(payload, meta?.busId ?? BUS_ID_PADRAO);
       ultimasLocalizacoesPorBusId.set(mensagemNormalizada.busId, mensagemNormalizada);
@@ -132,6 +157,7 @@ wss.on('connection', (ws, req) => {
 
   ws.on('close', () => {
     const meta = metaPorConexao.get(ws);
+    // Em modo auto-assign, remove ônibus desconectado da lista ativa.
     if (AUTO_ASSIGN_BUS_ID && meta?.busId) {
       ultimasLocalizacoesPorBusId.delete(meta.busId);
       broadcast({

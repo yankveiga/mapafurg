@@ -1,3 +1,10 @@
+/**
+ * Configuração de lint do projeto.
+ *
+ * Objetivo:
+ * - aplicar regras recomendadas de JavaScript e React;
+ * - validar hooks e compatibilidade com fluxo do Vite.
+ */
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -23,6 +30,7 @@ export default defineConfig([
       },
     },
     rules: {
+      // Permite constantes em MAIÚSCULO sem acusar "unused".
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },

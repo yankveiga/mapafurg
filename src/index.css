@@ -1,6 +1,13 @@
+/*
+ * Estilos globais da aplicação.
+ *
+ * Objetivo principal:
+ * - garantir que `html`, `body` e `#root` ocupem 100% da altura,
+ *   requisito para renderização correta do mapa em tela cheia.
+ */
 @import "tailwindcss";
 
-/* O mapa exige que o corpo ocupe a tela toda */
+/* Base de layout para o Leaflet ocupar a viewport completa. */
 html, body, #root {
   height: 100%;
   margin: 0;
