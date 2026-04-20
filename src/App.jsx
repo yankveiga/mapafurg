@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline, useMap, useMapEvents } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -13,6 +13,7 @@ const POSICAO_INICIAL_ONIBUS = {
   lng: -52.15502479544119,
   timestamp: null,
 };
+const LIMITE_RASTRO_ONIBUS = 20;
 const STATUS_WS = {
   conectando: 'Conectando...',
   conectado: 'Ao vivo',
@@ -42,6 +43,19 @@ const formatarTempoDecorrido = (timestamp, agoraMs) => {
 
   const horas = Math.floor(minutos / 60);
   return `há ${horas}h`;
+};
+
+const obterOnibusPrincipal = (onibusPorId) => {
+  const entradas = Object.entries(onibusPorId);
+  if (entradas.length === 0) return POSICAO_INICIAL_ONIBUS;
+
+  return entradas.reduce((maisRecente, [, atual]) => {
+    const atualMs = Date.parse(atual.timestamp ?? '');
+    const maisRecenteMs = Date.parse(maisRecente.timestamp ?? '');
+    if (!Number.isFinite(atualMs)) return maisRecente;
+    if (!Number.isFinite(maisRecenteMs)) return atual;
+    return atualMs > maisRecenteMs ? atual : maisRecente;
+  }, entradas[0][1]);
 };
 
 function Localizador({ focar }) {
@@ -141,26 +155,9 @@ function App() {
   const [solicitarOnibus, setSolicitarOnibus] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
-  const [posicaoOnibus, setPosicaoOnibus] = useState(POSICAO_INICIAL_ONIBUS);
+  const [onibusPorId, setOnibusPorId] = useState({});
+  const [rastrosPorId, setRastrosPorId] = useState({});
   const [agoraMs, setAgoraMs] = useState(Date.now());
-  // MODO MULTI-ÔNIBUS (deixe comentado por enquanto):
-  // 1) Troque o estado acima por:
-  // const [posicoesOnibus, setPosicoesOnibus] = useState({
-  //   interno: POSICAO_INICIAL_ONIBUS,
-  // });
-  // 2) No onmessage, troque setPosicaoOnibus(...) por:
-  // setPosicoesOnibus((prev) => ({
-  //   ...prev,
-  //   [payload.busId]: {
-  //     lat: payload.lat,
-  //     lng: payload.lng,
-  //     timestamp: payload.timestamp ?? new Date().toISOString(),
-  //   },
-  // }));
-  // 3) Renderize vários marcadores com:
-  // {Object.entries(posicoesOnibus).map(([busId, pos]) => (
-  //   <Marker key={busId} position={[pos.lat, pos.lng]} icon={criarIconeOnibusAoVivo()} />
-  // ))}
   const [statusWs, setStatusWs] = useState('desconectado');
   const reconnectRef = useRef(null);
   const pontoInterno = useMemo(
@@ -209,16 +206,53 @@ function App() {
       ws.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
+          if (payload.type === 'bus_disconnected') {
+            if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
+            setOnibusPorId((anterior) => {
+              const proximo = { ...anterior };
+              delete proximo[payload.busId];
+              return proximo;
+            });
+            setRastrosPorId((anterior) => {
+              const proximo = { ...anterior };
+              delete proximo[payload.busId];
+              return proximo;
+            });
+            return;
+          }
+
           if (payload.type !== 'bus_location') return;
-          // MODO MULTI-ÔNIBUS:
-          // remova a linha abaixo para aceitar todos os busId.
-          if (payload.busId !== ID_ONIBUS) return;
+          if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
           if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return;
 
-          setPosicaoOnibus({
+          const posicaoAtualizada = {
             lat: payload.lat,
             lng: payload.lng,
             timestamp: payload.timestamp ?? new Date().toISOString(),
+          };
+          const busId = payload.busId.trim();
+
+          setOnibusPorId((anterior) => ({
+            ...anterior,
+            [busId]: posicaoAtualizada,
+          }));
+
+          setRastrosPorId((anterior) => {
+            const rastroAtual = anterior[busId] ?? [];
+            const ultimo = rastroAtual[rastroAtual.length - 1];
+            if (
+              ultimo &&
+              Math.abs(ultimo.lat - posicaoAtualizada.lat) < 0.000005 &&
+              Math.abs(ultimo.lng - posicaoAtualizada.lng) < 0.000005
+            ) {
+              return anterior;
+            }
+
+            const proximoRastro = [...rastroAtual, posicaoAtualizada].slice(-LIMITE_RASTRO_ONIBUS);
+            return {
+              ...anterior,
+              [busId]: proximoRastro,
+            };
           });
 
         } catch {
@@ -300,7 +334,9 @@ function App() {
   const predioAbertoAtual = predioAberto
     ? predios.find((predio) => predio.id === predioAberto.id) ?? predioAberto
     : null;
-  const ultimaAtualizacao = formatarTempoDecorrido(posicaoOnibus.timestamp, agoraMs);
+  const onibusAtivos = Object.entries(onibusPorId);
+  const onibusPrincipal = obterOnibusPrincipal(onibusPorId);
+  const ultimaAtualizacao = formatarTempoDecorrido(onibusPrincipal.timestamp, agoraMs);
 
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
@@ -410,7 +446,7 @@ function App() {
       </button>
 
       <div className="absolute bottom-12 left-6 z-[9999] px-3 py-2 rounded-xl bg-white/70 backdrop-blur-xl border border-white/60 text-[11px] font-bold text-slate-700 shadow-lg">
-        Ônibus: {STATUS_WS[statusWs]} • Última: {ultimaAtualizacao}
+        Ônibus: {STATUS_WS[statusWs]} • Ativos: {onibusAtivos.length} • Última: {ultimaAtualizacao}
       </div>
 
       <div 
@@ -515,7 +551,7 @@ function App() {
                     </div>
                   ))}
                 </div>
-                {posicaoOnibus.timestamp && (
+                {onibusPrincipal.timestamp && (
                   <p className="mt-3 text-[9px] text-slate-500 text-center">
                     Última atualização: {ultimaAtualizacao}
                   </p>
@@ -566,7 +602,24 @@ function App() {
         
         <Bussola alvo={predioAbertoAtual || predioFocado} />
         <Localizador focar={solicitarGps} />
-        <CentralizadorOnibus focar={solicitarOnibus} posicao={posicaoOnibus} />
+        <CentralizadorOnibus focar={solicitarOnibus} posicao={onibusPrincipal} />
+
+        {Object.entries(rastrosPorId).map(([busId, rastro]) => {
+          if (!Array.isArray(rastro) || rastro.length < 2) return null;
+          return (
+            <Polyline
+              key={`rastro-${busId}`}
+              positions={rastro.map((ponto) => [ponto.lat, ponto.lng])}
+              pathOptions={{
+                color: '#2563eb',
+                weight: 4,
+                opacity: 0.45,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          );
+        })}
 
         <MarkerClusterGroup
           chunkedLoading
@@ -585,18 +638,36 @@ function App() {
           ))}
         </MarkerClusterGroup>
 
-        <Marker
-          position={[posicaoOnibus.lat, posicaoOnibus.lng]}
-          icon={criarIconeOnibusAoVivo()}
-          zIndexOffset={1500}
-          eventHandlers={{
-            click: () => {
-              if (pontoInterno) {
-                setPredioAberto(pontoInterno);
-              }
-            },
-          }}
-        />
+        {onibusAtivos.length === 0 ? (
+          <Marker
+            position={[POSICAO_INICIAL_ONIBUS.lat, POSICAO_INICIAL_ONIBUS.lng]}
+            icon={criarIconeOnibusAoVivo()}
+            zIndexOffset={1500}
+            eventHandlers={{
+              click: () => {
+                if (pontoInterno) {
+                  setPredioAberto(pontoInterno);
+                }
+              },
+            }}
+          />
+        ) : (
+          onibusAtivos.map(([busId, posicao]) => (
+            <Marker
+              key={busId}
+              position={[posicao.lat, posicao.lng]}
+              icon={criarIconeOnibusAoVivo()}
+              zIndexOffset={1500}
+              eventHandlers={{
+                click: () => {
+                  if (pontoInterno) {
+                    setPredioAberto(pontoInterno);
+                  }
+                },
+              }}
+            />
+          ))
+        )}
 
       </MapContainer>
     </div>
