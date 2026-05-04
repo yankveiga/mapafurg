@@ -1,0 +1,367 @@
+GUIA COMPLETO DO CODIGO - MAPAFURG
+Versao: estado atual do diretorio /home/ssd/Documentos/Github/mapafurg
+
+========================================================================
+1) RESUMO EM 1 MINUTO
+========================================================================
+Este projeto tem duas partes:
+
+1. Frontend (React + Leaflet):
+   - mostra o mapa do campus;
+   - permite buscar predios;
+   - abre painel com detalhes;
+   - recebe a localizacao do onibus em tempo real por WebSocket.
+
+2. Backend (Node + ws):
+   - recebe coordenadas dos celulares;
+   - valida formato e token;
+   - guarda a ultima posicao de cada onibus em memoria;
+   - envia atualizacoes para todos os clientes conectados no mapa.
+
+Decisao de arquitetura:
+- mapa no Vercel (site estatico);
+- WebSocket em servidor separado (Render, laboratorio, etc.).
+Motivo: Vercel nao e usado como servidor WS persistente nesse fluxo.
+
+========================================================================
+2) FLUXO TECNICO COMPLETO (DO CELULAR ATE O MAPA)
+========================================================================
+Passo 1: celular envia JSON para o WS
+Exemplo:
+{
+  "type": "bus_location",
+  "token": "SEU_TOKEN",
+  "lat": -32.07,
+  "lng": -52.16,
+  "timestamp": "2026-04-21T12:00:00.000Z"
+}
+
+Passo 2: server/ws-server.js recebe a mensagem
+- verifica type, token, lat/lng validos;
+- normaliza os campos;
+- define busId (autoassign ou busId recebido, conforme configuracao).
+
+Passo 3: servidor faz broadcast
+- envia o payload para todos os sockets conectados.
+
+Passo 4: src/App.jsx recebe no navegador
+- ws.onmessage faz parse JSON;
+- se for bus_location valido, atualiza estado onibusPorId;
+- React renderiza/atualiza o marcador no Leaflet.
+
+Passo 5: interface mostra status
+- "Ao vivo", "Offline", "Erro";
+- quantidade de onibus ativos;
+- "ultima atualizacao ha Xs".
+
+========================================================================
+3) EXPLICACAO ARQUIVO POR ARQUIVO
+========================================================================
+
+-----------------------------------------------------------------------
+3.1 index.html
+-----------------------------------------------------------------------
+Papel:
+- e o HTML base da SPA.
+- cria o <div id="root"> onde o React monta tudo.
+- referencia /src/main.jsx.
+
+Por que foi feito assim:
+- em Vite + React, index.html e o ponto de entrada da pagina.
+- minimiza complexidade e deixa o JS controlar a interface inteira.
+
+-----------------------------------------------------------------------
+3.2 src/main.jsx
+-----------------------------------------------------------------------
+Papel:
+- bootstrap do React.
+- renderiza <App /> no #root.
+- registra Service Worker da PWA via virtual:pwa-register.
+
+Onde esta a logica principal:
+- registerSW({ immediate: true, onNeedRefresh() { updateSW(true) } })
+
+Por que foi feito assim:
+- garante update automatico da PWA para evitar versao velha em cache.
+
+-----------------------------------------------------------------------
+3.3 src/App.jsx (arquivo central do sistema)
+-----------------------------------------------------------------------
+Papel:
+- concentra regras de interface, mapa, busca e WebSocket.
+
+Blocos principais:
+
+A) Constantes de dominio
+- ID_ONIBUS: id estatico "interno" para referencia no menu.
+- POSICAO_INICIAL_ONIBUS: fallback visual quando nao ha onibus online.
+- STATUS_WS: rotulos para status da conexao.
+
+B) Funcoes utilitarias
+- normalizarWsUrl(url):
+  transforma http->ws e https->wss.
+- formatarTempoDecorrido(timestamp, agoraMs):
+  gera texto "agora", "ha 12s", "ha 3min".
+- obterOnibusPrincipal(onibusPorId):
+  escolhe o onibus com timestamp mais recente.
+
+C) Componentes auxiliares internos
+- Localizador:
+  pega geolocalizacao do usuario atual e opcionalmente centraliza.
+- Bussola:
+  quando um predio fica selecionado, move a camera para ele.
+- CentralizadorOnibus:
+  centraliza no onibus quando o botao e clicado.
+
+D) Icones Leaflet
+- criarIcone(sigla): marcador azul com texto do id/sigla do predio.
+- criarIconeOnibusAoVivo(): marcador do onibus (emoji dentro de bolha).
+- criarIconeCluster(): visual dos clusters quando muitos pontos se sobrepoem.
+
+E) Estado React principal
+- busca: texto do input.
+- solicitarGps: contador-gatilho para centralizar no usuario.
+- solicitarOnibus: contador-gatilho para centralizar no onibus.
+- predioAberto: item do drawer inferior.
+- menuAberto: menu lateral.
+- onibusPorId: dicionario com posicoes em tempo real.
+- agoraMs: relogio para atualizar "ultima atualizacao".
+- statusWs: conectando/conectado/erro/desconectado.
+
+F) Conexao WebSocket
+- monta wsUrl:
+  1) usa VITE_WS_URL se existir;
+  2) senao, fallback para ws://host:8080 (ou wss se pagina https).
+- abre socket.
+- onopen -> status conectado.
+- onmessage:
+  - se bus_disconnected: remove marcador daquele busId.
+  - se bus_location valido: atualiza onibusPorId[busId].
+- onclose -> marca offline e tenta reconectar em 3s.
+
+G) Busca de predios
+- traduzirBusca(busca) retorna:
+  - idsExtras (atalhos/aliases curados)
+  - termosBusca (texto normalizado)
+- filtro final usa:
+  - id, nome, aliases e projetos.
+
+H) Render da interface
+- menu lateral com atalhos.
+- barra superior com busca.
+- botoes flutuantes (GPS usuario e centralizar onibus).
+- badge com status do onibus.
+- drawer inferior com descricao, projetos, horarios, interno e cardapio.
+- MapContainer com tiles OSM.
+- MarkerClusterGroup para predios.
+- marcador de onibus:
+  - sem onibus ativo -> mostra fallback em POSICAO_INICIAL_ONIBUS;
+  - com onibus ativo -> mostra marcadores dos onibus em tempo real.
+
+Observacao importante:
+- no estado atual, maxBounds esta comentado.
+- portanto, nao ha bloqueio geografico rigido da navegacao.
+
+-----------------------------------------------------------------------
+3.4 src/buscas.js
+-----------------------------------------------------------------------
+Papel:
+- motor semantico da busca.
+
+O que faz:
+1) normaliza texto (minusculas, sem acento, sem simbolos).
+2) normaliza consulta compacta (remove termos tipo "predio", "sala").
+3) traduz apelidos para ids (objeto rotas).
+4) aplica busca parcial por chave para nao "sumir resultado" digitando.
+5) trata regras especiais:
+   - prefixos (ex.: eg123 -> expressao_grafica)
+   - pavilhao explicito
+   - numero de sala (ex.: 4103 -> pavilhao_4)
+
+Saida:
+- idsExtras: ids forcados.
+- termosBusca: termo para filtro textual complementar no App.jsx.
+
+Por que foi feito assim:
+- separa regra de negocio da busca do arquivo de interface.
+
+-----------------------------------------------------------------------
+3.5 src/data.js
+-----------------------------------------------------------------------
+Papel:
+- base estatica de pontos do campus.
+
+Estrutura de cada item:
+- obrigatorio: id, nome, lat, lng, descricao
+- opcional: aliases, projetos, horarios, cardapio, interno
+
+Exemplos de uso no App.jsx:
+- id/nome/descricao: marcador + drawer
+- projetos: cards de laboratorios/projetos
+- horarios: quadro de horarios
+- cardapio: RU
+- interno: horarios do onibus no drawer
+
+Por que foi feito assim:
+- modelo simples e direto no frontend.
+- sem banco de dados nesta versao.
+
+Ponto de atencao:
+- ids devem permanecer estaveis, porque buscas e atalhos dependem deles.
+
+-----------------------------------------------------------------------
+3.6 server/ws-server.js (backend tempo real)
+-----------------------------------------------------------------------
+Papel:
+- servidor HTTP + WebSocket.
+
+Config de ambiente:
+- PORT / WS_PORT
+- WS_HOST
+- BUS_ID
+- WS_AUTH_TOKEN
+- BUS_ID_PREFIX
+- AUTO_ASSIGN_BUS_ID
+
+Responsabilidades:
+1) endpoint /health:
+   retorna ok, conexoes ativas e onibus ativos.
+2) handshake WS:
+   aloca slot bus-1, bus-2, ... quando autoassign ligado.
+3) validacao:
+   type=bus_location, token valido (se configurado), lat/lng validos.
+4) normalizacao:
+   padroniza payload com timestamp e serverReceivedAt.
+5) broadcast:
+   envia para todos os clientes conectados.
+6) close:
+   remove onibus desconectado e emite bus_disconnected.
+
+Por que foi feito assim:
+- arquitetura simples, sem dependencia de banco.
+- baixa latencia para exibicao em tempo real.
+
+Limitacao conhecida:
+- estado em memoria (nao persiste apos restart).
+
+-----------------------------------------------------------------------
+3.7 public/ws-tester.html
+-----------------------------------------------------------------------
+Papel:
+- cliente de teste manual do WebSocket no navegador.
+
+O que permite:
+- conectar em uma URL WS;
+- enviar coordenadas simuladas;
+- ver mensagens recebidas no log.
+
+Por que existe:
+- depuracao sem depender do app Android.
+
+-----------------------------------------------------------------------
+3.8 src/index.css
+-----------------------------------------------------------------------
+Papel:
+- importa Tailwind.
+- garante html/body/root com altura 100% para mapa tela cheia.
+
+-----------------------------------------------------------------------
+3.9 src/App.css
+-----------------------------------------------------------------------
+Papel:
+- estilos legados do template inicial.
+- hoje nao e o arquivo principal de layout (layout esta no App.jsx com Tailwind).
+
+-----------------------------------------------------------------------
+3.10 vite.config.js
+-----------------------------------------------------------------------
+Papel:
+- define plugins: React, Tailwind, PWA.
+- configura manifesto PWA e cache.
+
+Detalhe relevante:
+- runtimeCaching das tiles OSM via CacheFirst.
+- melhora uso offline parcial e desempenho.
+
+-----------------------------------------------------------------------
+3.11 tailwind.config.js
+-----------------------------------------------------------------------
+Papel:
+- caminhos que o Tailwind escaneia.
+- extensao de tema (ex.: boxShadow neumorphic).
+
+-----------------------------------------------------------------------
+3.12 eslint.config.js
+-----------------------------------------------------------------------
+Papel:
+- padrao de qualidade de codigo (JS + hooks React + Vite refresh).
+
+Regra personalizada:
+- permite constantes em MAIUSCULO sem falso positivo de unused vars.
+
+-----------------------------------------------------------------------
+3.13 package.json
+-----------------------------------------------------------------------
+Papel:
+- declara dependencias e scripts.
+
+Scripts mais importantes:
+- npm run dev            -> frontend
+- npm run ws:server      -> backend WS
+- npm run dev:all        -> ambos juntos
+- npm run build          -> build producao
+
+========================================================================
+4) POR QUE CADA DECISAO TECNICA FOI TOMADA
+========================================================================
+1. WebSocket separado do front:
+   - simplifica deploy do mapa no Vercel;
+   - permite hospedar realtime em qualquer servidor.
+
+2. Estado em memoria no WS:
+   - suficiente para prototipo/operacao leve;
+   - reduz complexidade inicial.
+
+3. Base estatica (data.js):
+   - facilita manutencao por estudantes sem infra de banco.
+
+4. Busca semantica em modulo separado:
+   - reduz acoplamento com interface;
+   - facilita evoluir regras de busca.
+
+5. Reconexao automatica no front:
+   - melhora resiliencia em redes instaveis.
+
+========================================================================
+5) ONDE ALTERAR CADA COISA RAPIDAMENTE
+========================================================================
+- URL do WS no front: variavel VITE_WS_URL (ambiente Vercel)
+- URL do WS local fallback: src/App.jsx (montagem wsUrl)
+- token no servidor: WS_AUTH_TOKEN
+- formato de validacao do payload: server/ws-server.js (validarMensagemLocalizacao)
+- visual do icone do onibus: src/App.jsx (criarIconeOnibusAoVivo)
+- posicao padrao do onibus offline: src/App.jsx (POSICAO_INICIAL_ONIBUS)
+- dados dos predios/horarios/cardapio: src/data.js
+- regras de busca: src/buscas.js
+
+========================================================================
+6) RISCOS E LIMITACOES (PARA EXPLICAR AO TI)
+========================================================================
+1. Sem persistencia:
+   - restart do WS limpa ultimo estado dos onibus.
+2. Sem historico:
+   - sistema mostra estado atual, nao trilha historica salva.
+3. Dependencia de qualidade de GPS e rede no celular:
+   - pode haver salto de posicao.
+4. Seguranca baseada em token:
+   - precisa manter token fora do Git.
+
+========================================================================
+7) RESPOSTA CURTA PARA APRESENTACAO (ELEVATOR PITCH TECNICO)
+========================================================================
+O Mapa FURG e uma SPA React com Leaflet que renderiza pontos estaticos do
+campus e integra telemetria em tempo real por WebSocket. O backend Node valida
+mensagens de localizacao, mantém o ultimo estado em memoria e distribui as
+coordenadas aos clientes conectados. A arquitetura separa front estatico e
+canal realtime para facilitar deploy, reduzir custo e manter manutencao simples.
+
