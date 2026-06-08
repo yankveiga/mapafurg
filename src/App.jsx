@@ -462,7 +462,7 @@ function App() {
       >
         {predioAbertoAtual && (
           <div className="p-6 pb-8 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="flex justify-between items-start mb-4">
+            <div className="sticky top-0 z-10 -mx-6 -mt-6 mb-4 flex justify-between items-start gap-4 px-6 pt-6 pb-4 bg-white/95 backdrop-blur-2xl border-b border-white/60">
               <div className="pr-4">
                 <h2 className="text-xl font-black text-[#003366] leading-tight">{predioAbertoAtual.nome}</h2>
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{predioAbertoAtual.id}</span>

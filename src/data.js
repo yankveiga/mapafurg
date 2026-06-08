@@ -22,11 +22,11 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-      segunda: "Arroz, Arroz Integral, Feijão Carioca, Carne de panela, Sassami de frango ao molho teriaky, Charuto de legumes com lentilha, Ovo cozido, Farofa de cebola caramelizada, Mix de folhas, Caicó, Chuchu cozido com cheiro verde, Laranja",
-      terca: "Arroz, Arroz Integral com linhaça, Feijão preto, Torta de moída, Escabeche de peixe, Lasanha de berinjela com grão de bico, Omelete, Purê de batata, Mix de folhas, Pepino com cebola, Mix de repolho cozido, Gelatina com fruta",
-      quarta: "Arroz, Arroz Integral, Feijão preto, Coxa sobrecoxa ao molho de alho, Bisteca suína acebolada, Quibe de PTS, Ovo cozido, Batata doce caramelizada, Mix de folhas, Cenoura ralada, Chuchu cozido, Bergamota",
-      quinta: "Feriado",
-      sexta: "Arroz, Arroz Integral, Lentilha, Frango a caçador, Moída Refogada, Pastel de PTS, Omelete, Polenta, Mix de folhas, Mix de repolho, Beterraba cozida, Banana"
+      segunda: "Arroz, Arroz Integral, Feijão Preto, Picadinho ao Sugo, Sassami Grelhado, Hambúrguer de Lentilha, Ovo Cozido, Purê de Batata, Mix de Folhas, Repolho com Abacaxi, Cenoura Cozida em Rodelas, Maçã",
+      terca: "Arroz, Arroz Integral, Feijão Carioca, Iscas de Pernil ao Shoyu, Coxa e Sobrecoxa ao Molho de Laranja, Charuto de Legumes com Lentilha, Ovo Cozido, Farofa Rica, Mix de Folhas, Beterraba Ralada, Mix de Legumes Cozidos, Laranja",
+      quarta: "Arroz, Arroz Integral, Feijão Preto, Frango ao Molho, Moída Refogada com Batata, Almôndega de PTS, Omelete, Polenta Cozida, Mix de Folhas, Pepino com Tomate, Chuchu Cozido com Cheiro Verde, Sagu com Fruta",
+      quinta: "Arroz, Arroz Integral, Feijão Preto, Bife Acebolado, Frango à Caçador, Lasanha de Berinjela com Ervilha, Ovo Poché, Macarrão Alho e Óleo, Mix de Folhas, Cenoura Ralada, Abobrinha Cozida, Bergamota",
+      sexta: "Arroz, Arroz Integral, Lentilha, Feijão, Cubo Bovino ao Molho Pardo, Peixe Empanado, Quibe Assado, Ovo Frito, Batata Doce Caramelizada, Mix de Folhas, Salada Caicó, Repolho Cozido, Pudim de Baunilha"
     }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
