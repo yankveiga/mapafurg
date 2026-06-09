@@ -8,6 +8,7 @@
     "dev:websocket": "node server/ws-server.js",
     "dev:all": "concurrently -n WEB,WS -c blue,green \"npm run dev\" \"npm run dev:websocket\"",
     "ws:server": "node server/ws-server.js",
+    "estimate:ws": "node consumo/estimar-consumo-ws.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

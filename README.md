@@ -71,6 +71,7 @@ npm run dev
 npm run dev:websocket
 npm run ws:server
 npm run dev:all
+npm run estimate:ws
 npm run build
 npm run preview
 npm run lint
@@ -125,6 +126,35 @@ Com o projeto rodando localmente, abra:
 
 Esse utilitário permite conectar ao servidor WebSocket e enviar coordenadas de teste no formato esperado pelo mapa.
 
+## Estimativa de consumo do WebSocket
+
+Para estimar o tráfego mensal gerado pelo rastreamento, rode:
+
+```bash
+npm.cmd run estimate:ws
+```
+
+No Windows, `npm.cmd` evita bloqueios de política de execução do PowerShell. Em outros ambientes, `npm run estimate:ws` também funciona.
+
+O cálculo fica em [`consumo/estimar-consumo-ws.js`](./consumo/estimar-consumo-ws.js) e usa como base:
+
+- intervalo de envio do app Android: `3s`
+- payload do celular com `token`, `speed`, `accuracy` e `heading`: `223 bytes`
+- payload retransmitido pelo servidor para cada mapa aberto: `219 bytes`
+- mês de referência: `30 dias`
+
+Exemplo de saída:
+
+```text
+1 onibus - 1 conexao:     381.888 MB
+2 onibus - 1 conexao:     763.776 MB
+1 onibus - 50 conexoes:   9.653 GB
+2 onibus - 50 conexoes:   19.307 GB
+2 onibus - 200 conexoes:  76.072 GB
+```
+
+Esses valores estimam o JSON trafegado pela aplicação. O consumo real de rede pode ser um pouco maior por overhead de WebSocket, TCP/IP e TLS em conexões `wss://`.
+
 ## Aplicativo Android
 
 O repositório inclui a pasta [`android-bus-location`](./android-bus-location), com um aplicativo Android dedicado ao envio contínuo de localização.
@@ -154,6 +184,9 @@ public/
 
 server/
   ws-server.js     servidor WebSocket / healthcheck HTTP
+
+consumo/
+  estimar-consumo-ws.js   estimador de tráfego mensal do WebSocket
 
 android-bus-location/
   ...              app Android para envio de localização
