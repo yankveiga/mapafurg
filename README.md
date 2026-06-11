@@ -138,7 +138,7 @@ No Windows, `npm.cmd` evita bloqueios de política de execução do PowerShell. 
 
 O cálculo fica em [`consumo/estimar-consumo-ws.js`](./consumo/estimar-consumo-ws.js) e usa como base:
 
-- intervalo de envio do app Android: `3s`
+- intervalo de envio do app rastreador: `3s`
 - payload do celular com `token`, `speed`, `accuracy` e `heading`: `223 bytes`
 - payload retransmitido pelo servidor para cada mapa aberto: `219 bytes`
 - mês de referência: `30 dias`
@@ -155,18 +155,19 @@ Exemplo de saída:
 
 Esses valores estimam o JSON trafegado pela aplicação. O consumo real de rede pode ser um pouco maior por overhead de WebSocket, TCP/IP e TLS em conexões `wss://`.
 
-## Aplicativo Android
+## Rastreador externo
 
-O repositório inclui a pasta [`android-bus-location`](./android-bus-location), com um aplicativo Android dedicado ao envio contínuo de localização.
+Este repositório não inclui o aplicativo rastreador usado no celular ou no dispositivo instalado no ônibus.
 
-Responsabilidades do app:
+Para o rastreamento em tempo real funcionar, é necessário um app externo que:
 
-- obter localização do aparelho
-- manter rastreamento em foreground service
-- reconectar ao WebSocket quando necessário
-- enviar payloads compatíveis com o servidor
+- obtenha a localização do aparelho
+- mantenha o envio ativo enquanto o rastreamento estiver ligado
+- conecte ao servidor WebSocket configurado para o projeto
+- envie mensagens `bus_location` no formato esperado pelo servidor
+- reconecte automaticamente em caso de queda de rede
 
-As configurações específicas de implantação do app ficam no código Android e devem ser revisadas antes de gerar builds para uso real.
+Esse app pode ser Android ou outra solução equivalente, desde que envie coordenadas válidas para o WebSocket do backend.
 
 ## Estrutura do projeto
 
@@ -187,9 +188,6 @@ server/
 
 consumo/
   estimar-consumo-ws.js   estimador de tráfego mensal do WebSocket
-
-android-bus-location/
-  ...              app Android para envio de localização
 ```
 
 ## Manutenção
@@ -241,7 +239,7 @@ Este repositório não deve expor:
 Boas práticas recomendadas:
 
 - manter segredos em variáveis de ambiente
-- revisar `AppConfig.kt` e arquivos de deploy antes de publicar
+- revisar as configurações do app rastreador antes de publicar ou instalar em produção
 - evitar commit de endpoints internos, túneis temporários e chaves reais
 
 ## Observações

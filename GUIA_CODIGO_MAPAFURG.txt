@@ -4,7 +4,7 @@ Versao: estado atual do diretorio /home/ssd/Documentos/Github/mapafurg
 ========================================================================
 1) RESUMO EM 1 MINUTO
 ========================================================================
-Este projeto tem duas partes:
+Este projeto tem duas partes principais:
 
 1. Frontend (React + Leaflet):
    - mostra o mapa do campus;
@@ -13,10 +13,15 @@ Este projeto tem duas partes:
    - recebe a localizacao do onibus em tempo real por WebSocket.
 
 2. Backend (Node + ws):
-   - recebe coordenadas dos celulares;
+   - recebe coordenadas enviadas por apps rastreadores externos;
    - valida formato e token;
    - guarda a ultima posicao de cada onibus em memoria;
    - envia atualizacoes para todos os clientes conectados no mapa.
+
+Observacao sobre o rastreador:
+- este repositorio nao inclui o app do celular/dispositivo rastreador;
+- para o onibus aparecer em tempo real, um app externo precisa obter o GPS e
+  enviar mensagens bus_location para o servidor WebSocket.
 
 Decisao de arquitetura:
 - mapa no Vercel (site estatico);
@@ -26,7 +31,7 @@ Motivo: Vercel nao e usado como servidor WS persistente nesse fluxo.
 ========================================================================
 2) FLUXO TECNICO COMPLETO (DO CELULAR ATE O MAPA)
 ========================================================================
-Passo 1: celular envia JSON para o WS
+Passo 1: app rastreador externo envia JSON para o WS
 Exemplo:
 {
   "type": "bus_location",
@@ -244,6 +249,13 @@ Por que foi feito assim:
 Limitacao conhecida:
 - estado em memoria (nao persiste apos restart).
 
+Observacao sobre o app rastreador:
+- o servidor nao depende de uma pasta do rastreador dentro deste repositorio;
+- qualquer app ou dispositivo pode ser usado como rastreador, desde que envie
+  o JSON bus_location no formato aceito pelo server/ws-server.js;
+- se WS_AUTH_TOKEN estiver configurado no servidor, o app rastreador tambem
+  precisa enviar o mesmo token no payload.
+
 -----------------------------------------------------------------------
 3.7 public/ws-tester.html
 -----------------------------------------------------------------------
@@ -256,7 +268,7 @@ O que permite:
 - ver mensagens recebidas no log.
 
 Por que existe:
-- depuracao sem depender do app Android.
+- depuracao sem depender do app rastreador.
 
 -----------------------------------------------------------------------
 3.8 src/index.css
@@ -338,6 +350,7 @@ Scripts mais importantes:
 - URL do WS no front: variavel VITE_WS_URL (ambiente Vercel)
 - URL do WS local fallback: src/App.jsx (montagem wsUrl)
 - token no servidor: WS_AUTH_TOKEN
+- URL/token no rastreador: configuracao do app rastreador externo
 - formato de validacao do payload: server/ws-server.js (validarMensagemLocalizacao)
 - visual do icone do onibus: src/App.jsx (criarIconeOnibusAoVivo)
 - posicao padrao do onibus offline: src/App.jsx (POSICAO_INICIAL_ONIBUS)
