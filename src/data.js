@@ -22,11 +22,11 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-      segunda: "Arroz, Arroz Integral, Feijão Carioca, Carne Moída Refogada com Milho, Frango Xadrez, Grão de Bico ao Shoyu, Ovo Cozido, Espaguete ao Alho e Óleo, Mix de Folhas, Salada Mista, Laranja",
-      terca: "Arroz, Arroz Integral, Feijão Preto, Coxa e Sobrecoxa ao Pomodoro, Cubos de Pernil ao Molho Shoyu, PTS Refogada com Milho, Omelete, Polenta, Mix de Folhas, Pepino com Tomate, Cenoura Cozida, Gelatina com Fruta",
-      quarta: "Arroz, Arroz Integral, Feijão Preto, Carne de Panela, Peixe Frito, Charuto de Grão de Bico com Legumes, Omelete, Jardineira de Legumes, Mix de Folhas, Repolho com Laranja, Beterraba Cozida, Banana",
-      quinta: "Arroz, Arroz Integral, Feijão Carioca, Costelina Suína ao BBQ, Sassami Acebolado, Panqueca de Legumes, Ovo Cozido, Abóbora à Provençal, Mix de Folhas, Abobrinha Ralada, Cenoura Cozida em Rodelas, Pudim com Fruta",
-      sexta: "Arroz, Arroz Integral, Lentilha, Strogonoff de Frango, Carne Moída Refogada ao Sugo, PTS Refogada, Ovo Frito, Batata Palha, Mix de Folhas, Beterraba Ralada, Chuchu Cozido, Bergamota"
+      segunda: "Arroz, Arroz integral, Feijão carioca, Cubos suínos ao molho teriaky, Sassami ao molho de alho, Panqueca de legumes, Ovo cozido, Purê de batata, Mix de folhas, Pepino com tomate, Beterraba cozida, Poncã",
+      terca: "Arroz, Arroz integral com linhaça, Feijão preto, Coxa sobrecoxa assada, Cubos bovinos a chinesa, Hamburguer de grão de bico, Omelete, Polenta, Mix de folhas, Abobrinha ralada, Cenoura cozida, Gelatina com fruta",
+      quarta: "Arroz, Arroz integral, Lentilha, Sassami ao molho vermelho, Iscas de pernil ao molho ferrugem, Charuto de lentilha com legumes, Ovo cozido, Farofa de legumes, Mix de folhas, Cenoura ralada, Chuchu cozido, Banana",
+      quinta: "Arroz, Arroz integral, Feijão preto, Quibe assado, Fricassê de frango, Panqueca de legumes, Ovo poché, Macarrão ao alho e óleo, Mix de folhas, Beterraba filetada, Cenoura cozida, Pudim com fruta",
+      sexta: "Arroz, Arroz integral, Feijão preto, Peixe frito, Carne moida refogada, Escondidinho de PTS, Omelete, Massa com molho, Sopa de legumes, Mix de folhas, Repolho ralado, Abobrinha cozida, Laranja"
     }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
