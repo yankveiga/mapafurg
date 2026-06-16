@@ -37,13 +37,13 @@ export const predios = [
     lng: -52.166576, 
     descricao: "Segunda a Sexta:\n☕ Café: 07h15 às 09h00\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00\n\nSábados, Domingos e Feriados:\n☕ Café: 08h30 às 09h45\n☀️ Almoço: 12h00 às 13h45\n🌙 Jantar: 18h30 às 20h00",
     cardapio: {
-      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Strogonoff de Carne Bovina, Frango à Milanesa, Bolinho de Lentilha, Batata Palha, Alface, Beterraba Cozida com Maçã, Pepino, Melão",
-      terca: "Arroz Branco, Arroz Integral, Feijão Carioca, Fricassê de Frango, Bife Bovino Acebolado, Hambúrguer de Grão de Bico, Farofa com Legumes, Mix de Folhas, Repolho Cozido com Orégano, Salada Náutico, Maçã",
-      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Carne de Panela, Peixe à Escabeche, Tomate Recheado com Lentilha, Purê de Batatas Especial, Alface, Cenoura Cozida, Tabule, Laranja",
-      quinta: "Arroz Branco, Arroz Integral, Feijão Preto, Cubos Suínos ao Molho Madeira, Bife de Frango Grelhado, Strogonoff de Cogumelos, Quibebe, Couve Chinesa, Abobrinha Cozida com Milho, Tomate com Cebola, Bergamota",
-      sexta: "Arroz Branco, Arroz Integral, Lentilha, Lasanha à Bolonhesa, Bife de Frango ao Molho Mostarda, Almôndegas de PTS ao Molho de Tomate e Cebolas, Cenoura Sautê, Mix de Folhas, Soja em Grãos Refogada com Tempero Verde, Salpicão, Banana",
-      sábado: "Arroz Branco, Arroz Integral, Feijão Preto, Iscas de Suínos ao Molho BBQ, Cubos de Frango a Xadrez, Kibe de PTS, Legumes Salteados, Alface, Maionese de Beterraba, Pepino, Maçã",
-      domingo: "Arroz Branco, Arroz Integral, Feijão Carioca, Carne de Panela, Coxa com Sobrecoxa Assada no Forno, Grão de Bico Acebolado, Massa Parafuso com Tomate e Rúcula, Alface, Chuchu com Milho, Cenoura Ralada, Salada de Frutas"
+      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Strogonoff de Carne Bovina, Bife de Frango Grelhado, Tomate recheado com lentilha, Massa parafuso com tomate e rúcula, Alface, Cenoura cozida, Tabule, Maçã",
+      terca: "Arroz Branco, Arroz Integral, Feijão Preto, Carne de Panela, Rocambole de Frango com Frios ao sugo, Grão de bico e soja refogada ao curry, Polenta com queijo, Mix de folhas, Beterraba cozida com maçã, Pepino, Laranja",
+      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Carré suíno ao molho BBQ, Cubos de Frango a Xadrez, Kibe de PTS, Quibebe, Couve chinesa, Macarronese, Tomate com cebola, Melão",
+      quinta: "Arroz Branco, Arroz Integral com linhaça, Feijão Carioca, Bife bovino acebolado, Croquete de frango, PTS refogado, Massa ao Sugo, Alface, Abobrinha cozida com milho, Salpicão, Maçã",
+      sexta: "Arroz Branco, Arroz Integral, Lentilha, Carré suíno ao molho ferrugem, Filé de frango ao molho mostarda, Grão de bico acebolado, Batata Doce Caramelada, Alface roxa, Beterraba cozida, Repolho misto, Banana",
+      sábado: "Arroz Branco, Arroz Integral, Feijão Preto, Lasanha a bolonhesa, Peixe a milanesa, Cogumelos com legumes, Cenoura Sautê, Alface, Soja em grãos refogada, Tomate com cebola, Laranja",
+      domingo: "Arroz Branco, Arroz Integral, Feijão Preto, Bife bovino acebolado, Coxa com sobrecoxa assada, Legumes sauteados, Farofa com legumes, Alface, Beterraba cozida com maçã, Cenoura ralada, Melão, Creme de Moranga"
     }
   },     
     
