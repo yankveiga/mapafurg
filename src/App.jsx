@@ -12,6 +12,7 @@ import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-lea
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { BusFront, LocateFixed } from 'lucide-react';
 import { normalizarTextoBusca, traduzirBusca } from './buscas';
 import { predios } from './data';
 import logoPet from './assets/logopetvetorizado.svg';
@@ -76,21 +77,48 @@ const obterOnibusPrincipal = (onibusPorId) => {
 function Localizador({ focar }) {
   const [posicao, setPosicao] = useState(null);
   const map = useMap();
+  const rastreandoRef = useRef(false);
+  const centralizarProximaLocalizacaoRef = useRef(false);
+  const posicaoAtualRef = useRef(null);
 
   useMapEvents({
     locationfound(e) {
+      posicaoAtualRef.current = e.latlng;
       setPosicao(e.latlng);
-      if (focar) {
+      if (centralizarProximaLocalizacaoRef.current) {
         map.flyTo(e.latlng, 18);
+        centralizarProximaLocalizacaoRef.current = false;
       }
     },
   });
 
   useEffect(() => {
-    if (focar) {
-      map.locate({ setView: false, enableHighAccuracy: true });
+    if (!focar) return;
+
+    centralizarProximaLocalizacaoRef.current = true;
+
+    if (posicaoAtualRef.current) {
+      map.flyTo(posicaoAtualRef.current, 18);
+      centralizarProximaLocalizacaoRef.current = false;
+    }
+
+    if (!rastreandoRef.current) {
+      rastreandoRef.current = true;
+      map.locate({
+        setView: false,
+        enableHighAccuracy: true,
+        watch: true,
+        maximumAge: 1000,
+        timeout: 10000,
+      });
     }
   }, [focar, map]);
+
+  useEffect(() => {
+    return () => {
+      map.stopLocate();
+    };
+  }, [map]);
     
   return posicao === null ? null : (
     <Marker position={posicao} icon={L.divIcon({
@@ -142,9 +170,11 @@ const criarIconeOnibusAoVivo = () => {
     className: 'bg-transparent',
     html: `
       <div class="-translate-x-1/2 -translate-y-1/2">
-        <div class="w-9 h-9 rounded-full border-2 border-white shadow-md flex items-center justify-center bg-[#003366]">
-          <span class="text-[18px] leading-none">🚌</span>
-        </div>
+        <img
+          src="/interno.svg"
+          alt=""
+          class="w-8 h-8 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.35)]"
+        />
       </div>
     `,
     iconSize: [0, 0],
@@ -314,34 +344,41 @@ function App() {
     [-32.0625, -52.1500]  // Nordeste — bem folgado
   ];
 
-  const { idsExtras, termosBusca } = traduzirBusca(busca);
+  const { idsExtras, termosBusca } = useMemo(() => traduzirBusca(busca), [busca]);
 
   // Aplica busca textual + atalhos semânticos definidos em buscas.js.
-  const prediosFiltrados = !busca.trim()
-    ? predios
-    : predios.filter((p) => {
-        if (idsExtras.includes(p.id)) return true;
+  const prediosFiltrados = useMemo(() => {
+    if (!busca.trim()) return predios;
 
-        const camposBuscaveis = [
-          p.nome,
-          p.id,
-          ...(p.aliases ?? []),
-          ...((p.projetos ?? []).map((projeto) =>
-            typeof projeto === 'string' ? projeto : projeto.nome ?? ''
-          )),
-        ]
-          .map(normalizarTextoBusca)
-          .filter(Boolean);
+    return predios.filter((p) => {
+      if (idsExtras.includes(p.id)) return true;
 
-        return termosBusca.some((termo) =>
-          camposBuscaveis.some((campo) => new RegExp(`\\b${termo}`).test(campo))
-        );
-      });
+      const camposBuscaveis = [
+        p.nome,
+        p.id,
+        ...(p.aliases ?? []),
+        ...((p.projetos ?? []).map((projeto) =>
+          typeof projeto === 'string' ? projeto : projeto.nome ?? ''
+        )),
+      ]
+        .map(normalizarTextoBusca)
+        .filter(Boolean);
+
+      return termosBusca.some((termo) =>
+        camposBuscaveis.some((campo) => new RegExp(`\\b${termo}`).test(campo))
+      );
+    });
+  }, [busca, idsExtras, termosBusca]);
 
   const predioFocado = prediosFiltrados.length === 1 ? prediosFiltrados[0] : null;
   const predioAbertoAtual = predioAberto
     ? predios.find((predio) => predio.id === predioAberto.id) ?? predioAberto
     : null;
+  const buscaAtiva = Boolean(busca.trim());
+  const totalResultadosBusca = prediosFiltrados.length;
+  const rotuloResultadosBusca = totalResultadosBusca === 1
+    ? '1 resultado'
+    : `${totalResultadosBusca} resultados`;
   const onibusAtivos = Object.entries(onibusPorId);
   const onibusPrincipal = obterOnibusPrincipal(onibusPorId);
   const ultimaAtualizacao = formatarTempoDecorrido(onibusPrincipal.timestamp, agoraMs);
@@ -419,39 +456,54 @@ function App() {
                 setBusca(e.target.value);
                 setPredioAberto(null);
               }}
-              className="w-full bg-white/40 hover:bg-white/60 text-slate-800 px-3 py-2.5 pr-8 rounded-xl border border-white/50 outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all text-sm"
+              className={`w-full bg-white/40 hover:bg-white/60 text-slate-800 px-3 py-2.5 pr-8 rounded-xl border outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all duration-200 text-sm ${buscaAtiva ? 'border-[#003366]/30 shadow-sm' : 'border-white/50'}`}
             />
             {busca && (
               <button 
                 onClick={() => setBusca('')} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 font-bold p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 font-bold p-1 rounded-full transition-all duration-200 hover:bg-white/70 hover:rotate-90 active:scale-90"
+                aria-label="Limpar busca"
+                title="Limpar busca"
               >
                 &#x2715;
               </button>
             )}
+            <div
+              className={`pointer-events-none absolute left-1 top-[calc(100%+8px)] rounded-full border border-white/70 bg-white/80 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-[#003366] shadow-md backdrop-blur-xl transition-all duration-200 ${buscaAtiva ? 'translate-y-0 opacity-100' : '-translate-y-1 opacity-0'}`}
+            >
+              {totalResultadosBusca === 0 ? 'Nenhum resultado' : rotuloResultadosBusca}
+            </div>
           </div>
         </div>
       </div>
 
-      <button 
-        onClick={() => setSolicitarGps(prev => prev + 1)}
-        className="absolute bottom-12 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all text-[#003366] hover:bg-white/70"
-      >
-        <svg viewBox="0 0 24 24" className="w-7 h-7 fill-none stroke-current stroke-2" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="9" />
-          <circle cx="12" cy="12" r="2" className="fill-current" />
-          <path d="M12 2v3m0 14v3M2 12h3m14 0h3" strokeLinecap="round"/>
-        </svg>
-      </button>
+      <div className="group absolute bottom-12 right-6 z-[9999]">
+        <button
+          onClick={() => setSolicitarGps(prev => prev + 1)}
+          className="bg-white/55 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/70 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/80 hover:shadow-xl"
+          aria-label="Minha localização"
+          title="Minha localização"
+        >
+          <LocateFixed size={27} strokeWidth={2.25} aria-hidden="true" />
+        </button>
+        <span className="pointer-events-none absolute right-14 top-1/2 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-lg bg-slate-900/90 px-2.5 py-1.5 text-[11px] font-bold text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 md:block">
+          Minha localização
+        </span>
+      </div>
 
-      <button
-        onClick={() => setSolicitarOnibus(prev => prev + 1)}
-        className="absolute bottom-28 right-6 z-[9999] bg-white/50 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/60 shadow-lg active:scale-95 transition-all text-[#003366] hover:bg-white/70"
-        aria-label="Centralizar no ônibus"
-        title="Centralizar no ônibus"
-      >
-        <span className="text-[22px] leading-none">🚌</span>
-      </button>
+      <div className="group absolute bottom-28 right-6 z-[9999]">
+        <button
+          onClick={() => setSolicitarOnibus(prev => prev + 1)}
+          className="bg-white/55 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/70 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/80 hover:shadow-xl"
+          aria-label="Centralizar ônibus"
+          title="Centralizar ônibus"
+        >
+          <BusFront size={27} strokeWidth={2.25} aria-hidden="true" />
+        </button>
+        <span className="pointer-events-none absolute right-14 top-1/2 hidden -translate-y-1/2 translate-x-1 whitespace-nowrap rounded-lg bg-slate-900/90 px-2.5 py-1.5 text-[11px] font-bold text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 md:block">
+          Centralizar ônibus
+        </span>
+      </div>
 
       <div className="absolute bottom-12 left-6 z-[9999] px-3 py-2 rounded-xl bg-white/70 backdrop-blur-xl border border-white/60 text-[11px] font-bold text-slate-700 shadow-lg">
         Ônibus: {STATUS_WS[statusWs]} • Ativos: {onibusAtivos.length} • Última: {ultimaAtualizacao}
@@ -461,11 +513,11 @@ function App() {
         className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAbertoAtual ? 'translate-y-0' : 'translate-y-full'}`}
       >
         {predioAbertoAtual && (
-          <div className="p-6 pb-8 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="sticky top-0 z-10 -mx-6 -mt-6 mb-4 flex justify-between items-start gap-4 px-6 pt-6 pb-4 bg-white/95 backdrop-blur-2xl border-b border-white/60">
+          <div className="px-6 pb-8 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="sticky top-0 z-10 -mx-6 mb-4 flex justify-between items-center gap-4 px-6 py-3 bg-white/95 backdrop-blur-2xl border-b border-white/60">
               <div className="pr-4">
-                <h2 className="text-xl font-black text-[#003366] leading-tight">{predioAbertoAtual.nome}</h2>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{predioAbertoAtual.id}</span>
+                <h2 className="text-base font-black text-[#003366] leading-tight">{predioAbertoAtual.nome}</h2>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{predioAbertoAtual.id}</span>
               </div>
               <button 
                 onClick={() => setPredioAberto(null)}
@@ -478,33 +530,40 @@ function App() {
             <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAbertoAtual.descricao}</p>
             {predioAbertoAtual.projetos && (
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-base">📋</span>
-                  <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Projetos & Laboratórios</p>
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">📋</span>
+                    <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Projetos & Laboratórios</p>
+                  </div>
+                  <span className="rounded-full bg-white px-2 py-1 text-[9px] font-black text-slate-400 border border-slate-200">
+                    {predioAbertoAtual.projetos.length}
+                  </span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {predioAbertoAtual.projetos.map((projeto, index) => {
+                    const salaLimpa = projeto.sala?.replace(/^Sala\s+/i, '') ?? '';
                     const conteudo = (
                       <>
-                        <span className="text-[12px] font-black text-[#003366] leading-none">
+                        <div className="flex items-start justify-between gap-2">
+                        <span className="min-w-0 truncate text-[12px] font-black text-[#003366] leading-tight">
                           {projeto.sigla || projeto.nome}
                         </span>
+                          {salaLimpa && (
+                            <span className="flex-shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[8px] font-black text-slate-500 border border-slate-200 leading-none">
+                              {salaLimpa}
+                            </span>
+                          )}
+                        </div>
                         
                         {projeto.sigla && (
-                          <span className="text-[8px] font-medium text-slate-500 mt-1 leading-tight line-clamp-1">
+                          <span className="mt-1 line-clamp-2 text-[9px] font-medium text-slate-500 leading-tight">
                             {projeto.nome}
-                          </span>
-                        )}
-                        
-                        {projeto.sala && (
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 leading-none">
-                            {projeto.sala}
                           </span>
                         )}
                       </>
                     );
 
-                    const estilosBase = "bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-sm flex flex-col transition-all";
+                    const estilosBase = "min-h-[62px] bg-white border border-slate-200 px-3 py-2.5 rounded-xl shadow-sm flex flex-col transition-all hover:-translate-y-0.5";
                     
                     return projeto.link ? (
                       <a 
@@ -512,7 +571,7 @@ function App() {
                         href={projeto.link} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className={`${estilosBase} hover:border-[#003366] hover:shadow-md cursor-pointer`}
+                        className={`${estilosBase} hover:border-[#003366]/60 hover:shadow-md cursor-pointer`}
                       >
                         {conteudo}
                       </a>

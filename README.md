@@ -44,7 +44,7 @@ npm install
 Suba apenas o frontend:
 
 ```bash
-npm run dev
+  npm run dev
 ```
 
 Suba apenas o servidor WebSocket:
@@ -61,7 +61,7 @@ npm run dev:all
 
 Por padrão:
 
-- frontend: `http://localhost:5173`
+- frontend: `npm run dev:allnpm run dev:allnpm run dev:all`
 - WebSocket: `ws://0.0.0.0:8080`
 
 ## Scripts disponíveis

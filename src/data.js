@@ -45,7 +45,7 @@ export const predios = [
       sábado: "Arroz Branco, Arroz Integral, Feijão Preto, Lasanha a bolonhesa, Peixe a milanesa, Cogumelos com legumes, Cenoura Sautê, Alface, Soja em grãos refogada, Tomate com cebola, Laranja",
       domingo: "Arroz Branco, Arroz Integral, Feijão Preto, Bife bovino acebolado, Coxa com sobrecoxa assada, Legumes sauteados, Farofa com legumes, Alface, Beterraba cozida com maçã, Cenoura ralada, Melão, Creme de Moranga"
     }
-  },     
+  },  
     
   // Horários Interno
     { 
