@@ -406,7 +406,7 @@ export const predios = [
       { nome: "CAGEO", sigla: "Centro acadêmico da Geografia", liink: "https://www.instagram.com/cageo.furg?igsh=MWt6cWE5Mjd5cTExZw%3D%3D"},
       { nome: "07", sigla: ""},
       { nome: "08", sigla: ""},
-      { nome: "09", sigla: "Laboratório de morfologia"},
+      { nome: "Laboratório de morfologia", sigla: "09"},
       { nome: "Sala 6102", sigla: "" },
       { nome: "Sala 6103", sigla: "" },
       { nome: "Sala 6104-A", sigla: "" },
