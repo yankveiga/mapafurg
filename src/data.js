@@ -399,7 +399,35 @@ export const predios = [
     nome: "Pavilhão 6", 
     lat: -32.07620023329867,  
     lng: -52.16775650890125, 
-    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus." 
+    descricao: "Bloco de salas de aula utilizado por diversos cursos do campus.",
+    projetos: [
+      //Primeiro Andar
+      { nome: "CABIO", sigla: "Centro acadêmico da Biologia", link: "https://www.instagram.com/cabiofurg/"},
+      { nome: "CAGEO", sigla: "Centro acadêmico da Geografia", liink: "https://www.instagram.com/cageo.furg?igsh=MWt6cWE5Mjd5cTExZw%3D%3D"},
+      { nome: "Laboratório de morfologia", sigla: ""},
+      { nome: "07", sigla: ""},
+      { nome: "08", sigla: ""},
+      { nome: "Sala 6102", sigla: "" },
+      { nome: "Sala 6103", sigla: "" },
+      { nome: "Sala 6104-A", sigla: "" },
+      { nome: "Sala 6104-B", sigla: "" },
+      { nome: "Sala 6105", sigla: "" },
+      { nome: "Sala 6106", sigla: "" },
+      //Segundo Andar
+      { sala: "23", sigla: "MUVI-e", nome: "Museu virtual do ensino de ciências fisiológicas da Furg", link: "https://www.instagram.com/muviefurg/" },
+      { sala: "24", sigla: "Ecotoxicologia", nome: "Escritório de projeto PMBA", link: "https://www.instagram.com/lab_ecotoxicologiaycb/" },
+      { sala: "25", sigla: "Ecotoxicologia", nome: "Depósito de materiais/insumos", link: "https://www.instagram.com/lab_ecotoxicologiaycb/" },
+      { sala: "26", sigla: "Geografia", nome: "" },
+      { sala: "27", sigla: "Geografia", nome: "" },
+      { sala: "DAEB", sigla: "", nome: "Diretório acadêmico da Engenharia Bioquímica", link: "" },
+      { sala: "DAQUI", sigla: "", nome: "Diretório acadêmico da química licenciatura e bacharelado", link:"" },
+      { nome: "Sala 6201", sigla: "" },
+      { nome: "Sala 6202", sigla: "" },
+      { nome: "Sala 6203", sigla: "" },
+      { nome: "Sala 6204", sigla: "" },
+      { nome: "Sala 6205", sigla: "" },
+      { nome: "Sala 6206", sigla: "" },
+    ] 
   },  
 
   // CEMESUL
