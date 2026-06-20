@@ -404,9 +404,9 @@ export const predios = [
       //Primeiro Andar
       { nome: "CABIO", sigla: "Centro acadêmico da Biologia", link: "https://www.instagram.com/cabiofurg/"},
       { nome: "CAGEO", sigla: "Centro acadêmico da Geografia", liink: "https://www.instagram.com/cageo.furg?igsh=MWt6cWE5Mjd5cTExZw%3D%3D"},
-      { nome: "Laboratório de morfologia", sigla: ""},
       { nome: "07", sigla: ""},
       { nome: "08", sigla: ""},
+      { nome: "09", sigla: "Laboratório de morfologia"},
       { nome: "Sala 6102", sigla: "" },
       { nome: "Sala 6103", sigla: "" },
       { nome: "Sala 6104-A", sigla: "" },
