@@ -1,0 +1,266 @@
+EXPLICACAO RAPIDA - COMO ALTERAR DADOS DO MAPA FURG
+
+========================================================================
+1) COMO ADICIONAR UM NOVO PREDIO
+========================================================================
+
+Arquivo principal:
+- src/data.js
+
+Passo 1: criar um novo objeto dentro do array predios
+
+Modelo basico:
+
+{
+  id: "novo_predio",
+  nome: "Nome do Novo Predio",
+  lat: -32.000000,
+  lng: -52.000000,
+  descricao: "Descricao curta do local.",
+  aliases: ["apelido", "outro nome"]
+}
+
+Campos principais:
+
+- id:
+  identificador unico do ponto.
+  Use letras minusculas, sem acento e sem espaco.
+  Exemplo: "pavilhao_7", "laboratorio_x", "novo_predio".
+
+- nome:
+  nome que aparece no painel do mapa.
+
+- lat e lng:
+  coordenadas do ponto no mapa.
+
+- descricao:
+  texto exibido quando o usuario abre o painel do predio.
+
+- aliases:
+  nomes alternativos usados pela busca.
+  Exemplo: se o predio e conhecido por uma sigla ou apelido, coloque aqui.
+
+Passo 2: adicionar informacoes opcionais, se existirem
+
+Projetos/laboratorios:
+
+projetos: [
+  {
+    sigla: "PET C3",
+    nome: "PET Ciencias Computacionais",
+    sala: "Sala 114",
+    link: "https://exemplo.com"
+  }
+]
+
+Horario de funcionamento:
+
+horarios: {
+  "segunda a sexta": "08:00 - 18:00",
+  "sabado": "fechado"
+}
+
+Cardapio:
+
+cardapio: {
+  "segunda": "Arroz, feijao e prato principal",
+  "terca": "..."
+}
+
+Horarios do onibus interno:
+
+interno: {
+  "manha": "07:45, 08:30, 09:15",
+  "tarde": "13:30, 14:15, 15:00"
+}
+
+Passo 3: ajustar a busca, se necessario
+
+Arquivo:
+- src/buscas.js
+
+Se o novo predio precisar responder a termos especiais, adicione os apelidos
+em buscas.js apontando para o mesmo id usado em data.js.
+
+Exemplo:
+
+"apelido do predio": ["novo_predio"]
+
+Quando precisa mexer em buscas.js?
+
+- quando o usuario pode procurar por um nome que nao esta em nome ou aliases;
+- quando existe uma regra especial;
+- quando uma sala ou apelido deve levar diretamente ao predio.
+
+Passo 4: testar
+
+Rode:
+
+npm.cmd run dev
+
+Depois procure pelo nome, id e aliases na barra de busca.
+
+========================================================================
+2) COMO ADICIONAR UM NOVO ONIBUS RASTREADO
+========================================================================
+
+Arquivos principais:
+- src/onibus.js
+- public/
+- app rastreador externo
+- server/ws-server.js, se for mudar a regra de busId
+
+Importante:
+- o ponto informativo "Onibus Interno - FURG" continua em src/data.js;
+- os onibus rastreados em tempo real ficam configurados em src/onibus.js.
+
+Hoje ja existe uma estrutura para:
+
+- onibus_amarelo
+- onibus_branco
+- onibus_teste
+
+Passo 1: cadastrar o onibus em src/onibus.js
+
+Exemplo:
+
+export const ONIBUS_CONFIG = {
+  onibus_amarelo: {
+    nome: 'Interno Amarelo',
+    icone: '/interno.svg',
+    acessivel: true,
+  },
+  onibus_branco: {
+    nome: 'Interno Branco',
+    icone: '/interno.svg',
+    acessivel: false,
+  },
+  onibus_teste: {
+    nome: 'Onibus Teste',
+    icone: '/interno.svg',
+    acessivel: false,
+    teste: true,
+  },
+};
+
+Campos:
+
+- chave do objeto:
+  deve ser igual ao busId enviado pelo app rastreador.
+  Exemplo: onibus_amarelo.
+
+- nome:
+  nome humano do onibus.
+
+- icone:
+  caminho do SVG dentro da pasta public/.
+  Exemplo: /interno-amarelo.svg.
+
+- acessivel:
+  true para onibus com acessibilidade;
+  false para onibus sem acessibilidade;
+  null quando nao se sabe.
+
+- teste:
+  true quando for um rastreador usado apenas para teste.
+
+Passo 2: colocar o icone em public/
+
+Exemplo:
+
+public/
+  interno-amarelo.svg
+  interno-branco.svg
+  interno-teste.svg
+
+Depois, em src/onibus.js:
+
+onibus_amarelo: {
+  nome: 'Interno Amarelo',
+  icone: '/interno-amarelo.svg',
+  acessivel: true,
+}
+
+Passo 3: configurar o app rastreador
+
+O app externo precisa enviar o mesmo busId:
+
+{
+  "type": "bus_location",
+  "busId": "onibus_amarelo",
+  "lat": -32.074,
+  "lng": -52.167,
+  "timestamp": "2026-06-21T12:00:00.000Z"
+}
+
+Futuramente, para melhorar a movimentacao, tambem pode enviar:
+
+{
+  "speed": 8.7,
+  "accuracy": 6.2,
+  "bearing": 92.4
+}
+
+Termos:
+
+- bearing (direcao de deslocamento):
+  angulo indicando para onde o onibus esta indo.
+
+- speed (velocidade):
+  velocidade estimada pelo GPS.
+
+- accuracy (precisao):
+  margem de erro estimada pelo GPS, em metros.
+
+Passo 4: regra do servidor
+
+Atualmente, o servidor pode atribuir ids automaticos como:
+
+- bus-1
+- bus-2
+
+Isso permite que apps antigos continuem funcionando.
+
+Para aceitar ids especificos como onibus_amarelo, a regra ideal e:
+
+Se o app mandou busId valido:
+  usar esse busId.
+Senao:
+  manter o comportamento antigo e usar id automatico/generico.
+
+Assim, o sistema fica compativel com:
+
+- app antigo sem busId especifico;
+- app novo com onibus_amarelo;
+- app novo com onibus_branco;
+- app de teste com onibus_teste.
+
+Passo 5: testar no mapa
+
+Com o servidor e frontend rodando:
+
+npm.cmd run dev:all
+
+Envie uma mensagem pelo app rastreador ou pelo public/ws-tester.html.
+
+Se o busId for cadastrado em src/onibus.js, o mapa usa a configuracao dele.
+Se o busId nao for cadastrado, o mapa usa ONIBUS_PADRAO.
+
+========================================================================
+3) RESUMO RAPIDO
+========================================================================
+
+Para predio novo:
+
+1. Adicionar objeto em src/data.js.
+2. Colocar aliases se necessario.
+3. Ajustar src/buscas.js apenas se precisar de busca especial.
+4. Testar no mapa.
+
+Para onibus novo:
+
+1. Adicionar configuracao em src/onibus.js.
+2. Colocar SVG em public/.
+3. Fazer o app rastreador enviar o mesmo busId.
+4. Garantir que o servidor aceite esse busId.
+5. Testar no mapa.

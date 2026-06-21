@@ -49,7 +49,7 @@ Passo 2: server/ws-server.js recebe a mensagem
 Passo 3: servidor faz broadcast
 - envia o payload para todos os sockets conectados.
 
-Passo 4: src/App.jsx recebe no navegador
+Passo 4: src/useBusLocations.js recebe no navegador
 - ws.onmessage faz parse JSON;
 - se for bus_location valido, atualiza estado onibusPorId;
 - React renderiza/atualiza o marcador no Leaflet.
@@ -90,73 +90,42 @@ Por que foi feito assim:
 - garante update automatico da PWA para evitar versao velha em cache.
 
 -----------------------------------------------------------------------
-3.3 src/App.jsx (arquivo central do sistema)
+3.3 src/App.jsx (orquestrador da interface)
 -----------------------------------------------------------------------
 Papel:
-- concentra regras de interface, mapa, busca e WebSocket.
+- orquestra a tela principal do mapa.
+- combina busca, dados estaticos, status dos onibus e componentes visuais.
+- a logica mais especifica foi separada em modulos menores.
 
 Blocos principais:
 
-A) Constantes de dominio
-- ID_ONIBUS: id estatico "interno" para referencia no menu.
-- POSICAO_INICIAL_ONIBUS: fallback visual quando nao ha onibus online.
-- STATUS_WS: rotulos para status da conexao.
-
-B) Funcoes utilitarias
-- normalizarWsUrl(url):
-  transforma http->ws e https->wss.
-- formatarTempoDecorrido(timestamp, agoraMs):
-  gera texto "agora", "ha 12s", "ha 3min".
-- obterOnibusPrincipal(onibusPorId):
-  escolhe o onibus com timestamp mais recente.
-
-C) Componentes auxiliares internos
-- Localizador:
-  pega geolocalizacao do usuario atual e opcionalmente centraliza.
-- Bussola:
-  quando um predio fica selecionado, move a camera para ele.
-- CentralizadorOnibus:
-  centraliza no onibus quando o botao e clicado.
-
-D) Icones Leaflet
-- criarIcone(sigla): marcador azul com texto do id/sigla do predio.
-- criarIconeOnibusAoVivo(): marcador do onibus (emoji dentro de bolha).
-- criarIconeCluster(): visual dos clusters quando muitos pontos se sobrepoem.
-
-E) Estado React principal
+A) Estado React principal
 - busca: texto do input.
 - solicitarGps: contador-gatilho para centralizar no usuario.
 - solicitarOnibus: contador-gatilho para centralizar no onibus.
 - predioAberto: item do drawer inferior.
 - menuAberto: menu lateral.
-- onibusPorId: dicionario com posicoes em tempo real.
 - agoraMs: relogio para atualizar "ultima atualizacao".
-- statusWs: conectando/conectado/erro/desconectado.
 
-F) Conexao WebSocket
-- monta wsUrl:
-  1) usa VITE_WS_URL se existir;
-  2) senao, fallback para ws://host:8080 (ou wss se pagina https).
-- abre socket.
-- onopen -> status conectado.
-- onmessage:
-  - se bus_disconnected: remove marcador daquele busId.
-  - se bus_location valido: atualiza onibusPorId[busId].
-- onclose -> marca offline e tenta reconectar em 3s.
+B) Conexao WebSocket
+- App.jsx monta wsUrl.
+- useBusLocations(wsUrl) devolve:
+  - onibusPorId;
+  - statusWs.
 
-G) Busca de predios
+C) Busca de predios
 - traduzirBusca(busca) retorna:
   - idsExtras (atalhos/aliases curados)
   - termosBusca (texto normalizado)
 - filtro final usa:
   - id, nome, aliases e projetos.
 
-H) Render da interface
+D) Render da interface
 - menu lateral com atalhos.
 - barra superior com busca.
 - botoes flutuantes (GPS usuario e centralizar onibus).
 - badge com status do onibus.
-- drawer inferior com descricao, projetos, horarios, interno e cardapio.
+- drawer inferior via PredioDrawer.
 - MapContainer com tiles OSM.
 - MarkerClusterGroup para predios.
 - marcador de onibus:
@@ -215,7 +184,99 @@ Ponto de atencao:
 - ids devem permanecer estaveis, porque buscas e atalhos dependem deles.
 
 -----------------------------------------------------------------------
-3.6 server/ws-server.js (backend tempo real)
+3.6 src/onibus.js
+-----------------------------------------------------------------------
+Papel:
+- concentrar configuracoes e utilitarios dos onibus rastreados.
+
+O que contem:
+- ID_PONTO_ONIBUS:
+  id do ponto informativo do onibus em src/data.js.
+- POSICAO_INICIAL_ONIBUS:
+  fallback visual quando nao ha onibus online.
+- STATUS_WS:
+  rotulos de status exibidos na interface.
+- ONIBUS_CONFIG:
+  cadastro dos onibus conhecidos.
+  Exemplos atuais:
+  - onibus_amarelo
+  - onibus_branco
+  - onibus_teste
+- ONIBUS_PADRAO:
+  fallback para ids genericos ou antigos, como bus-1.
+- obterConfigOnibus(busId):
+  retorna nome, icone e metadados do onibus.
+- obterOnibusPrincipal(onibusPorId):
+  escolhe o onibus com timestamp mais recente.
+- formatarTempoDecorrido(timestamp, agoraMs):
+  gera textos como "agora", "ha 12s", "ha 3min".
+
+Por que foi separado:
+- facilita cadastrar onibus oficiais e de teste;
+- evita aumentar ainda mais App.jsx;
+- deixa a evolucao para onibus amarelo/branco/acessivel mais organizada.
+
+-----------------------------------------------------------------------
+3.7 src/mapIcons.js
+-----------------------------------------------------------------------
+Papel:
+- centralizar a criacao dos icones Leaflet.
+
+Funcoes:
+- criarIconeLocalizacaoUsuario():
+  marcador azul da localizacao do usuario.
+- criarIconePredio(sigla):
+  marcador azul com id/sigla do predio.
+- criarIconeOnibusAoVivo(icone):
+  marcador visual do onibus usando SVG em public/.
+- criarIconeCluster(cluster):
+  marcador de agrupamento de predios.
+
+Por que foi separado:
+- icones Leaflet usam HTML manual;
+- separar isso deixa App.jsx mais legivel.
+
+-----------------------------------------------------------------------
+3.8 src/useBusLocations.js
+-----------------------------------------------------------------------
+Papel:
+- hook React responsavel pela conexao WebSocket dos onibus.
+
+O que faz:
+- normaliza URL WS com normalizarWsUrl;
+- conecta ao servidor;
+- marca status conectando/conectado/erro/desconectado;
+- reconecta automaticamente em caso de queda;
+- trata bus_disconnected;
+- trata bus_location;
+- devolve onibusPorId e statusWs para App.jsx.
+
+Por que foi separado:
+- a logica de rede deixa de ficar misturada com a interface;
+- facilita evoluir depois para speed, accuracy, bearing e filtros.
+
+-----------------------------------------------------------------------
+3.9 src/components/
+-----------------------------------------------------------------------
+Papel:
+- componentes visuais ou auxiliares extraidos de App.jsx.
+
+Arquivos:
+- Localizador.jsx:
+  geolocalizacao do usuario e marcador azul no mapa.
+- Bussola.jsx:
+  move a camera para o predio selecionado.
+- CentralizadorOnibus.jsx:
+  move a camera para o onibus quando o botao e acionado.
+- PredioDrawer.jsx:
+  painel inferior com descricao, projetos, horarios, interno e cardapio.
+
+Por que foi separado:
+- App.jsx fica como orquestrador;
+- cada componente fica mais facil de revisar e testar visualmente.
+
+-----------------------------------------------------------------------
+3.10 server/ws-server.js (backend tempo real)
 -----------------------------------------------------------------------
 Papel:
 - servidor HTTP + WebSocket.
@@ -257,7 +318,7 @@ Observacao sobre o app rastreador:
   precisa enviar o mesmo token no payload.
 
 -----------------------------------------------------------------------
-3.7 public/ws-tester.html
+3.11 public/ws-tester.html
 -----------------------------------------------------------------------
 Papel:
 - cliente de teste manual do WebSocket no navegador.
@@ -271,21 +332,21 @@ Por que existe:
 - depuracao sem depender do app rastreador.
 
 -----------------------------------------------------------------------
-3.8 src/index.css
+3.12 src/index.css
 -----------------------------------------------------------------------
 Papel:
 - importa Tailwind.
 - garante html/body/root com altura 100% para mapa tela cheia.
 
 -----------------------------------------------------------------------
-3.9 src/App.css
+3.13 src/App.css
 -----------------------------------------------------------------------
 Papel:
 - estilos legados do template inicial.
 - hoje nao e o arquivo principal de layout (layout esta no App.jsx com Tailwind).
 
 -----------------------------------------------------------------------
-3.10 vite.config.js
+3.14 vite.config.js
 -----------------------------------------------------------------------
 Papel:
 - define plugins: React, Tailwind, PWA.
@@ -296,14 +357,14 @@ Detalhe relevante:
 - melhora uso offline parcial e desempenho.
 
 -----------------------------------------------------------------------
-3.11 tailwind.config.js
+3.15 tailwind.config.js
 -----------------------------------------------------------------------
 Papel:
 - caminhos que o Tailwind escaneia.
 - extensao de tema (ex.: boxShadow neumorphic).
 
 -----------------------------------------------------------------------
-3.12 eslint.config.js
+3.16 eslint.config.js
 -----------------------------------------------------------------------
 Papel:
 - padrao de qualidade de codigo (JS + hooks React + Vite refresh).
@@ -312,7 +373,7 @@ Regra personalizada:
 - permite constantes em MAIUSCULO sem falso positivo de unused vars.
 
 -----------------------------------------------------------------------
-3.13 package.json
+3.17 package.json
 -----------------------------------------------------------------------
 Papel:
 - declara dependencias e scripts.
@@ -352,8 +413,12 @@ Scripts mais importantes:
 - token no servidor: WS_AUTH_TOKEN
 - URL/token no rastreador: configuracao do app rastreador externo
 - formato de validacao do payload: server/ws-server.js (validarMensagemLocalizacao)
-- visual do icone do onibus: src/App.jsx (criarIconeOnibusAoVivo)
-- posicao padrao do onibus offline: src/App.jsx (POSICAO_INICIAL_ONIBUS)
+- cadastro de onibus: src/onibus.js (ONIBUS_CONFIG)
+- visual do icone do onibus: src/mapIcons.js (criarIconeOnibusAoVivo)
+- arquivo SVG usado por cada onibus: src/onibus.js (campo icone)
+- posicao padrao do onibus offline: src/onibus.js (POSICAO_INICIAL_ONIBUS)
+- conexao WS no frontend: src/useBusLocations.js
+- painel inferior de predio: src/components/PredioDrawer.jsx
 - dados dos predios/horarios/cardapio: src/data.js
 - regras de busca: src/buscas.js
 

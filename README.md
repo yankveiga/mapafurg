@@ -25,7 +25,6 @@ O projeto é dividido em duas frentes:
 - atualização em tempo real do ônibus interno
 - centralização manual no ônibus
 - indicação da última atualização recebida
-- rastro recente de deslocamento do ônibus
 - suporte a PWA
 
 ## Requisitos
@@ -61,7 +60,7 @@ npm run dev:all
 
 Por padrão:
 
-- frontend: `npm run dev:allnpm run dev:allnpm run dev:all`
+- frontend: `http://localhost:5173`
 - WebSocket: `ws://0.0.0.0:8080`
 
 ## Scripts disponíveis
@@ -173,11 +172,19 @@ Esse app pode ser Android ou outra solução equivalente, desde que envie coorde
 
 ```text
 src/
-  App.jsx          interface principal e lógica do mapa
+  App.jsx          orquestra a tela principal do mapa
   data.js          base de dados dos prédios e pontos de interesse
   buscas.js        normalização e tradução da busca
+  onibus.js        configuração dos ônibus rastreados e status
+  mapIcons.js      criação dos ícones Leaflet
+  useBusLocations.js  conexão WebSocket e estado dos ônibus em tempo real
   main.jsx         bootstrap da aplicação React
   index.css        estilos globais
+  components/
+    Bussola.jsx
+    CentralizadorOnibus.jsx
+    Localizador.jsx
+    PredioDrawer.jsx
 
 public/
   ws-tester.html   cliente simples para teste do WebSocket
@@ -206,13 +213,40 @@ Cada item inclui, em geral:
 - `aliases`
 - `projetos`
 
+Para adicionar um prédio, inclua um novo objeto no array `predios`. Se quiser que a busca encontre termos alternativos, preencha `aliases`. Se houver salas, laboratórios, horários ou cardápio, use os blocos opcionais já existentes como modelo.
+
 ### Busca e atalhos
 
 As regras de normalização e tradução da busca ficam em [`src/buscas.js`](./src/buscas.js).
 
+Quando um novo prédio precisar responder a apelidos ou buscas especiais, adicione os termos em `buscas.js` apontando para o `id` cadastrado em `data.js`.
+
+### Ônibus rastreados
+
+A configuração visual e operacional dos ônibus rastreados fica em [`src/onibus.js`](./src/onibus.js).
+
+Nesse arquivo ficam:
+
+- `ID_PONTO_ONIBUS`: id do ponto informativo do ônibus em `data.js`
+- `POSICAO_INICIAL_ONIBUS`: posição exibida quando não há ônibus online
+- `STATUS_WS`: rótulos de conexão exibidos na interface
+- `ONIBUS_CONFIG`: cadastro dos ônibus conhecidos, como `onibus_amarelo`, `onibus_branco` e `onibus_teste`
+- `ONIBUS_PADRAO`: fallback para IDs antigos ou genéricos, como `bus-1`
+
+Para trocar o ícone de um ônibus, coloque o arquivo em `public/` e altere o campo `icone` em `ONIBUS_CONFIG`.
+
+Para adicionar um novo ônibus, cadastre um novo item em `ONIBUS_CONFIG` e configure o app rastreador para enviar o mesmo `busId`.
+
 ### Interface e comportamento do mapa
 
-O fluxo principal da aplicação está em [`src/App.jsx`](./src/App.jsx).
+O fluxo principal da aplicação está em [`src/App.jsx`](./src/App.jsx), mas as responsabilidades maiores foram separadas:
+
+- [`src/useBusLocations.js`](./src/useBusLocations.js): conexão, reconexão e mensagens WebSocket
+- [`src/mapIcons.js`](./src/mapIcons.js): criação dos ícones do Leaflet
+- [`src/components/PredioDrawer.jsx`](./src/components/PredioDrawer.jsx): painel inferior de detalhes
+- [`src/components/Localizador.jsx`](./src/components/Localizador.jsx): localização do usuário
+- [`src/components/Bussola.jsx`](./src/components/Bussola.jsx): foco em prédio selecionado
+- [`src/components/CentralizadorOnibus.jsx`](./src/components/CentralizadorOnibus.jsx): foco no ônibus
 
 ## Build de produção
 

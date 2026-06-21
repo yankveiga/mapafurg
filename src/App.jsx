@@ -7,196 +7,28 @@
  * - Consumir atualizações do WebSocket de localização do ônibus.
  * - Controlar ações de foco (usuário e ônibus).
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { BusFront, LocateFixed } from 'lucide-react';
 import { normalizarTextoBusca, traduzirBusca } from './buscas';
 import { predios } from './data';
+import { criarIconeCluster, criarIconeOnibusAoVivo, criarIconePredio } from './mapIcons';
+import {
+  formatarTempoDecorrido,
+  ID_PONTO_ONIBUS,
+  obterConfigOnibus,
+  obterOnibusPrincipal,
+  POSICAO_INICIAL_ONIBUS,
+  STATUS_WS,
+} from './onibus';
+import { normalizarWsUrl, useBusLocations } from './useBusLocations';
 import logoPet from './assets/logopetvetorizado.svg';
-
-// Ponto estático usado para fallback e referência no menu.
-const ID_ONIBUS = 'interno';
-// Coordenada inicial exibida quando não há ônibus online.
-const POSICAO_INICIAL_ONIBUS = {
-  lat: -32.07488993829145,
-  lng: -52.15502479544119,
-  timestamp: null,
-};
-// Rótulos de estado de conexão WebSocket para a interface.
-const STATUS_WS = {
-  conectando: 'Conectando...',
-  conectado: 'Ao vivo',
-  erro: 'Erro de conexão',
-  desconectado: 'Offline',
-};
-
-// Aceita ws:// e wss:// e converte http/https para o protocolo WebSocket.
-const normalizarWsUrl = (url) => {
-  if (!url) return null;
-  const limpa = url.trim().replace(/\/+$/, '');
-  if (limpa.startsWith('wss://') || limpa.startsWith('ws://')) return limpa;
-  if (limpa.startsWith('https://')) return limpa.replace('https://', 'wss://');
-  if (limpa.startsWith('http://')) return limpa.replace('http://', 'ws://');
-  return null;
-};
-
-// Formata o "tempo desde a última atualização" para exibição no badge.
-const formatarTempoDecorrido = (timestamp, agoraMs) => {
-  if (!timestamp) return 'sem atualização';
-  const ms = agoraMs - Date.parse(timestamp);
-  if (!Number.isFinite(ms) || ms < 1000) return 'agora';
-
-  const segundos = Math.floor(ms / 1000);
-  if (segundos < 60) return `há ${segundos}s`;
-
-  const minutos = Math.floor(segundos / 60);
-  if (minutos < 60) return `há ${minutos}min`;
-
-  const horas = Math.floor(minutos / 60);
-  return `há ${horas}h`;
-};
-
-// Em cenário de múltiplos ônibus, define como principal o mais recente.
-const obterOnibusPrincipal = (onibusPorId) => {
-  const entradas = Object.entries(onibusPorId);
-  if (entradas.length === 0) return POSICAO_INICIAL_ONIBUS;
-
-  return entradas.reduce((maisRecente, [, atual]) => {
-    const atualMs = Date.parse(atual.timestamp ?? '');
-    const maisRecenteMs = Date.parse(maisRecente.timestamp ?? '');
-    if (!Number.isFinite(atualMs)) return maisRecente;
-    if (!Number.isFinite(maisRecenteMs)) return atual;
-    return atualMs > maisRecenteMs ? atual : maisRecente;
-  }, entradas[0][1]);
-};
-
-// Marcador da localização do usuário no dispositivo atual.
-function Localizador({ focar }) {
-  const [posicao, setPosicao] = useState(null);
-  const map = useMap();
-  const rastreandoRef = useRef(false);
-  const centralizarProximaLocalizacaoRef = useRef(false);
-  const posicaoAtualRef = useRef(null);
-
-  useMapEvents({
-    locationfound(e) {
-      posicaoAtualRef.current = e.latlng;
-      setPosicao(e.latlng);
-      if (centralizarProximaLocalizacaoRef.current) {
-        map.flyTo(e.latlng, 18);
-        centralizarProximaLocalizacaoRef.current = false;
-      }
-    },
-  });
-
-  useEffect(() => {
-    if (!focar) return;
-
-    centralizarProximaLocalizacaoRef.current = true;
-
-    if (posicaoAtualRef.current) {
-      map.flyTo(posicaoAtualRef.current, 18);
-      centralizarProximaLocalizacaoRef.current = false;
-    }
-
-    if (!rastreandoRef.current) {
-      rastreandoRef.current = true;
-      map.locate({
-        setView: false,
-        enableHighAccuracy: true,
-        watch: true,
-        maximumAge: 1000,
-        timeout: 10000,
-      });
-    }
-  }, [focar, map]);
-
-  useEffect(() => {
-    return () => {
-      map.stopLocate();
-    };
-  }, [map]);
-    
-  return posicao === null ? null : (
-    <Marker position={posicao} icon={L.divIcon({
-      className: 'bg-transparent',
-      html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-[0_0_15px_rgba(59,130,246,0.8)] animate-pulse"></div>`,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8],
-    })} zIndexOffset={1000} />
-  );
-}
-
-// Move o mapa para o prédio selecionado (busca ou menu).
-function Bussola({ alvo }) {
-  const map = useMap();
-  useEffect(() => {
-    if (alvo) {
-      map.flyTo([alvo.lat - 0.0005, alvo.lng], 17, { animate: true, duration: 1.2 });
-    }
-  }, [alvo, map]);
-  return null; 
-}
-
-// Move o mapa para o ônibus somente quando o botão é acionado.
-function CentralizadorOnibus({ focar, posicao }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!focar || !posicao) return;
-    map.flyTo([posicao.lat, posicao.lng], 18, { animate: true, duration: 1.1 });
-  }, [focar, map]);
-
-  return null;
-}
-
-// Ícone padrão dos prédios, com sigla em destaque.
-const criarIcone = (sigla) => {
-  const tamanhoFonte = sigla.length > 4 ? 'text-[7px]' : 'text-[10px]';
-  return L.divIcon({
-    className: 'bg-transparent',
-    html: `<div class="bg-[#003366] text-white font-bold ${tamanhoFonte} rounded-full border-2 border-white shadow-md px-2 min-w-[40px] h-6 flex items-center justify-center whitespace-nowrap -translate-x-1/2 -translate-y-1/2">${sigla.toUpperCase()}</div>`,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
-  });
-};
-
-// Ícone do ônibus em tempo real.
-const criarIconeOnibusAoVivo = () => {
-  return L.divIcon({
-    className: 'bg-transparent',
-    html: `
-      <div class="-translate-x-1/2 -translate-y-1/2">
-        <img
-          src="/interno.svg"
-          alt=""
-          class="w-8 h-8 object-contain drop-shadow-[0_3px_6px_rgba(0,0,0,0.35)]"
-        />
-      </div>
-    `,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
-  });
-};
-
-// Estilo visual dos clusters para manter legibilidade com muitos pontos.
-const criarIconeCluster = (cluster) => {
-  const quantidade = cluster.getChildCount();
-  
-  // Ajusta tamanho e sombra conforme a quantidade de itens no cluster.
-  const tamanho = quantidade > 8 ? 'w-12 h-12 text-base' : 'w-9 h-9 text-sm';
-  const sombra = quantidade > 8 ? 'shadow-[0_0_25px_rgba(0,51,102,0.5)]' : 'shadow-md';
-
-  return L.divIcon({
-    html: `<div class="bg-gradient-to-br from-[#003366] to-blue-800 text-white font-black rounded-full border-2 border-white/90 ${sombra} ${tamanho} flex items-center justify-center -translate-x-1/2 -translate-y-1/2 transition-all hover:scale-110">${quantidade}</div>`,
-    className: 'bg-transparent',
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
-  });
-};
+import { Bussola } from './components/Bussola';
+import { CentralizadorOnibus } from './components/CentralizadorOnibus';
+import { Localizador } from './components/Localizador';
+import { PredioDrawer } from './components/PredioDrawer';
 
 function App() {
   // Estados principais de interface e dados em tempo real.
@@ -205,12 +37,9 @@ function App() {
   const [solicitarOnibus, setSolicitarOnibus] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
-  const [onibusPorId, setOnibusPorId] = useState({});
   const [agoraMs, setAgoraMs] = useState(Date.now());
-  const [statusWs, setStatusWs] = useState('desconectado');
-  const reconnectRef = useRef(null);
   const pontoInterno = useMemo(
-    () => predios.find((predio) => predio.id === ID_ONIBUS) ?? null,
+    () => predios.find((predio) => predio.id === ID_PONTO_ONIBUS) ?? null,
     []
   );
 
@@ -223,6 +52,7 @@ function App() {
     const protocolo = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     return `${protocolo}//${window.location.hostname}:8080`;
   }, []);
+  const { onibusPorId, statusWs } = useBusLocations(wsUrl);
 
   useEffect(() => {
     // Atualiza relógio local para o texto "Última: há Xs".
@@ -231,88 +61,6 @@ function App() {
     }, 1000);
     return () => window.clearInterval(intervalo);
   }, []);
-
-  useEffect(() => {
-    // Fluxo de conexão WebSocket com tentativa de reconexão automática.
-    let ws = null;
-    let ativo = true;
-
-    const conectar = () => {
-      if (!ativo) return;
-      if (!wsUrl) {
-        setStatusWs('erro');
-        return;
-      }
-
-      setStatusWs('conectando');
-      try {
-        ws = new WebSocket(wsUrl);
-      } catch {
-        setStatusWs('erro');
-        reconnectRef.current = window.setTimeout(conectar, 3000);
-        return;
-      }
-
-      ws.onopen = () => setStatusWs('conectado');
-
-      ws.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-
-          // Remove marcador do ônibus quando o servidor informa desconexão.
-          if (payload.type === 'bus_disconnected') {
-            if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
-            setOnibusPorId((anterior) => {
-              const proximo = { ...anterior };
-              delete proximo[payload.busId];
-              return proximo;
-            });
-            return;
-          }
-
-          // Ignora mensagens fora do contrato esperado.
-          if (payload.type !== 'bus_location') return;
-          if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
-          if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return;
-
-          const posicaoAtualizada = {
-            lat: payload.lat,
-            lng: payload.lng,
-            timestamp: payload.timestamp ?? new Date().toISOString(),
-          };
-          const busId = payload.busId.trim();
-
-          // Atualiza posição do ônibus por identificador.
-          setOnibusPorId((anterior) => ({
-            ...anterior,
-            [busId]: posicaoAtualizada,
-          }));
-
-        } catch {
-          // Ignora mensagens não-JSON enviadas por clientes externos.
-        }
-      };
-
-      ws.onerror = () => setStatusWs('erro');
-
-      ws.onclose = () => {
-        if (!ativo) return;
-        setStatusWs('desconectado');
-        // Retenta conexão após breve espera para reduzir efeito de oscilação.
-        reconnectRef.current = window.setTimeout(conectar, 3000);
-      };
-    };
-
-    conectar();
-
-    return () => {
-      ativo = false;
-      if (reconnectRef.current) {
-        window.clearTimeout(reconnectRef.current);
-      }
-      ws?.close();
-    };
-  }, [wsUrl]);
 
   useEffect(() => {
     // Permite fechar o drawer com o botão "voltar" do navegador.
@@ -509,148 +257,13 @@ function App() {
         Ônibus: {STATUS_WS[statusWs]} • Ativos: {onibusAtivos.length} • Última: {ultimaAtualizacao}
       </div>
 
-      <div 
-        className={`absolute bottom-0 left-0 right-0 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[10000] bg-white/90 backdrop-blur-2xl border-t border-white/60 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] transition-transform duration-300 ease-out flex flex-col max-h-[85vh] ${predioAbertoAtual ? 'translate-y-0' : 'translate-y-full'}`}
-      >
-        {predioAbertoAtual && (
-          <div className="px-6 pb-8 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            <div className="sticky top-0 z-10 -mx-6 mb-4 flex justify-between items-center gap-4 px-6 py-3 bg-white/95 backdrop-blur-2xl border-b border-white/60">
-              <div className="pr-4">
-                <h2 className="text-base font-black text-[#003366] leading-tight">{predioAbertoAtual.nome}</h2>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{predioAbertoAtual.id}</span>
-              </div>
-              <button 
-                onClick={() => setPredioAberto(null)}
-                className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors font-bold"
-              >
-                &#x2715;
-              </button>
-            </div>
-            
-            <p className="text-sm text-slate-600 mb-5 leading-relaxed whitespace-pre-wrap">{predioAbertoAtual.descricao}</p>
-            {predioAbertoAtual.projetos && (
-              <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">📋</span>
-                    <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Projetos & Laboratórios</p>
-                  </div>
-                  <span className="rounded-full bg-white px-2 py-1 text-[9px] font-black text-slate-400 border border-slate-200">
-                    {predioAbertoAtual.projetos.length}
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {predioAbertoAtual.projetos.map((projeto, index) => {
-                    const salaLimpa = projeto.sala?.replace(/^Sala\s+/i, '') ?? '';
-                    const conteudo = (
-                      <>
-                        <div className="flex items-start justify-between gap-2">
-                        <span className="min-w-0 truncate text-[12px] font-black text-[#003366] leading-tight">
-                          {projeto.sigla || projeto.nome}
-                        </span>
-                          {salaLimpa && (
-                            <span className="flex-shrink-0 rounded-full bg-slate-100 px-1.5 py-0.5 text-[8px] font-black text-slate-500 border border-slate-200 leading-none">
-                              {salaLimpa}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {projeto.sigla && (
-                          <span className="mt-1 line-clamp-2 text-[9px] font-medium text-slate-500 leading-tight">
-                            {projeto.nome}
-                          </span>
-                        )}
-                      </>
-                    );
-
-                    const estilosBase = "min-h-[62px] bg-white border border-slate-200 px-3 py-2.5 rounded-xl shadow-sm flex flex-col transition-all hover:-translate-y-0.5";
-                    
-                    return projeto.link ? (
-                      <a 
-                        key={index} 
-                        href={projeto.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className={`${estilosBase} hover:border-[#003366]/60 hover:shadow-md cursor-pointer`}
-                      >
-                        {conteudo}
-                      </a>
-                    ) : (
-                      <div key={index} className={`${estilosBase} hover:border-[#003366]/30`}>
-                        {conteudo}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            {predioAbertoAtual.horarios && (
-              <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-base">🕒</span>
-                  <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horário de Funcionamento</p>
-                </div>
-                <div className="space-y-2.5">
-                  {Object.entries(predioAbertoAtual.horarios).map(([dia, hora]) => (
-                    <div key={dia} className="flex justify-between border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{dia}</span>
-                      <span className="text-xs font-medium text-slate-700 leading-snug">{hora}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {predioAbertoAtual.interno && (
-              <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100 mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-base">🚌</span>
-                  <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Horários de Partida</p>
-                </div>
-                <p className="text-[10px] font-semibold text-slate-500 mb-3">
-                  Localização em tempo real: {STATUS_WS[statusWs]}
-                </p>
-                <div className="space-y-2.5">
-                  {Object.entries(predioAbertoAtual.interno).map(([turno, horarios]) => (
-                    <div key={turno} className="flex flex-col border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{turno}</span>
-                      <span className="text-xs font-medium text-slate-700 leading-snug">{horarios}</span>
-                    </div>
-                  ))}
-                </div>
-                {onibusPrincipal.timestamp && (
-                  <p className="mt-3 text-[9px] text-slate-500 text-center">
-                    Última atualização: {ultimaAtualizacao}
-                  </p>
-                )}
-                <p className="mt-4 text-[9px] text-slate-400 font-medium italic text-center">
-                  Horários sujeitos a atrasos de acordo com o trânsito do campus.
-                </p>
-              </div>
-            )}
-            
-            {predioAbertoAtual.cardapio && (
-              <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-100">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-base">🍴</span>
-                  <p className="font-bold text-[#003366] text-[11px] uppercase tracking-wider">Cardápio da Semana</p>
-                </div>
-                <div className="space-y-2.5">
-                  {Object.entries(predioAbertoAtual.cardapio).map(([dia, prato]) => (
-                    <div key={dia} className="flex flex-col border-b border-slate-200/50 pb-2 last:border-0 last:pb-0">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wide">{dia}</span>
-                      <span className="text-xs font-medium text-slate-700 leading-snug">{prato}</span>
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-4 text-[9px] text-slate-400 font-medium italic text-center">
-                  Atualizado presencialmente toda segunda às 07:45
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <PredioDrawer
+        predio={predioAbertoAtual}
+        onClose={() => setPredioAberto(null)}
+        statusOnibus={STATUS_WS[statusWs]}
+        onibusPrincipal={onibusPrincipal}
+        ultimaAtualizacao={ultimaAtualizacao}
+      />
       
       <MapContainer 
       // Centro inicial do campus.
@@ -680,7 +293,7 @@ function App() {
             <Marker 
               key={predio.id} 
               position={[predio.lat, predio.lng]} 
-              icon={criarIcone(predio.id)}
+              icon={criarIconePredio(predio.id)}
               eventHandlers={{
                 click: () => setPredioAberto(predio),
               }}
@@ -691,7 +304,7 @@ function App() {
         {onibusAtivos.length === 0 ? (
           <Marker
             position={[POSICAO_INICIAL_ONIBUS.lat, POSICAO_INICIAL_ONIBUS.lng]}
-            icon={criarIconeOnibusAoVivo()}
+            icon={criarIconeOnibusAoVivo(obterConfigOnibus().icone)}
             zIndexOffset={1500}
             eventHandlers={{
               click: () => {
@@ -706,7 +319,7 @@ function App() {
             <Marker
               key={busId}
               position={[posicao.lat, posicao.lng]}
-              icon={criarIconeOnibusAoVivo()}
+              icon={criarIconeOnibusAoVivo(obterConfigOnibus(busId).icone)}
               zIndexOffset={1500}
               eventHandlers={{
                 click: () => {
