@@ -18,6 +18,7 @@ const BUS_ID_PADRAO = process.env.BUS_ID ?? 'interno';
 const AUTH_TOKEN = process.env.WS_AUTH_TOKEN ?? '';
 const BUS_ID_PREFIX = process.env.BUS_ID_PREFIX ?? 'bus';
 const AUTO_ASSIGN_BUS_ID = (process.env.AUTO_ASSIGN_BUS_ID ?? 'true').toLowerCase() !== 'false';
+const BUS_ID_REGEX = /^[a-zA-Z0-9_-]{1,40}$/;
 
 // HTTP simples para healthcheck e identificação do serviço.
 const server = http.createServer((req, res) => {
@@ -27,6 +28,7 @@ const server = http.createServer((req, res) => {
       ok: true,
       service: 'bus-ws',
       autoAssignBusId: AUTO_ASSIGN_BUS_ID,
+      acceptsExplicitBusId: true,
       activeConnections: wss.clients.size,
       activeBuses: ultimasLocalizacoesPorBusId.size,
       time: new Date().toISOString(),
@@ -70,11 +72,26 @@ const enviarJson = (cliente, payload) => {
   }
 };
 
+const busIdValido = (busId) => (
+  typeof busId === 'string'
+  && BUS_ID_REGEX.test(busId.trim())
+);
+
+const busIdFoiInformado = (busId) => (
+  typeof busId === 'string'
+  && busId.trim().length > 0
+);
+
+const obterBusIdPayload = (payload) => (
+  busIdValido(payload.busId) ? payload.busId.trim() : null
+);
+
 // Valida contrato mínimo de mensagem recebida.
 const validarMensagemLocalizacao = (payload) => {
   if (!payload || typeof payload !== 'object') return false;
   if (payload.type !== 'bus_location') return false;
   if (AUTH_TOKEN && payload.token !== AUTH_TOKEN) return false;
+  if (busIdFoiInformado(payload.busId) && !busIdValido(payload.busId)) return false;
   if (typeof payload.lat !== 'number' || typeof payload.lng !== 'number') return false;
   if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return false;
   if (payload.lat < -90 || payload.lat > 90 || payload.lng < -180 || payload.lng > 180) return false;
@@ -82,19 +99,21 @@ const validarMensagemLocalizacao = (payload) => {
 };
 
 // Padroniza payload para o formato consumido pelo frontend.
-const normalizarMensagemLocalizacao = (payload, busIdConexao) => ({
-  type: 'bus_location',
-  busId: AUTO_ASSIGN_BUS_ID
-    ? busIdConexao
-    : (typeof payload.busId === 'string' && payload.busId.trim() ? payload.busId : BUS_ID_PADRAO),
-  lat: payload.lat,
-  lng: payload.lng,
-  heading: Number.isFinite(payload.heading) ? payload.heading : null,
-  speed: Number.isFinite(payload.speed) ? payload.speed : null,
-  accuracy: Number.isFinite(payload.accuracy) ? payload.accuracy : null,
-  timestamp: typeof payload.timestamp === 'string' ? payload.timestamp : new Date().toISOString(),
-  serverReceivedAt: new Date().toISOString(),
-});
+const normalizarMensagemLocalizacao = (payload, busIdConexao) => {
+  const busIdPayload = obterBusIdPayload(payload);
+
+  return {
+    type: 'bus_location',
+    busId: busIdPayload ?? (AUTO_ASSIGN_BUS_ID ? busIdConexao : BUS_ID_PADRAO),
+    lat: payload.lat,
+    lng: payload.lng,
+    heading: Number.isFinite(payload.heading) ? payload.heading : null,
+    speed: Number.isFinite(payload.speed) ? payload.speed : null,
+    accuracy: Number.isFinite(payload.accuracy) ? payload.accuracy : null,
+    timestamp: typeof payload.timestamp === 'string' ? payload.timestamp : new Date().toISOString(),
+    serverReceivedAt: new Date().toISOString(),
+  };
+};
 
 // Distribui atualização para todos os clientes conectados.
 const broadcast = (payload) => {
@@ -123,7 +142,9 @@ wss.on('connection', (ws, req) => {
     autoAssignBusId: AUTO_ASSIGN_BUS_ID,
     expectedFormat: {
       type: 'bus_location',
-      busId: AUTO_ASSIGN_BUS_ID ? '(ignorado; servidor atribui automaticamente)' : BUS_ID_PADRAO,
+      busId: AUTO_ASSIGN_BUS_ID
+        ? '(opcional; se ausente, servidor atribui automaticamente)'
+        : BUS_ID_PADRAO,
       lat: -32.0754,
       lng: -52.1536,
       timestamp: new Date().toISOString(),
@@ -148,6 +169,17 @@ wss.on('connection', (ws, req) => {
       // Atualiza memória e retransmite para observadores.
       const meta = metaPorConexao.get(ws);
       const mensagemNormalizada = normalizarMensagemLocalizacao(payload, meta?.busId ?? BUS_ID_PADRAO);
+      if (meta && meta.busId !== mensagemNormalizada.busId) {
+        if (ultimasLocalizacoesPorBusId.has(meta.busId)) {
+          ultimasLocalizacoesPorBusId.delete(meta.busId);
+          broadcast({
+            type: 'bus_disconnected',
+            busId: meta.busId,
+            timestamp: new Date().toISOString(),
+          });
+        }
+        meta.busId = mensagemNormalizada.busId;
+      }
       ultimasLocalizacoesPorBusId.set(mensagemNormalizada.busId, mensagemNormalizada);
       broadcast(mensagemNormalizada);
     } catch {

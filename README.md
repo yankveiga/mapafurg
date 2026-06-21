@@ -101,6 +101,8 @@ Campos obrigatórios:
 - `lat`
 - `lng`
 
+O campo `busId` é opcional. Quando o app rastreador envia um `busId` válido, o servidor preserva esse identificador, por exemplo `onibus_amarelo`, `onibus_branco` ou `onibus_teste`. Quando o campo não é enviado, o servidor mantém compatibilidade com o modo antigo e atribui um ID automático, como `bus-1`.
+
 Variáveis de ambiente suportadas pelo servidor:
 
 - `PORT`
@@ -110,6 +112,8 @@ Variáveis de ambiente suportadas pelo servidor:
 - `BUS_ID_PREFIX`
 - `AUTO_ASSIGN_BUS_ID` (default: `true`)
 - `WS_AUTH_TOKEN`
+
+Com `AUTO_ASSIGN_BUS_ID=true`, o servidor ainda aceita `busId` explícito. O autoassign é usado apenas quando o app não envia um identificador válido.
 
 O frontend pode consumir um endpoint WebSocket externo por meio de `VITE_WS_URL`. Quando essa variável não é definida, o projeto usa fallback para `ws://<host>:8080` em ambiente local.
 

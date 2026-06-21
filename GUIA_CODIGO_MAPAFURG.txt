@@ -44,7 +44,9 @@ Exemplo:
 Passo 2: server/ws-server.js recebe a mensagem
 - verifica type, token, lat/lng validos;
 - normaliza os campos;
-- define busId (autoassign ou busId recebido, conforme configuracao).
+- define busId:
+  - se o app enviou busId valido, preserva esse identificador;
+  - se nao enviou, usa id automatico/generico conforme configuracao.
 
 Passo 3: servidor faz broadcast
 - envia o payload para todos os sockets conectados.
@@ -298,6 +300,8 @@ Responsabilidades:
    type=bus_location, token valido (se configurado), lat/lng validos.
 4) normalizacao:
    padroniza payload com timestamp e serverReceivedAt.
+   Se o app enviar busId valido, esse busId e preservado.
+   Se nao enviar, o servidor usa o id automatico/generico.
 5) broadcast:
    envia para todos os clientes conectados.
 6) close:
@@ -316,6 +320,9 @@ Observacao sobre o app rastreador:
   o JSON bus_location no formato aceito pelo server/ws-server.js;
 - se WS_AUTH_TOKEN estiver configurado no servidor, o app rastreador tambem
   precisa enviar o mesmo token no payload.
+- o campo busId e opcional:
+  - apps novos podem enviar onibus_amarelo, onibus_branco ou onibus_teste;
+  - apps antigos sem busId continuam funcionando com ids automaticos.
 
 -----------------------------------------------------------------------
 3.11 public/ws-tester.html
@@ -423,7 +430,7 @@ Scripts mais importantes:
 - regras de busca: src/buscas.js
 
 ========================================================================
-6) RISCOS E LIMITACOES (PARA EXPLICAR AO TI)
+6) RISCOS E LIMITACOES
 ========================================================================
 1. Sem persistencia:
    - restart do WS limpa ultimo estado dos onibus.
@@ -434,12 +441,4 @@ Scripts mais importantes:
 4. Seguranca baseada em token:
    - precisa manter token fora do Git.
 
-========================================================================
-7) RESPOSTA CURTA PARA APRESENTACAO (ELEVATOR PITCH TECNICO)
-========================================================================
-O Mapa FURG e uma SPA React com Leaflet que renderiza pontos estaticos do
-campus e integra telemetria em tempo real por WebSocket. O backend Node valida
-mensagens de localizacao, mantém o ultimo estado em memoria e distribui as
-coordenadas aos clientes conectados. A arquitetura separa front estatico e
-canal realtime para facilitar deploy, reduzir custo e manter manutencao simples.
-
+=======================================================================

@@ -221,7 +221,7 @@ Atualmente, o servidor pode atribuir ids automaticos como:
 
 Isso permite que apps antigos continuem funcionando.
 
-Para aceitar ids especificos como onibus_amarelo, a regra ideal e:
+O servidor tambem aceita ids especificos como onibus_amarelo. A regra usada e:
 
 Se o app mandou busId valido:
   usar esse busId.
