@@ -101,16 +101,26 @@ const validarMensagemLocalizacao = (payload) => {
 // Padroniza payload para o formato consumido pelo frontend.
 const normalizarMensagemLocalizacao = (payload, busIdConexao) => {
   const busIdPayload = obterBusIdPayload(payload);
+  const bearingRecebido = Number.isFinite(payload.bearing)
+    ? payload.bearing
+    : Number.isFinite(payload.heading)
+      ? payload.heading
+      : null;
+  const bearing = bearingRecebido === null
+    ? null
+    : ((bearingRecebido % 360) + 360) % 360;
 
   return {
     type: 'bus_location',
     busId: busIdPayload ?? (AUTO_ASSIGN_BUS_ID ? busIdConexao : BUS_ID_PADRAO),
     lat: payload.lat,
     lng: payload.lng,
-    heading: Number.isFinite(payload.heading) ? payload.heading : null,
-    speed: Number.isFinite(payload.speed) ? payload.speed : null,
-    accuracy: Number.isFinite(payload.accuracy) ? payload.accuracy : null,
-    timestamp: typeof payload.timestamp === 'string' ? payload.timestamp : new Date().toISOString(),
+    bearing,
+    speed: Number.isFinite(payload.speed) && payload.speed >= 0 ? payload.speed : null,
+    accuracy: Number.isFinite(payload.accuracy) && payload.accuracy >= 0 ? payload.accuracy : null,
+    timestamp: Number.isFinite(Date.parse(payload.timestamp ?? ''))
+      ? new Date(Date.parse(payload.timestamp)).toISOString()
+      : new Date().toISOString(),
     serverReceivedAt: new Date().toISOString(),
   };
 };
@@ -147,6 +157,9 @@ wss.on('connection', (ws, req) => {
         : BUS_ID_PADRAO,
       lat: -32.0754,
       lng: -52.1536,
+      bearing: 90,
+      speed: 8.7,
+      accuracy: 6.2,
       timestamp: new Date().toISOString(),
     },
   });
@@ -169,6 +182,20 @@ wss.on('connection', (ws, req) => {
       // Atualiza memória e retransmite para observadores.
       const meta = metaPorConexao.get(ws);
       const mensagemNormalizada = normalizarMensagemLocalizacao(payload, meta?.busId ?? BUS_ID_PADRAO);
+      const localizacaoAnterior = ultimasLocalizacoesPorBusId.get(mensagemNormalizada.busId);
+      const timestampAnterior = Date.parse(localizacaoAnterior?.timestamp ?? '');
+      const timestampAtual = Date.parse(mensagemNormalizada.timestamp);
+
+      if (Number.isFinite(timestampAnterior) && timestampAtual <= timestampAnterior) {
+        enviarJson(ws, {
+          type: 'location_ignored',
+          reason: 'stale_timestamp',
+          busId: mensagemNormalizada.busId,
+          timestamp: mensagemNormalizada.timestamp,
+        });
+        return;
+      }
+
       if (meta && meta.busId !== mensagemNormalizada.busId) {
         if (ultimasLocalizacoesPorBusId.has(meta.busId)) {
           ultimasLocalizacoesPorBusId.delete(meta.busId);

@@ -12,3 +12,8 @@ html, body, #root {
   height: 100%;
   margin: 0;
 }
+
+.bus-marker-image {
+  transition: transform 650ms ease-out;
+  will-change: transform;
+}

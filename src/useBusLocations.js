@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { processarAtualizacaoOnibus } from './busTracking';
 
 export const normalizarWsUrl = (url) => {
   if (!url) return null;
@@ -55,16 +56,15 @@ export function useBusLocations(wsUrl) {
           if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return;
 
           const busId = payload.busId.trim();
-          const posicaoAtualizada = {
-            lat: payload.lat,
-            lng: payload.lng,
-            timestamp: payload.timestamp ?? new Date().toISOString(),
-          };
+          setOnibusPorId((anterior) => {
+            const posicaoAtualizada = processarAtualizacaoOnibus(payload, anterior[busId]);
+            if (!posicaoAtualizada) return anterior;
 
-          setOnibusPorId((anterior) => ({
-            ...anterior,
-            [busId]: posicaoAtualizada,
-          }));
+            return {
+              ...anterior,
+              [busId]: posicaoAtualizada,
+            };
+          });
         } catch {
           // Ignora mensagens nao-JSON enviadas por clientes externos.
         }

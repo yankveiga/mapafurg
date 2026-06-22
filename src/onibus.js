@@ -16,19 +16,22 @@ export const STATUS_WS = {
 export const ONIBUS_CONFIG = {
   onibus_amarelo: {
     nome: 'Interno Amarelo',
-    icone: '/interno.svg',
+    icone: '/interno_amarelo.svg',
     acessivel: true,
+    rotacaoOffset: 0,
   },
   onibus_branco: {
     nome: 'Interno Branco',
-    icone: '/interno.svg',
+    icone: '/interno_branco.svg',
     acessivel: false,
+    rotacaoOffset: 0,
   },
   onibus_teste: {
     nome: 'Ônibus Teste',
-    icone: '/interno.svg',
+    icone: '/interno_teste.svg',
     acessivel: false,
     teste: true,
+    rotacaoOffset: 0,
   },
 };
 
@@ -36,6 +39,7 @@ export const ONIBUS_PADRAO = {
   nome: 'Ônibus Interno',
   icone: '/interno.svg',
   acessivel: null,
+  rotacaoOffset: 0,
 };
 
 export const obterConfigOnibus = (busId) => ONIBUS_CONFIG[busId] ?? ONIBUS_PADRAO;

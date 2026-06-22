@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer';
+
 const INTERVALO_SEGUNDOS = 3;
 const DIAS_NO_MES = 30;
 const HORAS_NO_DIA = 24;
@@ -16,7 +18,7 @@ const payloadCelular = {
   token: tokenPlaceholder,
   speed: 8.7,
   accuracy: 6.2,
-  heading: 123.45,
+  bearing: 123.45,
 };
 
 const payloadServidor = {
@@ -24,7 +26,7 @@ const payloadServidor = {
   busId: 'bus-1',
   lat: payloadCelular.lat,
   lng: payloadCelular.lng,
-  heading: payloadCelular.heading,
+  bearing: payloadCelular.bearing,
   speed: payloadCelular.speed,
   accuracy: payloadCelular.accuracy,
   timestamp,

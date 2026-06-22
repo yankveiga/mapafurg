@@ -70,6 +70,17 @@
 
       <div class="row" style="margin-top: 12px">
         <div>
+          <label>ID do ônibus</label>
+          <input id="busId" value="onibus_teste" />
+        </div>
+        <div>
+          <label>Token (se configurado)</label>
+          <input id="token" type="password" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top: 12px">
+        <div>
           <label>Latitude</label>
           <input id="lat" type="number" step="any" value="-32.07548437944093" />
         </div>
@@ -77,6 +88,22 @@
           <label>Longitude</label>
           <input id="lng" type="number" step="any" value="-52.153652687153084" />
         </div>
+      </div>
+
+      <div class="row" style="margin-top: 12px">
+        <div>
+          <label>Velocidade (m/s)</label>
+          <input id="speed" type="number" step="any" value="8.7" />
+        </div>
+        <div>
+          <label>Precisão (m)</label>
+          <input id="accuracy" type="number" step="any" value="6.2" />
+        </div>
+      </div>
+
+      <div style="margin-top: 12px">
+        <label>Bearing - direção (0 a 359°)</label>
+        <input id="bearing" type="number" min="0" max="359" step="any" value="90" />
       </div>
 
       <div style="display: flex; gap: 10px; margin-top: 14px">
@@ -139,11 +166,17 @@
         // Payload mínimo compatível com o servidor de localização.
         const payload = {
           type: "bus_location",
-          busId: "interno",
+          busId: $("busId").value.trim(),
           lat: Number($("lat").value),
           lng: Number($("lng").value),
+          speed: Number($("speed").value),
+          accuracy: Number($("accuracy").value),
+          bearing: Number($("bearing").value),
           timestamp: new Date().toISOString(),
         };
+
+        const token = $("token").value;
+        if (token) payload.token = token;
 
         ws.send(JSON.stringify(payload));
         log(`[send] ${JSON.stringify(payload)}`);

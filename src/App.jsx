@@ -26,6 +26,7 @@ import {
 import { normalizarWsUrl, useBusLocations } from './useBusLocations';
 import logoPet from './assets/logopetvetorizado.svg';
 import { Bussola } from './components/Bussola';
+import { BusMarker } from './components/BusMarker';
 import { CentralizadorOnibus } from './components/CentralizadorOnibus';
 import { Localizador } from './components/Localizador';
 import { PredioDrawer } from './components/PredioDrawer';
@@ -37,7 +38,7 @@ function App() {
   const [solicitarOnibus, setSolicitarOnibus] = useState(0);
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
-  const [agoraMs, setAgoraMs] = useState(Date.now());
+  const [agoraMs, setAgoraMs] = useState(0);
   const pontoInterno = useMemo(
     () => predios.find((predio) => predio.id === ID_PONTO_ONIBUS) ?? null,
     []
@@ -85,12 +86,6 @@ function App() {
       setBusca(''); 
     }
   };
-
-  // Limites geográficos reservados para testes de navegação do mapa.
-  const limitesCampus = [
-    [-32.0815, -52.1765], // Sudoeste — expandido de verdade
-    [-32.0625, -52.1500]  // Nordeste — bem folgado
-  ];
 
   const { idsExtras, termosBusca } = useMemo(() => traduzirBusca(busca), [busca]);
 
@@ -270,8 +265,6 @@ function App() {
         center={[-32.0732, -52.1651]} 
         zoom={16} 
         minZoom={15} // Impede que a câmera afaste o suficiente para ver o vazio além das bordas
-        // maxBounds={limitesCampus}
-        // maxBoundsViscosity={1.0} // Parede sólida, sem elástico
         className="h-full w-full z-0"
         zoomControl={false} 
       >
@@ -316,17 +309,14 @@ function App() {
           />
         ) : (
           onibusAtivos.map(([busId, posicao]) => (
-            <Marker
+            <BusMarker
               key={busId}
-              position={[posicao.lat, posicao.lng]}
-              icon={criarIconeOnibusAoVivo(obterConfigOnibus(busId).icone)}
-              zIndexOffset={1500}
-              eventHandlers={{
-                click: () => {
-                  if (pontoInterno) {
-                    setPredioAberto(pontoInterno);
-                  }
-                },
+              posicao={posicao}
+              config={obterConfigOnibus(busId)}
+              onClick={() => {
+                if (pontoInterno) {
+                  setPredioAberto(pontoInterno);
+                }
               }}
             />
           ))

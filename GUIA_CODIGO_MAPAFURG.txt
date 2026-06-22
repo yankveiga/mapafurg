@@ -250,7 +250,7 @@ O que faz:
 - marca status conectando/conectado/erro/desconectado;
 - reconecta automaticamente em caso de queda;
 - trata bus_disconnected;
-- trata bus_location;
+- trata bus_location e encaminha a telemetria para busTracking.js;
 - devolve onibusPorId e statusWs para App.jsx.
 
 Por que foi separado:
@@ -258,7 +258,23 @@ Por que foi separado:
 - facilita evoluir depois para speed, accuracy, bearing e filtros.
 
 -----------------------------------------------------------------------
-3.9 src/components/
+3.9 src/busTracking.js
+-----------------------------------------------------------------------
+Papel:
+- validar e preparar cada atualizacao antes de alterar o marcador.
+
+Regras iniciais:
+- descarta timestamp antigo ou repetido;
+- ignora accuracy acima de 40 metros;
+- ignora salto com velocidade calculada acima de 30 m/s;
+- desconsidera deslocamento inferior a 2 metros;
+- mantem a ultima direcao abaixo de 0,8 m/s;
+- calcula duracao de interpolacao entre 600 e 2800 ms.
+
+Os valores ficam em BUS_TRACKING_CONFIG e devem ser calibrados em campo.
+
+-----------------------------------------------------------------------
+3.10 src/components/
 -----------------------------------------------------------------------
 Papel:
 - componentes visuais ou auxiliares extraidos de App.jsx.
@@ -272,13 +288,15 @@ Arquivos:
   move a camera para o onibus quando o botao e acionado.
 - PredioDrawer.jsx:
   painel inferior com descricao, projetos, horarios, interno e cardapio.
+- BusMarker.jsx:
+  interpola a posicao e gira o SVG pelo bearing usando o menor caminho angular.
 
 Por que foi separado:
 - App.jsx fica como orquestrador;
 - cada componente fica mais facil de revisar e testar visualmente.
 
 -----------------------------------------------------------------------
-3.10 server/ws-server.js (backend tempo real)
+3.11 server/ws-server.js (backend tempo real)
 -----------------------------------------------------------------------
 Papel:
 - servidor HTTP + WebSocket.
@@ -325,7 +343,7 @@ Observacao sobre o app rastreador:
   - apps antigos sem busId continuam funcionando com ids automaticos.
 
 -----------------------------------------------------------------------
-3.11 public/ws-tester.html
+3.12 public/ws-tester.html
 -----------------------------------------------------------------------
 Papel:
 - cliente de teste manual do WebSocket no navegador.
@@ -339,21 +357,21 @@ Por que existe:
 - depuracao sem depender do app rastreador.
 
 -----------------------------------------------------------------------
-3.12 src/index.css
+3.13 src/index.css
 -----------------------------------------------------------------------
 Papel:
 - importa Tailwind.
 - garante html/body/root com altura 100% para mapa tela cheia.
 
 -----------------------------------------------------------------------
-3.13 src/App.css
+3.14 src/App.css
 -----------------------------------------------------------------------
 Papel:
 - estilos legados do template inicial.
 - hoje nao e o arquivo principal de layout (layout esta no App.jsx com Tailwind).
 
 -----------------------------------------------------------------------
-3.14 vite.config.js
+3.15 vite.config.js
 -----------------------------------------------------------------------
 Papel:
 - define plugins: React, Tailwind, PWA.
@@ -364,14 +382,14 @@ Detalhe relevante:
 - melhora uso offline parcial e desempenho.
 
 -----------------------------------------------------------------------
-3.15 tailwind.config.js
+3.16 tailwind.config.js
 -----------------------------------------------------------------------
 Papel:
 - caminhos que o Tailwind escaneia.
 - extensao de tema (ex.: boxShadow neumorphic).
 
 -----------------------------------------------------------------------
-3.16 eslint.config.js
+3.17 eslint.config.js
 -----------------------------------------------------------------------
 Papel:
 - padrao de qualidade de codigo (JS + hooks React + Vite refresh).
@@ -380,7 +398,7 @@ Regra personalizada:
 - permite constantes em MAIUSCULO sem falso positivo de unused vars.
 
 -----------------------------------------------------------------------
-3.17 package.json
+3.18 package.json
 -----------------------------------------------------------------------
 Papel:
 - declara dependencias e scripts.
