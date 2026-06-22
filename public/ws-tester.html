@@ -101,11 +101,6 @@
         </div>
       </div>
 
-      <div style="margin-top: 12px">
-        <label>Bearing - direção (0 a 359°)</label>
-        <input id="bearing" type="number" min="0" max="359" step="any" value="90" />
-      </div>
-
       <div style="display: flex; gap: 10px; margin-top: 14px">
         <button id="connect">Conectar</button>
         <button id="send" disabled>Enviar coordenadas</button>
@@ -171,7 +166,6 @@
           lng: Number($("lng").value),
           speed: Number($("speed").value),
           accuracy: Number($("accuracy").value),
-          bearing: Number($("bearing").value),
           timestamp: new Date().toISOString(),
         };
 

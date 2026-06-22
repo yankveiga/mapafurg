@@ -255,7 +255,7 @@ O que faz:
 
 Por que foi separado:
 - a logica de rede deixa de ficar misturada com a interface;
-- facilita evoluir depois para speed, accuracy, bearing e filtros.
+- facilita evoluir speed, accuracy, interpolacao e filtros.
 
 -----------------------------------------------------------------------
 3.9 src/busTracking.js
@@ -268,7 +268,6 @@ Regras iniciais:
 - ignora accuracy acima de 40 metros;
 - ignora salto com velocidade calculada acima de 30 m/s;
 - desconsidera deslocamento inferior a 2 metros;
-- mantem a ultima direcao abaixo de 0,8 m/s;
 - calcula duracao de interpolacao entre 600 e 2800 ms.
 
 Os valores ficam em BUS_TRACKING_CONFIG e devem ser calibrados em campo.
@@ -289,7 +288,7 @@ Arquivos:
 - PredioDrawer.jsx:
   painel inferior com descricao, projetos, horarios, interno e cardapio.
 - BusMarker.jsx:
-  interpola a posicao e gira o SVG pelo bearing usando o menor caminho angular.
+  interpola a posicao; o SVG permanece com orientacao fixa.
 
 Por que foi separado:
 - App.jsx fica como orquestrador;

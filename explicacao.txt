@@ -193,18 +193,14 @@ O app externo precisa enviar o mesmo busId:
   "timestamp": "2026-06-21T12:00:00.000Z"
 }
 
-Futuramente, para melhorar a movimentacao, tambem pode enviar:
+Para melhorar a qualidade da movimentacao, tambem pode enviar:
 
 {
   "speed": 8.7,
-  "accuracy": 6.2,
-  "bearing": 92.4
+  "accuracy": 6.2
 }
 
 Termos:
-
-- bearing (direcao de deslocamento):
-  angulo indicando para onde o onibus esta indo.
 
 - speed (velocidade):
   velocidade estimada pelo GPS.

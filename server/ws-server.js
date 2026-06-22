@@ -101,21 +101,12 @@ const validarMensagemLocalizacao = (payload) => {
 // Padroniza payload para o formato consumido pelo frontend.
 const normalizarMensagemLocalizacao = (payload, busIdConexao) => {
   const busIdPayload = obterBusIdPayload(payload);
-  const bearingRecebido = Number.isFinite(payload.bearing)
-    ? payload.bearing
-    : Number.isFinite(payload.heading)
-      ? payload.heading
-      : null;
-  const bearing = bearingRecebido === null
-    ? null
-    : ((bearingRecebido % 360) + 360) % 360;
 
   return {
     type: 'bus_location',
     busId: busIdPayload ?? (AUTO_ASSIGN_BUS_ID ? busIdConexao : BUS_ID_PADRAO),
     lat: payload.lat,
     lng: payload.lng,
-    bearing,
     speed: Number.isFinite(payload.speed) && payload.speed >= 0 ? payload.speed : null,
     accuracy: Number.isFinite(payload.accuracy) && payload.accuracy >= 0 ? payload.accuracy : null,
     timestamp: Number.isFinite(Date.parse(payload.timestamp ?? ''))
@@ -157,7 +148,6 @@ wss.on('connection', (ws, req) => {
         : BUS_ID_PADRAO,
       lat: -32.0754,
       lng: -52.1536,
-      bearing: 90,
       speed: 8.7,
       accuracy: 6.2,
       timestamp: new Date().toISOString(),

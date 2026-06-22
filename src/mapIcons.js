@@ -23,10 +23,9 @@ export const criarIconeOnibusAoVivo = (icone = '/interno.svg') => L.divIcon({
   html: `
     <div style="width: 36px; height: 36px; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;">
       <img
-        class="bus-marker-image"
         src="${icone}"
         alt=""
-        style="width: 36px; height: 36px; object-fit: contain; transform: rotate(0deg); transform-origin: center; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));"
+        style="width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));"
       />
     </div>
   `,

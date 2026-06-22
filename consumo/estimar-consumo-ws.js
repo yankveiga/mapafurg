@@ -18,7 +18,6 @@ const payloadCelular = {
   token: tokenPlaceholder,
   speed: 8.7,
   accuracy: 6.2,
-  bearing: 123.45,
 };
 
 const payloadServidor = {
@@ -26,7 +25,6 @@ const payloadServidor = {
   busId: 'bus-1',
   lat: payloadCelular.lat,
   lng: payloadCelular.lng,
-  bearing: payloadCelular.bearing,
   speed: payloadCelular.speed,
   accuracy: payloadCelular.accuracy,
   timestamp,

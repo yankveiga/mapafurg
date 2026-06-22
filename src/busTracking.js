@@ -1,7 +1,6 @@
 export const BUS_TRACKING_CONFIG = {
   maxAccuracyMeters: 40,
   minMovementMeters: 2,
-  minSpeedForBearingMps: 0.8,
   maxPlausibleSpeedMps: 30,
   minInterpolationMs: 600,
   maxInterpolationMs: 2800,
@@ -22,10 +21,6 @@ export const calcularDistanciaMetros = (origem, destino) => {
 
   return earthRadiusMeters * c;
 };
-
-export const normalizarBearing = (bearing) => (
-  Number.isFinite(bearing) ? ((bearing % 360) + 360) % 360 : null
-);
 
 const obterTimestamp = (payload) => {
   const timestampPayload = Date.parse(payload.timestamp ?? '');
@@ -52,13 +47,9 @@ export const processarAtualizacaoOnibus = (payload, anterior) => {
   const speed = Number.isFinite(payload.speed) && payload.speed >= 0
     ? payload.speed
     : null;
-  const bearingRecebido = normalizarBearing(
-    Number.isFinite(payload.bearing) ? payload.bearing : payload.heading
-  );
 
   let lat = payload.lat;
   let lng = payload.lng;
-  let bearing = anterior?.bearing ?? bearingRecebido ?? 0;
   let interpolationMs = BUS_TRACKING_CONFIG.minInterpolationMs;
 
   if (anterior && Number.isFinite(timestampAnteriorMs)) {
@@ -82,11 +73,6 @@ export const processarAtualizacaoOnibus = (payload, anterior) => {
     );
   }
 
-  const estaEmMovimento = speed === null || speed >= BUS_TRACKING_CONFIG.minSpeedForBearingMps;
-  if (bearingRecebido !== null && (estaEmMovimento || !anterior)) {
-    bearing = bearingRecebido;
-  }
-
   return {
     lat,
     lng,
@@ -94,7 +80,6 @@ export const processarAtualizacaoOnibus = (payload, anterior) => {
     serverReceivedAt: payload.serverReceivedAt ?? null,
     speed,
     accuracy,
-    bearing,
     interpolationMs,
   };
 };

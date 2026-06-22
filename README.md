@@ -88,7 +88,6 @@ Formato esperado:
   "busId": "interno",
   "lat": -32.07548,
   "lng": -52.15365,
-  "bearing": 90,
   "speed": 8.2,
   "accuracy": 5.4,
   "timestamp": "2026-04-07T12:00:00.000Z"
@@ -142,18 +141,18 @@ No Windows, `npm.cmd` evita bloqueios de política de execução do PowerShell. 
 O cálculo fica em [`consumo/estimar-consumo-ws.js`](./consumo/estimar-consumo-ws.js) e usa como base:
 
 - intervalo de envio do app rastreador: `3s`
-- payload do celular com `token`, `speed`, `accuracy` e `bearing`: `223 bytes`
-- payload retransmitido pelo servidor para cada mapa aberto: `219 bytes`
+- payload do celular com `token`, `speed` e `accuracy`: `206 bytes`
+- payload retransmitido pelo servidor para cada mapa aberto: `202 bytes`
 - mês de referência: `30 dias`
 
 Exemplo de saída:
 
 ```text
-1 onibus - 1 conexao:     381.888 MB
-2 onibus - 1 conexao:     763.776 MB
-1 onibus - 50 conexoes:   9.653 GB
-2 onibus - 50 conexoes:   19.307 GB
-2 onibus - 200 conexoes:  76.072 GB
+1 onibus - 1 conexao:     352.512 MB
+2 onibus - 1 conexao:     705.024 MB
+1 onibus - 50 conexoes:   8.904 GB
+2 onibus - 50 conexoes:   17.809 GB
+2 onibus - 200 conexoes:  70.167 GB
 ```
 
 Esses valores estimam o JSON trafegado pela aplicação. O consumo real de rede pode ser um pouco maior por overhead de WebSocket, TCP/IP e TLS em conexões `wss://`.
@@ -251,10 +250,9 @@ O tratamento das atualizações fica em [`src/busTracking.js`](./src/busTracking
 - ignora leituras com precisão superior a `40m`
 - ignora saltos que implicariam velocidade superior a `30m/s`
 - desconsidera deslocamentos menores que `2m`
-- mantém a última direção quando a velocidade está abaixo de `0,8m/s`
 - interpola a posição entre atualizações
 
-O componente [`src/components/BusMarker.jsx`](./src/components/BusMarker.jsx) anima a posição e aplica `bearing (direção de deslocamento)` ao SVG. Os limites ficam centralizados em `BUS_TRACKING_CONFIG` para calibração durante os testes em campo.
+O componente [`src/components/BusMarker.jsx`](./src/components/BusMarker.jsx) anima a posição entre as atualizações. O ícone permanece com orientação fixa. Os limites ficam centralizados em `BUS_TRACKING_CONFIG` para calibração durante os testes em campo.
 
 ### Interface e comportamento do mapa
 
@@ -263,7 +261,7 @@ O fluxo principal da aplicação está em [`src/App.jsx`](./src/App.jsx), mas as
 - [`src/useBusLocations.js`](./src/useBusLocations.js): conexão, reconexão e mensagens WebSocket
 - [`src/mapIcons.js`](./src/mapIcons.js): criação dos ícones do Leaflet
 - [`src/components/PredioDrawer.jsx`](./src/components/PredioDrawer.jsx): painel inferior de detalhes
-- [`src/components/BusMarker.jsx`](./src/components/BusMarker.jsx): marcador animado e rotação do ônibus
+- [`src/components/BusMarker.jsx`](./src/components/BusMarker.jsx): marcador animado do ônibus
 - [`src/components/Localizador.jsx`](./src/components/Localizador.jsx): localização do usuário
 - [`src/components/Bussola.jsx`](./src/components/Bussola.jsx): foco em prédio selecionado
 - [`src/components/CentralizadorOnibus.jsx`](./src/components/CentralizadorOnibus.jsx): foco no ônibus
