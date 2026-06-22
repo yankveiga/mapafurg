@@ -19,6 +19,12 @@ export function BusMarker({ posicao, config, onClick }) {
     const origem = marker.getLatLng();
     const destino = { lat: posicao.lat, lng: posicao.lng };
     const duracao = posicao.interpolationMs ?? 600;
+
+    if (duracao <= 0) {
+      marker.setLatLng([destino.lat, destino.lng]);
+      return;
+    }
+
     const inicio = performance.now();
 
     const animar = (agora) => {

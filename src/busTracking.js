@@ -1,10 +1,31 @@
 export const BUS_TRACKING_CONFIG = {
+  // Impede que uma mensagem atrasada substitua uma posicao mais recente.
+  discardStaleTimestamps: true,
+  // Ignora leituras cujo raio estimado de erro do GPS seja maior que 40 metros.
   maxAccuracyMeters: 40,
+  // Mantem o marcador parado quando a mudanca de posicao for menor que 2 metros.
   minMovementMeters: 2,
+  // Descarta saltos que exigiriam velocidade superior a 30 m/s (108 km/h).
   maxPlausibleSpeedMps: 30,
+  // Duracao minima, em milissegundos, do deslizamento entre duas posicoes.
   minInterpolationMs: 600,
+  // Duracao maxima, em milissegundos, do deslizamento entre duas posicoes.
   maxInterpolationMs: 2800,
 };
+
+/*
+ * Configuracao alternativa para desativar filtros e interpolacao.
+ * Para usar, comente o bloco BUS_TRACKING_CONFIG acima e descomente este.
+ *
+ * export const BUS_TRACKING_CONFIG = {
+ *   discardStaleTimestamps: false,
+ *   maxAccuracyMeters: Infinity,
+ *   minMovementMeters: 0,
+ *   maxPlausibleSpeedMps: Infinity,
+ *   minInterpolationMs: 0,
+ *   maxInterpolationMs: 0,
+ * };
+ */
 
 const toRadians = (degrees) => degrees * Math.PI / 180;
 
@@ -37,7 +58,11 @@ export const processarAtualizacaoOnibus = (payload, anterior) => {
 
   const timestampMs = obterTimestamp(payload);
   const timestampAnteriorMs = Date.parse(anterior?.timestamp ?? '');
-  if (Number.isFinite(timestampAnteriorMs) && timestampMs <= timestampAnteriorMs) return null;
+  if (
+    BUS_TRACKING_CONFIG.discardStaleTimestamps
+    && Number.isFinite(timestampAnteriorMs)
+    && timestampMs <= timestampAnteriorMs
+  ) return null;
 
   const accuracy = Number.isFinite(payload.accuracy) && payload.accuracy >= 0
     ? payload.accuracy
