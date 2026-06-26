@@ -8,9 +8,9 @@ export const BUS_TRACKING_CONFIG = {
   // Descarta saltos que exigiriam velocidade superior a 30 m/s (108 km/h).
   maxPlausibleSpeedMps: 30,
   // Duracao minima, em milissegundos, do deslizamento entre duas posicoes.
-  minInterpolationMs: 600,
-  // Duracao maxima, em milissegundos, do deslizamento entre duas posicoes.
-  maxInterpolationMs: 2800,
+  minInterpolationMs: 900,
+  // Duracao maxima pensada para GPS a cada 3s: desliza e ainda sobra uma pausa visual.
+  maxInterpolationMs: 2200,
 };
 
 /*

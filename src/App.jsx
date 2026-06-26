@@ -7,7 +7,7 @@
  * - Consumir atualizações do WebSocket de localização do ônibus.
  * - Controlar ações de foco (usuário e ônibus).
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
@@ -39,6 +39,7 @@ function App() {
   const [predioAberto, setPredioAberto] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   const [agoraMs, setAgoraMs] = useState(0);
+  const [feedbackGps, setFeedbackGps] = useState(null);
   const pontoInterno = useMemo(
     () => predios.find((predio) => predio.id === ID_PONTO_ONIBUS) ?? null,
     []
@@ -62,6 +63,28 @@ function App() {
     }, 1000);
     return () => window.clearInterval(intervalo);
   }, []);
+
+  useEffect(() => {
+    if (!feedbackGps || feedbackGps.tipo === 'buscando') return undefined;
+
+    const timeout = window.setTimeout(() => {
+      setFeedbackGps(null);
+    }, 2800);
+
+    return () => window.clearTimeout(timeout);
+  }, [feedbackGps]);
+
+  const mostrarFeedbackGps = useCallback((tipo, texto) => {
+    setFeedbackGps({ tipo, texto });
+  }, []);
+
+  const handleGpsCentralizado = useCallback(() => {
+    mostrarFeedbackGps('sucesso', 'Localização centralizada');
+  }, [mostrarFeedbackGps]);
+
+  const handleGpsErro = useCallback(() => {
+    mostrarFeedbackGps('erro', 'Permissão de localização bloqueada ou indisponível');
+  }, [mostrarFeedbackGps]);
 
   useEffect(() => {
     // Permite fechar o drawer com o botão "voltar" do navegador.
@@ -93,24 +116,52 @@ function App() {
   const prediosFiltrados = useMemo(() => {
     if (!busca.trim()) return predios;
 
-    return predios.filter((p) => {
-      if (idsExtras.includes(p.id)) return true;
-
-      const camposBuscaveis = [
-        p.nome,
-        p.id,
-        ...(p.aliases ?? []),
-        ...((p.projetos ?? []).map((projeto) =>
-          typeof projeto === 'string' ? projeto : projeto.nome ?? ''
-        )),
-      ]
-        .map(normalizarTextoBusca)
-        .filter(Boolean);
-
-      return termosBusca.some((termo) =>
-        camposBuscaveis.some((campo) => new RegExp(`\\b${termo}`).test(campo))
+    const consulta = normalizarTextoBusca(busca);
+    const consultaNumericaCurta = /^\d{1,3}$/.test(consulta);
+    const calcularRelevancia = (predio) => {
+      const nome = normalizarTextoBusca(predio.nome);
+      const id = normalizarTextoBusca(predio.id);
+      const aliases = (predio.aliases ?? []).map(normalizarTextoBusca);
+      const projetos = (predio.projetos ?? []).map((projeto) =>
+        normalizarTextoBusca(typeof projeto === 'string' ? projeto : projeto.nome ?? '')
       );
-    });
+      const camposBuscaveis = [nome, id, ...aliases, ...projetos].filter(Boolean);
+
+      if (consultaNumericaCurta) {
+        const bateEmPrefixoNumerico = camposBuscaveis.some((campo) =>
+          campo.split(/\s+/).some((token) => /^\d+$/.test(token) && token.startsWith(consulta))
+        );
+
+        return bateEmPrefixoNumerico ? 70 : 0;
+      }
+
+      if (idsExtras.includes(predio.id)) return 120;
+      if (id === consulta) return 110;
+      if (nome === consulta) return 100;
+      if (id.startsWith(consulta)) return 90;
+      if (nome.startsWith(consulta)) return 80;
+      if (aliases.some((alias) => alias === consulta || alias.startsWith(consulta))) return 70;
+      if (nome.includes(consulta)) return 55;
+      if (aliases.some((alias) => alias.includes(consulta))) return 45;
+      if (projetos.some((projeto) => projeto.startsWith(consulta))) return 38;
+      if (projetos.some((projeto) => projeto.includes(consulta))) return 30;
+
+      const bateEmTermo = termosBusca.some((termo) =>
+        camposBuscaveis.some((campo) => campo.includes(termo))
+      );
+
+      return bateEmTermo ? 20 : 0;
+    };
+
+    return predios
+      .map((predio, index) => ({
+        predio,
+        index,
+        relevancia: calcularRelevancia(predio),
+      }))
+      .filter((item) => item.relevancia > 0)
+      .sort((a, b) => b.relevancia - a.relevancia || a.index - b.index)
+      .map((item) => item.predio);
   }, [busca, idsExtras, termosBusca]);
 
   const predioFocado = prediosFiltrados.length === 1 ? prediosFiltrados[0] : null;
@@ -142,7 +193,14 @@ function App() {
         <div className="p-6 pt-10 flex-grow overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
             <h3 className="text-xl font-black text-[#003366]">Acesso Rápido</h3>
-            <button onClick={() => setMenuAberto(false)} className="text-slate-400 hover:text-slate-800 font-bold text-2xl">✕</button>
+            <button
+              type="button"
+              onClick={() => setMenuAberto(false)}
+              className="flex h-11 w-11 items-center justify-center rounded-full text-2xl font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
+              aria-label="Fechar menu"
+            >
+              ✕
+            </button>
           </div>
           
           <ul className="space-y-3">
@@ -178,8 +236,10 @@ function App() {
         <div className="flex flex-row items-center gap-3 p-2.5 bg-white/50 backdrop-blur-xl shadow-lg rounded-2xl border border-white/60">
           
           <button 
+            type="button"
             onClick={() => setMenuAberto(true)}
-            className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/40 hover:bg-white/60 text-[#003366] text-2xl active:scale-95 transition-all"
+            className="w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/50 hover:bg-white/70 text-[#003366] text-2xl active:scale-95 transition-all"
+            aria-label="Abrir menu de acesso rapido"
           >
             ☰
           </button>
@@ -194,36 +254,53 @@ function App() {
             <input 
               type="text" 
               placeholder="Buscar prédio..." 
+              aria-label="Buscar predio, sala, restaurante ou projeto"
               value={busca}
               onChange={(e) => {
                 setBusca(e.target.value);
                 setPredioAberto(null);
               }}
-              className={`w-full bg-white/40 hover:bg-white/60 text-slate-800 px-3 py-2.5 pr-8 rounded-xl border outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all duration-200 text-sm ${buscaAtiva ? 'border-[#003366]/30 shadow-sm' : 'border-white/50'}`}
+              className={`w-full bg-white/50 hover:bg-white/70 text-slate-900 px-3 py-3 pr-20 rounded-xl border outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all duration-200 text-sm ${buscaAtiva ? 'border-[#003366]/40 shadow-sm' : 'border-white/60'}`}
             />
             {busca && (
               <button 
+                type="button"
                 onClick={() => setBusca('')} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-800 font-bold p-1 rounded-full transition-all duration-200 hover:bg-white/70 hover:rotate-90 active:scale-90"
+                className="absolute right-2 top-1/2 min-h-8 -translate-y-1/2 rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-slate-700 shadow-sm transition-colors hover:bg-white hover:text-slate-900 active:scale-95"
                 aria-label="Limpar busca"
                 title="Limpar busca"
               >
-                &#x2715;
+                Limpar
               </button>
             )}
-            <div
-              className={`pointer-events-none absolute left-1 top-[calc(100%+8px)] rounded-full border border-white/70 bg-white/80 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-[#003366] shadow-md backdrop-blur-xl transition-all duration-200 ${buscaAtiva ? 'translate-y-0 opacity-100' : '-translate-y-1 opacity-0'}`}
-            >
-              {totalResultadosBusca === 0 ? 'Nenhum resultado' : rotuloResultadosBusca}
-            </div>
+            {buscaAtiva && (
+              <div className="absolute left-0 right-0 top-[calc(100%+8px)] rounded-2xl border border-white/70 bg-white/95 px-3 py-2 text-[12px] font-bold text-slate-700 shadow-lg backdrop-blur-xl">
+                {totalResultadosBusca === 0 ? (
+                  <div>
+                    <span>Nenhum resultado encontrado.</span>
+                    <span className="mt-1 block text-[11px] font-semibold text-slate-500">
+                      Tente: C3, RU, Biblioteca, ônibus, sala 1101.
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-[#003366]">
+                    {rotuloResultadosBusca}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="group absolute bottom-12 right-6 z-[9999]">
+      <div className="group absolute bottom-12 right-4 z-[9999] md:right-6">
         <button
-          onClick={() => setSolicitarGps(prev => prev + 1)}
-          className="bg-white/55 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/70 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/80 hover:shadow-xl"
+          type="button"
+          onClick={() => {
+            mostrarFeedbackGps('buscando', 'Buscando sua localização...');
+            setSolicitarGps(prev => prev + 1);
+          }}
+          className="bg-white/65 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/80 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/90 hover:shadow-xl"
           aria-label="Minha localização"
           title="Minha localização"
         >
@@ -234,10 +311,28 @@ function App() {
         </span>
       </div>
 
-      <div className="group absolute bottom-28 right-6 z-[9999]">
+      {feedbackGps && (
+        <div
+          className="pointer-events-none absolute left-4 right-4 top-24 z-[10001] flex justify-center"
+          aria-live="polite"
+        >
+          <div
+            className={`rounded-2xl border px-3.5 py-2 text-xs font-bold shadow-lg backdrop-blur-xl ${
+              feedbackGps.tipo === 'erro'
+                ? 'border-amber-100 bg-amber-50/95 text-amber-800'
+                : 'border-white/70 bg-white/95 text-[#003366]'
+            }`}
+          >
+            {feedbackGps.texto}
+          </div>
+        </div>
+      )}
+
+      <div className="group absolute bottom-28 right-4 z-[9999] md:right-6">
         <button
+          type="button"
           onClick={() => setSolicitarOnibus(prev => prev + 1)}
-          className="bg-white/55 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/70 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/80 hover:shadow-xl"
+          className="bg-white/65 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/80 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/90 hover:shadow-xl"
           aria-label="Centralizar ônibus"
           title="Centralizar ônibus"
         >
@@ -248,7 +343,10 @@ function App() {
         </span>
       </div>
 
-      <div className="absolute bottom-12 left-6 z-[9999] px-3 py-2 rounded-xl bg-white/70 backdrop-blur-xl border border-white/60 text-[11px] font-bold text-slate-700 shadow-lg">
+      <div
+        className="absolute bottom-12 left-4 right-20 z-[9999] max-w-[360px] px-3 py-2 rounded-xl bg-white/85 backdrop-blur-xl border border-white/70 text-[11px] font-bold text-slate-800 shadow-lg md:left-6 md:right-auto"
+        aria-live="polite"
+      >
         Ônibus: {STATUS_WS[statusWs]} • Ativos: {onibusAtivos.length} • Última: {ultimaAtualizacao}
       </div>
 
@@ -274,7 +372,11 @@ function App() {
         />
         
         <Bussola alvo={predioAbertoAtual || predioFocado} />
-        <Localizador focar={solicitarGps} />
+        <Localizador
+          focar={solicitarGps}
+          onCentralizado={handleGpsCentralizado}
+          onErro={handleGpsErro}
+        />
         <CentralizadorOnibus focar={solicitarOnibus} posicao={onibusPrincipal} />
 
         <MarkerClusterGroup

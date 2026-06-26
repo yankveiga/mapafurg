@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Marker } from 'react-leaflet';
 import { criarIconeOnibusAoVivo } from '../mapIcons';
 
+const easeOutCubic = (valor) => 1 - (1 - valor) ** 3;
+
 export function BusMarker({ posicao, config, onClick }) {
   const markerRef = useRef(null);
   const animationFrameRef = useRef(null);
@@ -28,13 +30,14 @@ export function BusMarker({ posicao, config, onClick }) {
     const inicio = performance.now();
 
     const animar = (agora) => {
-      const progresso = Math.min((agora - inicio) / duracao, 1);
+      const progressoLinear = Math.min((agora - inicio) / duracao, 1);
+      const progresso = easeOutCubic(progressoLinear);
       marker.setLatLng([
         origem.lat + (destino.lat - origem.lat) * progresso,
         origem.lng + (destino.lng - origem.lng) * progresso,
       ]);
 
-      if (progresso < 1) {
+      if (progressoLinear < 1) {
         animationFrameRef.current = window.requestAnimationFrame(animar);
       }
     };

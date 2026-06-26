@@ -8,8 +8,30 @@
  * - Repassar atualizações para todos os clientes conectados no mapa.
  */
 import http from 'node:http';
+import fs from 'node:fs';
 import process from 'node:process';
 import { WebSocketServer, WebSocket } from 'ws';
+
+const carregarEnvLocal = () => {
+  if (!fs.existsSync('.env')) return;
+
+  const linhas = fs.readFileSync('.env', 'utf8').split(/\r?\n/);
+  for (const linha of linhas) {
+    const limpa = linha.trim();
+    if (!limpa || limpa.startsWith('#')) continue;
+
+    const separador = limpa.indexOf('=');
+    if (separador === -1) continue;
+
+    const chave = limpa.slice(0, separador).trim();
+    const valor = limpa.slice(separador + 1).trim().replace(/^["']|["']$/g, '');
+    if (chave && process.env[chave] === undefined) {
+      process.env[chave] = valor;
+    }
+  }
+};
+
+carregarEnvLocal();
 
 // Configurações base por ambiente.
 const PORT = Number(process.env.PORT ?? process.env.WS_PORT ?? 8080);
