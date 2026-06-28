@@ -30,6 +30,7 @@ import { BusMarker } from './components/BusMarker';
 import { CentralizadorOnibus } from './components/CentralizadorOnibus';
 import { Localizador } from './components/Localizador';
 import { PredioDrawer } from './components/PredioDrawer';
+import { StatusOnibus } from './components/StatusOnibus';
 
 function App() {
   // Estados principais de interface e dados em tempo real.
@@ -343,12 +344,12 @@ function App() {
         </span>
       </div>
 
-      <div
-        className="absolute bottom-12 left-4 right-20 z-[9999] max-w-[360px] px-3 py-2 rounded-xl bg-white/85 backdrop-blur-xl border border-white/70 text-[11px] font-bold text-slate-800 shadow-lg md:left-6 md:right-auto"
-        aria-live="polite"
-      >
-        Ônibus: {STATUS_WS[statusWs]} • Ativos: {onibusAtivos.length} • Última: {ultimaAtualizacao}
-      </div>
+      <StatusOnibus
+        status={statusWs}
+        statusLabel={STATUS_WS[statusWs]}
+        quantidadeAtivos={onibusAtivos.length}
+        ultimaAtualizacao={ultimaAtualizacao}
+      />
 
       <PredioDrawer
         predio={predioAbertoAtual}
