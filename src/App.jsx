@@ -14,6 +14,7 @@ import 'leaflet/dist/leaflet.css';
 import { BusFront, LocateFixed } from 'lucide-react';
 import { normalizarTextoBusca, traduzirBusca } from './buscas';
 import { predios } from './data';
+import { avisoInicial } from './aviso';
 import { criarIconeCluster, criarIconeOnibusAoVivo, criarIconePredio } from './mapIcons';
 import {
   formatarTempoDecorrido,
@@ -25,6 +26,7 @@ import {
 } from './onibus';
 import { normalizarWsUrl, useBusLocations } from './useBusLocations';
 import logoPet from './assets/logopetvetorizado.svg';
+import { AvisoInicial } from './components/AvisoInicial';
 import { Bussola } from './components/Bussola';
 import { BusMarker } from './components/BusMarker';
 import { CentralizadorOnibus } from './components/CentralizadorOnibus';
@@ -41,6 +43,9 @@ function App() {
   const [menuAberto, setMenuAberto] = useState(false);
   const [agoraMs, setAgoraMs] = useState(0);
   const [feedbackGps, setFeedbackGps] = useState(null);
+  const [avisoAberto, setAvisoAberto] = useState(() =>
+    Boolean(avisoInicial.ativo && avisoInicial.mensagem?.trim())
+  );
   const pontoInterno = useMemo(
     () => predios.find((predio) => predio.id === ID_PONTO_ONIBUS) ?? null,
     []
@@ -180,6 +185,8 @@ function App() {
 
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
+      <AvisoInicial aviso={avisoAberto ? avisoInicial : null} onClose={() => setAvisoAberto(false)} />
+
       
       {menuAberto && (
         <div 
