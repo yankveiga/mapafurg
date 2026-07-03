@@ -53,7 +53,7 @@ export const predios = [
       nome: "Ônibus Interno - FURG", 
       lat: -32.07548437944093, 
       lng: -52.15365261871531,
-      descricao: "🚌 Transporte circular gratuito dentro do Campus Carreiros.\n\n* Vai até o OCEANTEC (parada de 2 min).\n** Saída da EQA.\n✉️ viaturas@furg.br",
+      descricao: "🚌 Transporte circular gratuito dentro do Campus Carreiros.\n\n* Vai até o OCEANTEC (parada de 2 min).\n** Saída da EQA.\n✉️ viaturas@furg.br\nAtualizado dia 03/07/2026",
       interno: {
         "Manhã": "06:50 • 07:10 • 07:30 • 07:50* • 08:15 • 09:25 • 10:25 • 11:20 • 12:00*",
         "Tarde": "12:45* • 13:15 • 13:40* • 14:30 • 15:20 • 16:00 • 16:50 • 17:30 • 18:05*",
