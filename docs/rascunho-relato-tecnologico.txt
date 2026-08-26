@@ -1,0 +1,107 @@
+TITULO DO TRABALHO
+
+MapaFURG: plataforma web para localizacao de predios e acompanhamento do onibus interno
+
+AUTORES
+
+[Preencher conforme o modelo da MPU]
+
+RESUMO
+
+O MapaFURG e uma plataforma web progressiva desenvolvida pelo PET Ciencias Computacionais como projeto independente, com o objetivo de apoiar a localizacao de estudantes, servidores e visitantes no Campus Carreiros da Universidade Federal do Rio Grande - FURG. A proposta surgiu a partir de dificuldades observadas durante a Acolhida Cidada de 2026, quando estudantes ingressantes demonstraram dificuldade para se orientar no campus, identificar predios, consultar horarios de funcionamento, acessar informacoes sobre o onibus interno e acompanhar cardapios dos Restaurantes Universitarios. A necessidade tornou-se mais evidente durante um periodo de interrupcao parcial de fluxos informativos institucionais, quando algumas informacoes de rotina, como a publicacao diaria do cardapio do RU, ficaram fragilizadas. Como solucao, foi desenvolvido um mapa interativo publicado na web, com busca por predios, salas, pontos de interesse, horarios, informacoes dos Restaurantes Universitarios e acompanhamento do onibus interno em tempo real. A plataforma utiliza React, Vite, Leaflet, OpenStreetMap, PWA e comunicacao via WebSocket, integrada a um aplicativo rastreador em Kotlin instalado em celulares reutilizados. Apos a prototipagem, o projeto foi apresentado formalmente em reuniao com a Reitoria, tecnicos do CGTI e representantes de pro-reitorias, como PROINFRA e PROITI, obtendo aprovacao institucional para teste do rastreador em um onibus interno. O sistema foi publicado no final de abril de 2026 e testado durante todo o mes de junho de 2026, demonstrando viabilidade tecnica com infraestrutura gratuita baseada em Vercel e Render.
+
+Palavras-chave: Mapa digital; Mobilidade universitaria; PWA; WebSocket; Geolocalizacao.
+
+========================================================================
+1. O PROBLEMA E A SOLUCAO PROPOSTA
+========================================================================
+
+O Campus Carreiros da FURG possui grande extensao territorial, diversos predios, salas, servicos, restaurantes universitarios e linhas internas de deslocamento. Para estudantes ingressantes, visitantes e ate membros da comunidade academica, a localizacao de espacos e o acesso rapido a informacoes atualizadas podem ser uma barreira pratica no cotidiano universitario.
+
+A dificuldade foi observada de forma mais evidente durante a Acolhida Cidada de 2026, momento em que estudantes recem-chegados ao campus precisavam encontrar predios, salas e servicos sem conhecer previamente a organizacao espacial da universidade. Alem disso, durante um periodo de interrupcao parcial de fluxos informativos institucionais, algumas informacoes de rotina, como a publicacao diaria de cardapios dos Restaurantes Universitarios, deixaram de ocorrer com regularidade, evidenciando a fragilidade de fluxos informativos centralizados.
+
+Como resposta a esse problema, foi desenvolvido o MapaFURG, uma plataforma web para consulta interativa do Campus Carreiros. A solucao permite buscar predios, salas, restaurantes, pontos de interesse e informacoes uteis, apresentando os resultados em um mapa digital acessivel pelo navegador. A aplicacao tambem foi estruturada como PWA, permitindo melhor experiencia em dispositivos moveis e instalacao como aplicativo.
+
+Em uma segunda etapa, surgiu a demanda de acompanhar o onibus interno em tempo real. Para isso, foi desenvolvido um sistema de rastreamento baseado em celulares antigos reaproveitados como dispositivos de localizacao. Esses celulares executam um aplicativo em Kotlin que envia coordenadas via WebSocket para um servidor, que redistribui a posicao atualizada aos usuarios conectados ao mapa.
+
+O estagio atual da solucao e de aplicacao funcional publicada, aprovada institucionalmente e testada em ambiente real. O mapa esta publicado desde o final de abril de 2026, e o rastreamento do onibus foi testado durante todo o mes de junho de 2026, apos autorizacao institucional para instalacao do rastreador em um onibus interno. A continuidade da operacao depende principalmente da disponibilidade de conectividade movel para o dispositivo rastreador.
+
+========================================================================
+2. TECNOLOGIAS, METODOS OU FERRAMENTAS UTILIZADAS
+========================================================================
+
+O desenvolvimento do MapaFURG foi realizado pelo PET Ciencias Computacionais e envolveu tecnologias web, mapas digitais, comunicacao em tempo real e reaproveitamento de dispositivos moveis. No frontend, foram utilizados React e Vite para construcao da interface, Leaflet e React Leaflet para renderizacao do mapa, OpenStreetMap como base cartografica e Tailwind CSS para a composicao visual.
+
+A aplicacao foi configurada como Progressive Web App (PWA), utilizando vite-plugin-pwa para manifesto, service worker e cache de arquivos estaticos. Essa escolha permite que o mapa seja acessado como aplicacao web e instalado em dispositivos moveis, com melhor desempenho e alguma resiliencia de cache.
+
+Os dados de predios, salas, horarios, aliases de busca e informacoes dos Restaurantes Universitarios foram organizados em uma base estatica integrada ao frontend. As regras de busca foram estruturadas para permitir consultas por nomes, siglas, apelidos e termos relacionados.
+
+Para o acompanhamento do onibus interno, foi utilizado WebSocket, tecnologia que opera sobre TCP e permite comunicacao persistente entre cliente e servidor. O servidor foi implementado em Node.js com a biblioteca ws. Ele recebe coordenadas enviadas pelo app rastreador, valida os dados, guarda a ultima posicao em memoria e envia a atualizacao aos navegadores conectados.
+
+O rastreador foi desenvolvido como aplicativo Android em Kotlin e instalado em celulares antigos, reutilizados como dispositivos de localizacao. Esses aparelhos enviam dados de GPS ao servidor WebSocket, incluindo latitude, longitude, identificador do onibus e timestamp.
+
+As hospedagens utilizadas na fase de teste foram Vercel para o frontend e Render para o servidor WebSocket. Mesmo em planos gratuitos, os servicos suportaram os acessos durante o periodo de avaliacao inicial.
+
+========================================================================
+3. RESULTADOS OU EVIDENCIAS DE VALIDACAO
+========================================================================
+
+Como resultado, foi obtida uma aplicacao funcional do MapaFURG, publicada na web desde o final de abril de 2026. A plataforma permite navegar pelo mapa do Campus Carreiros, buscar predios e pontos de interesse, consultar informacoes associadas aos locais e visualizar a posicao do onibus interno quando ha rastreador ativo.
+
+O sistema foi testado durante todo o mes de junho de 2026 com rastreamento em ambiente real. Apos reuniao formal com a Reitoria, tecnicos do CGTI e representantes de pro-reitorias, como PROINFRA e PROITI, foi obtida aprovacao institucional para instalar o rastreador em um onibus interno. Com recursos proprios de membros do PET Ciencias Computacionais, foi contratado um plano pre-pago de celular para manter a conectividade do dispositivo durante o mes de teste.
+
+Durante esse periodo, a arquitetura baseada em Vercel e Render demonstrou viabilidade para a operacao inicial do projeto, mesmo utilizando cotas gratuitas. O sistema se manteve acessivel para os usuarios e permitiu o acompanhamento do onibus interno por meio da interface web.
+
+Tambem foi elaborado um estimador de consumo mensal do WebSocket, disponivel em scripts/estimar-consumo-ws.js, para avaliar a viabilidade de trafego da solucao. Considerando envio de localizacao a cada 3 segundos durante 30 dias, o estimador calcula 864.000 envios mensais por onibus. Com payload aproximado de 206 bytes do celular para o servidor e 202 bytes do servidor para cada mapa conectado, a estimativa e de aproximadamente 352,512 MB por mes para 1 onibus e 1 conexao, 8,904 GB por mes para 1 onibus e 50 conexoes, e 70,167 GB por mes para 2 onibus e 200 conexoes. Esses valores estimam apenas o JSON trafegado pela aplicacao, sem incluir todo o overhead de rede.
+
+Tambem foram produzidos recursos de apoio ao desenvolvimento e manutencao, incluindo documentacao tecnica, explicacao de alteracao de dados, perguntas tecnicas frequentes, cliente de teste WebSocket e estimador de consumo mensal de trafego.
+
+Evidencias que podem ser anexadas ou citadas no texto final:
+- link publico do MapaFURG;
+- captura de tela do mapa em funcionamento;
+- captura de tela do onibus aparecendo no mapa;
+- registro ou relato da reuniao institucional;
+- periodo do teste realizado durante junho de 2026;
+- estimativa de consumo mensal do WebSocket;
+- confirmacao da aprovacao institucional para o teste;
+- relato de aceitacao por estudantes, tecnicos ou gestores.
+
+========================================================================
+4. POTENCIAL DE APLICACAO E IMPACTO
+========================================================================
+
+O MapaFURG tem potencial de aplicacao direta na rotina academica do Campus Carreiros, especialmente para estudantes ingressantes, visitantes, servidores, tecnicos e participantes de eventos institucionais. A solucao contribui para reduzir dificuldades de orientacao espacial, facilitar o acesso a servicos e centralizar informacoes praticas sobre predios, restaurantes, horarios e transporte interno.
+
+Do ponto de vista social e institucional, o projeto fortalece a autonomia dos usuarios no campus, reduz a dependencia de orientacoes informais e pode apoiar atividades de recepcao de estudantes, eventos, visitas e deslocamentos cotidianos. A funcionalidade de rastreamento do onibus interno amplia esse impacto ao oferecer uma informacao dinamica, diretamente relacionada a mobilidade universitaria.
+
+O uso de tecnologias abertas e de baixo custo tambem e um diferencial. A solucao utiliza ferramentas amplamente disponiveis e reaproveita celulares antigos como rastreadores, reduzindo custos de implantacao. A experiencia demonstra que e possivel desenvolver uma solucao funcional com infraestrutura inicial gratuita e componentes acessiveis.
+
+A longo prazo, o projeto pode ser expandido para outros campi da FURG, integrar dados institucionais oficiais e servir como base para uma plataforma mais ampla de mobilidade, localizacao e comunicacao universitaria.
+
+========================================================================
+5. PROXIMOS PASSOS
+========================================================================
+
+Os proximos passos incluem a continuidade do uso em ambiente real, a qualificacao dos dados dos predios e servicos, a melhoria da acessibilidade da interface e a ampliacao das informacoes disponiveis no mapa.
+
+Para o rastreamento do onibus interno, pretende-se avaliar alternativas mais estaveis de conectividade, energia e fixacao do dispositivo, alem de aprimorar o aplicativo rastreador em Kotlin. Como a continuidade depende da disponibilidade de chip/plano de dados, tambem e importante definir uma estrategia permanente de conectividade. Com essa estrutura, o acompanhamento em tempo real pode continuar sendo utilizado pela universidade.
+
+Outra evolucao importante e a criacao de mecanismos para atualizacao dos dados sem necessidade de alterar diretamente o codigo-fonte, como um painel administrativo ou integracao com fontes institucionais. Isso permitiria que setores responsaveis mantivessem informacoes atualizadas sobre predios, horarios e servicos.
+
+Tambem podem ser investigadas possibilidades de formalizacao institucional do projeto, protecao da solucao, ampliacao da infraestrutura de hospedagem e integracao com sistemas oficiais da universidade.
+
+========================================================================
+6. REFERENCIAS SUGERIDAS
+========================================================================
+
+Leaflet. Leaflet: an open-source JavaScript library for mobile-friendly interactive maps. Disponivel em: https://leafletjs.com/. Acesso em: [preencher data].
+
+MDN Web Docs. WebSocket API. Disponivel em: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket. Acesso em: [preencher data].
+
+MDN Web Docs. Progressive web apps. Disponivel em: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps. Acesso em: [preencher data].
+
+OpenStreetMap. OpenStreetMap. Disponivel em: https://www.openstreetmap.org/. Acesso em: [preencher data].
+
+React. React documentation. Disponivel em: https://react.dev/. Acesso em: [preencher data].
+
+Vite. Vite documentation. Disponivel em: https://vite.dev/. Acesso em: [preencher data].

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { processarAtualizacaoOnibus } from './busTracking';
+import { processarAtualizacaoOnibus } from '../services/busTracking';
 
 export const normalizarWsUrl = (url) => {
   if (!url) return null;

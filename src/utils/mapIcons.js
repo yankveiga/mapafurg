@@ -18,7 +18,7 @@ export const criarIconePredio = (sigla) => {
   });
 };
 
-export const criarIconeOnibusAoVivo = (icone = '/interno.svg') => L.divIcon({
+export const criarIconeOnibusAoVivo = (icone = '/map-icons/interno.svg') => L.divIcon({
   className: 'bg-transparent',
   html: `
     <div style="width: 36px; height: 36px; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;">

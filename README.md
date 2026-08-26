@@ -138,7 +138,7 @@ npm.cmd run estimate:ws
 
 No Windows, `npm.cmd` evita bloqueios de política de execução do PowerShell. Em outros ambientes, `npm run estimate:ws` também funciona.
 
-O cálculo fica em [`consumo/estimar-consumo-ws.js`](./consumo/estimar-consumo-ws.js) e usa como base:
+O cálculo fica em [`scripts/estimar-consumo-ws.js`](./scripts/estimar-consumo-ws.js) e usa como base:
 
 - intervalo de envio do app rastreador: `3s`
 - payload do celular com `token`, `speed` e `accuracy`: `206 bytes`
@@ -174,39 +174,49 @@ Esse app pode ser Android ou outra solução equivalente, desde que envie coorde
 ## Estrutura do projeto
 
 ```text
+docs/
+  GUIA_CODIGO_MAPAFURG.txt   guia tecnico detalhado
+  explicacao.txt             guia rapido de manutencao
+
 src/
-  App.jsx          orquestra a tela principal do mapa
-  data.js          base de dados dos prédios e pontos de interesse
-  buscas.js        normalização e tradução da busca
-  onibus.js        configuração dos ônibus rastreados e status
-  busTracking.js   validação e filtros da telemetria recebida
-  mapIcons.js      criação dos ícones Leaflet
-  useBusLocations.js  conexão WebSocket e estado dos ônibus em tempo real
-  main.jsx         bootstrap da aplicação React
-  index.css        estilos globais
+  App.jsx                    orquestra a tela principal do mapa
+  main.jsx                   bootstrap da aplicacao React
+  index.css                  estilos globais
+  assets/
+    logos/                   logos importados pelo React
+    images/                  imagens usadas pela interface
   components/
-    BusMarker.jsx
-    Bussola.jsx
-    CentralizadorOnibus.jsx
-    Localizador.jsx
-    PredioDrawer.jsx
+    map/                     componentes acoplados ao Leaflet/mapa
+    ui/                      paineis, avisos e status de interface
+  data/
+    predios.js               base de dados dos predios e pontos de interesse
+    aviso.js                 conteudo do aviso inicial
+    onibus.js                configuracao dos onibus rastreados e status
+  hooks/
+    useBusLocations.js       conexao WebSocket e estado dos onibus em tempo real
+  services/
+    busTracking.js           validacao e filtros da telemetria recebida
+  utils/
+    buscas.js                normalizacao e traducao da busca
+    mapIcons.js              criacao dos icones Leaflet
 
 public/
-  ws-tester.html   cliente simples para teste do WebSocket
-  ...              ícones e assets do PWA
+  ws-tester.html             cliente simples para teste do WebSocket
+  map-icons/                 SVGs usados pelos marcadores do mapa
+  ...                        icones e assets do PWA
 
 server/
-  ws-server.js     servidor WebSocket / healthcheck HTTP
+  ws-server.js               servidor WebSocket / healthcheck HTTP
 
-consumo/
-  estimar-consumo-ws.js   estimador de tráfego mensal do WebSocket
+scripts/
+  estimar-consumo-ws.js      estimador de trafego mensal do WebSocket
 ```
 
 ## Manutenção
 
 ### Dados dos prédios
 
-Os pontos do mapa ficam em [`src/data.js`](./src/data.js).
+Os pontos do mapa ficam em [`src/data/predios.js`](./src/data/predios.js).
 
 Cada item inclui, em geral:
 
@@ -222,29 +232,29 @@ Para adicionar um prédio, inclua um novo objeto no array `predios`. Se quiser q
 
 ### Busca e atalhos
 
-As regras de normalização e tradução da busca ficam em [`src/buscas.js`](./src/buscas.js).
+As regras de normalização e tradução da busca ficam em [`src/utils/buscas.js`](./src/utils/buscas.js).
 
-Quando um novo prédio precisar responder a apelidos ou buscas especiais, adicione os termos em `buscas.js` apontando para o `id` cadastrado em `data.js`.
+Quando um novo prédio precisar responder a apelidos ou buscas especiais, adicione os termos em `src/utils/buscas.js` apontando para o `id` cadastrado em `src/data/predios.js`.
 
 ### Ônibus rastreados
 
-A configuração visual e operacional dos ônibus rastreados fica em [`src/onibus.js`](./src/onibus.js).
+A configuração visual e operacional dos ônibus rastreados fica em [`src/data/onibus.js`](./src/data/onibus.js).
 
 Nesse arquivo ficam:
 
-- `ID_PONTO_ONIBUS`: id do ponto informativo do ônibus em `data.js`
+- `ID_PONTO_ONIBUS`: id do ponto informativo do ônibus em `src/data/predios.js`
 - `POSICAO_INICIAL_ONIBUS`: posição exibida quando não há ônibus online
 - `STATUS_WS`: rótulos de conexão exibidos na interface
 - `ONIBUS_CONFIG`: cadastro dos ônibus conhecidos, como `onibus_amarelo`, `onibus_branco` e `onibus_teste`
 - `ONIBUS_PADRAO`: fallback para IDs antigos ou genéricos, como `bus-1`
 
-Para trocar o ícone de um ônibus, coloque o arquivo em `public/` e altere o campo `icone` em `ONIBUS_CONFIG`.
+Para trocar o ícone de um ônibus, coloque o arquivo em `public/map-icons/` e altere o campo `icone` em `ONIBUS_CONFIG`.
 
 Para adicionar um novo ônibus, cadastre um novo item em `ONIBUS_CONFIG` e configure o app rastreador para enviar o mesmo `busId`.
 
 ### Telemetria e movimento
 
-O tratamento das atualizações fica em [`src/busTracking.js`](./src/busTracking.js). O frontend:
+O tratamento das atualizações fica em [`src/services/busTracking.js`](./src/services/busTracking.js). O frontend:
 
 - descarta mensagens antigas pelo `timestamp`
 - ignora leituras com precisão superior a `40m`
@@ -252,19 +262,19 @@ O tratamento das atualizações fica em [`src/busTracking.js`](./src/busTracking
 - desconsidera deslocamentos menores que `2m`
 - interpola a posição entre atualizações
 
-O componente [`src/components/BusMarker.jsx`](./src/components/BusMarker.jsx) anima a posição entre as atualizações. O ícone permanece com orientação fixa. Os limites ficam centralizados em `BUS_TRACKING_CONFIG` para calibração durante os testes em campo.
+O componente [`src/components/map/BusMarker.jsx`](./src/components/map/BusMarker.jsx) anima a posição entre as atualizações. O ícone permanece com orientação fixa. Os limites ficam centralizados em `BUS_TRACKING_CONFIG` para calibração durante os testes em campo.
 
 ### Interface e comportamento do mapa
 
 O fluxo principal da aplicação está em [`src/App.jsx`](./src/App.jsx), mas as responsabilidades maiores foram separadas:
 
-- [`src/useBusLocations.js`](./src/useBusLocations.js): conexão, reconexão e mensagens WebSocket
-- [`src/mapIcons.js`](./src/mapIcons.js): criação dos ícones do Leaflet
-- [`src/components/PredioDrawer.jsx`](./src/components/PredioDrawer.jsx): painel inferior de detalhes
-- [`src/components/BusMarker.jsx`](./src/components/BusMarker.jsx): marcador animado do ônibus
-- [`src/components/Localizador.jsx`](./src/components/Localizador.jsx): localização do usuário
-- [`src/components/Bussola.jsx`](./src/components/Bussola.jsx): foco em prédio selecionado
-- [`src/components/CentralizadorOnibus.jsx`](./src/components/CentralizadorOnibus.jsx): foco no ônibus
+- [`src/hooks/useBusLocations.js`](./src/hooks/useBusLocations.js): conexão, reconexão e mensagens WebSocket
+- [`src/utils/mapIcons.js`](./src/utils/mapIcons.js): criação dos ícones do Leaflet
+- [`src/components/ui/PredioDrawer.jsx`](./src/components/ui/PredioDrawer.jsx): painel inferior de detalhes
+- [`src/components/map/BusMarker.jsx`](./src/components/map/BusMarker.jsx): marcador animado do ônibus
+- [`src/components/map/Localizador.jsx`](./src/components/map/Localizador.jsx): localização do usuário
+- [`src/components/map/Bussola.jsx`](./src/components/map/Bussola.jsx): foco em prédio selecionado
+- [`src/components/map/CentralizadorOnibus.jsx`](./src/components/map/CentralizadorOnibus.jsx): foco no ônibus
 
 ## Build de produção
 

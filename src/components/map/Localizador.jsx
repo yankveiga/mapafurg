@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Marker, useMap, useMapEvents } from 'react-leaflet';
-import { criarIconeLocalizacaoUsuario } from '../mapIcons';
+import { criarIconeLocalizacaoUsuario } from '../../utils/mapIcons';
 
 export function Localizador({ focar, onCentralizado, onErro }) {
   const [posicao, setPosicao] = useState(null);

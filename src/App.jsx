@@ -12,10 +12,10 @@ import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import { BusFront, LocateFixed } from 'lucide-react';
-import { normalizarTextoBusca, traduzirBusca } from './buscas';
-import { predios } from './data';
-import { avisoInicial } from './aviso';
-import { criarIconeCluster, criarIconeOnibusAoVivo, criarIconePredio } from './mapIcons';
+import { avisoInicial } from './data/aviso';
+import { predios } from './data/predios';
+import { normalizarTextoBusca, traduzirBusca } from './utils/buscas';
+import { criarIconeCluster, criarIconeOnibusAoVivo, criarIconePredio } from './utils/mapIcons';
 import {
   formatarTempoDecorrido,
   ID_PONTO_ONIBUS,
@@ -23,16 +23,16 @@ import {
   obterOnibusPrincipal,
   POSICAO_INICIAL_ONIBUS,
   STATUS_WS,
-} from './onibus';
-import { normalizarWsUrl, useBusLocations } from './useBusLocations';
-import logoPet from './assets/logopetvetorizado.svg';
-import { AvisoInicial } from './components/AvisoInicial';
-import { Bussola } from './components/Bussola';
-import { BusMarker } from './components/BusMarker';
-import { CentralizadorOnibus } from './components/CentralizadorOnibus';
-import { Localizador } from './components/Localizador';
-import { PredioDrawer } from './components/PredioDrawer';
-import { StatusOnibus } from './components/StatusOnibus';
+} from './data/onibus';
+import { normalizarWsUrl, useBusLocations } from './hooks/useBusLocations';
+import logoPet from './assets/logos/logopetvetorizado.svg';
+import { Bussola } from './components/map/Bussola';
+import { BusMarker } from './components/map/BusMarker';
+import { CentralizadorOnibus } from './components/map/CentralizadorOnibus';
+import { Localizador } from './components/map/Localizador';
+import { AvisoInicial } from './components/ui/AvisoInicial';
+import { PredioDrawer } from './components/ui/PredioDrawer';
+import { StatusOnibus } from './components/ui/StatusOnibus';
 
 function App() {
   // Estados principais de interface e dados em tempo real.

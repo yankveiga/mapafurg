@@ -5,7 +5,7 @@ EXPLICACAO RAPIDA - COMO ALTERAR DADOS DO MAPA FURG
 ========================================================================
 
 Arquivo principal:
-- src/data.js
+- src/data/predios.js
 
 Passo 1: criar um novo objeto dentro do array predios
 
@@ -77,16 +77,16 @@ interno: {
 Passo 3: ajustar a busca, se necessario
 
 Arquivo:
-- src/buscas.js
+- src/utils/buscas.js
 
 Se o novo predio precisar responder a termos especiais, adicione os apelidos
-em buscas.js apontando para o mesmo id usado em data.js.
+em src/utils/buscas.js apontando para o mesmo id usado em src/data/predios.js.
 
 Exemplo:
 
 "apelido do predio": ["novo_predio"]
 
-Quando precisa mexer em buscas.js?
+Quando precisa mexer em src/utils/buscas.js?
 
 - quando o usuario pode procurar por um nome que nao esta em nome ou aliases;
 - quando existe uma regra especial;
@@ -105,14 +105,14 @@ Depois procure pelo nome, id e aliases na barra de busca.
 ========================================================================
 
 Arquivos principais:
-- src/onibus.js
+- src/data/onibus.js
 - public/
 - app rastreador externo
 - server/ws-server.js, se for mudar a regra de busId
 
 Importante:
-- o ponto informativo "Onibus Interno - FURG" continua em src/data.js;
-- os onibus rastreados em tempo real ficam configurados em src/onibus.js.
+- o ponto informativo "Onibus Interno - FURG" continua em src/data/predios.js;
+- os onibus rastreados em tempo real ficam configurados em src/data/onibus.js.
 
 Hoje ja existe uma estrutura para:
 
@@ -120,24 +120,24 @@ Hoje ja existe uma estrutura para:
 - onibus_branco
 - onibus_teste
 
-Passo 1: cadastrar o onibus em src/onibus.js
+Passo 1: cadastrar o onibus em src/data/onibus.js
 
 Exemplo:
 
 export const ONIBUS_CONFIG = {
   onibus_amarelo: {
     nome: 'Interno Amarelo',
-    icone: '/interno.svg',
+    icone: '/map-icons/interno.svg',
     acessivel: true,
   },
   onibus_branco: {
     nome: 'Interno Branco',
-    icone: '/interno.svg',
+    icone: '/map-icons/interno.svg',
     acessivel: false,
   },
   onibus_teste: {
     nome: 'Onibus Teste',
-    icone: '/interno.svg',
+    icone: '/map-icons/interno.svg',
     acessivel: false,
     teste: true,
   },
@@ -154,7 +154,7 @@ Campos:
 
 - icone:
   caminho do SVG dentro da pasta public/.
-  Exemplo: /interno-amarelo.svg.
+  Exemplo: /map-icons/interno-amarelo.svg.
 
 - acessivel:
   true para onibus com acessibilidade;
@@ -173,11 +173,11 @@ public/
   interno-branco.svg
   interno-teste.svg
 
-Depois, em src/onibus.js:
+Depois, em src/data/onibus.js:
 
 onibus_amarelo: {
   nome: 'Interno Amarelo',
-  icone: '/interno-amarelo.svg',
+  icone: '/map-icons/interno-amarelo.svg',
   acessivel: true,
 }
 
@@ -239,7 +239,7 @@ npm.cmd run dev:all
 
 Envie uma mensagem pelo app rastreador ou pelo public/ws-tester.html.
 
-Se o busId for cadastrado em src/onibus.js, o mapa usa a configuracao dele.
+Se o busId for cadastrado em src/data/onibus.js, o mapa usa a configuracao dele.
 Se o busId nao for cadastrado, o mapa usa ONIBUS_PADRAO.
 
 ========================================================================
@@ -248,14 +248,14 @@ Se o busId nao for cadastrado, o mapa usa ONIBUS_PADRAO.
 
 Para predio novo:
 
-1. Adicionar objeto em src/data.js.
+1. Adicionar objeto em src/data/predios.js.
 2. Colocar aliases se necessario.
-3. Ajustar src/buscas.js apenas se precisar de busca especial.
+3. Ajustar src/utils/buscas.js apenas se precisar de busca especial.
 4. Testar no mapa.
 
 Para onibus novo:
 
-1. Adicionar configuracao em src/onibus.js.
+1. Adicionar configuracao em src/data/onibus.js.
 2. Colocar SVG em public/.
 3. Fazer o app rastreador enviar o mesmo busId.
 4. Garantir que o servidor aceite esse busId.

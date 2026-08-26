@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Marker } from 'react-leaflet';
-import { criarIconeOnibusAoVivo } from '../mapIcons';
+import { criarIconeOnibusAoVivo } from '../../utils/mapIcons';
 
 const easeOutCubic = (valor) => 1 - (1 - valor) ** 3;
 
