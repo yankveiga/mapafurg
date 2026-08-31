@@ -22,11 +22,11 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-      segunda: "Não informado",
-      terca: "Não informado",
-      quarta: "Não informado",
-      quinta: "Não informado",
-      sexta: "Não informado"
+      segunda: "Arroz, Arroz integral, Lentilha, Iscas de sassami a moda chinesa, Carne suína assada, PTS ao sugo, Ovo cozido, Creme de milho, Caldo verde, Mix de folhas, Caico, Beterraba cozida, Banana",
+      terca: "Arroz, Arroz integral, Feijão preto, Sassami chapeado, Torta de carne, Panqueca de grão de bico ao sugo, Ovo frito, Polenta com molho, Sopa de legumes, Mix de folhas, Pepino, Cenoura cozida em rodelas, Bergamota",
+      quarta: "Arroz, Arroz integral, Feijão carioca, Peixe ao molho, Carne de panela, Quibe de PTS, Omelete, Purê de batatas, Sopa de feijão, Mix de folhas, Mix de repolho, Abobrinha cozida, Laranja",
+      quinta: "Arroz, Arroz integral, Feijão preto, Carne moída refogada com cenoura, Sassami ao molho vermelho, Panqueca de legumes, Ovo cozido, Macarrão alho e óleo, Creme de abóbora, Mix de folhas, Beterraba ralada, Chuchu cozido, Maçã",
+      sexta: "Arroz, Arroz integral, Feijão preto, Coxa e sobrecoxa assadas, Bisteca acebolada, Bolinho de grão de bico, Omelete, Abóbora caramelada, Sopa de massa, Mix de folhas, Abobrinha ralada, Repolho cozido, Bergamota"
     }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
@@ -37,13 +37,13 @@ export const predios = [
     lng: -52.166576, 
     descricao: "Segunda a Sexta:\n☕ Café: 07h15 às 09h00\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00\n\nSábados, Domingos e Feriados:\n☕ Café: 08h30 às 09h45\n☀️ Almoço: 12h00 às 13h45\n🌙 Jantar: 18h30 às 20h00",
     cardapio: {
-      segunda: "Não informado",
-      terca: "Não informado",
-      quarta: "Não informado",
-      quinta: "Não informado",
-      sexta: "Não informado",
-      sábado: "Não informado",
-      domingo: "Não informado"
+      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Carne de Panela, Cubos de Frango a Xadrez, Kibe de Proteína de Soja, Ovo Cozido, Batata Rústica, Couve Chinesa, Cenoura Cozida, Beterraba Ralada, Laranja, Canja",
+      terca: "Arroz Branco, Arroz Integral, Feijão Preto, Bife Bovino Acebolado, Fricasse de Frango, Legumes Salteados, Omelete, Batata Palha, Alface, Abobrinha Cozida, Cenoura Ralada, Maçã, Creme de Milho",
+      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Pastel de Carne, Coxa com sobrecoxa assada, Lasanha de Cogumelos, Ovo Cozido, Seleta de Legumes, Alface, Soja em Grãos Refogada com Tempero Verde, Salpicão, Melão, Sopa de Legumes",
+      quinta: "Arroz Branco, Arroz Integral, Lentilha, Almôndegas de Carne Moída, Peixe a Milanesa, Bolinho de Lentilha, Ovo Cozido, Purê de Batata, Mix de Folhas, Beterraba Cozida, Salada Caico, Banana, Sopa de Feijão Preto com Legumes",
+      sexta: "Arroz Branco, Arroz Integral, Feijão Preto, Filé Suíno ao Molho BBQ, Lasanha de Frango, Strogonoff de Cogumelo, Ovo Pochê, Jardineira de Legumes, Alface, Cenoura Cozida com Ovos, Salada Náutico, Laranja, Caldo Verde",
+      sábado: "Arroz Branco, Arroz Integral, Feijão Preto, Croquete de Carne, Cubos de Frango a Xadrez, Grão de Bico Acebolado, Ovo Cozido, Espaguete ao Alho e Óleo, Alface, Abobrinha Cozida, Tomate com Cebola, Maçã, Creme de Moranga",
+      domingo: "Arroz Branco, Arroz Integral, Feijão Carioca, Bisteca Suína Acebolada, Iscas de Frango ao Molho Mostarda, Almôndegas de PTS Ao Sugo com Milho, Omelete, Batata Chip's, Chicória, Beterraba Cozida com Maçã, Tabule, Melão, Sopa de Legumes"
     }
   },  
     
