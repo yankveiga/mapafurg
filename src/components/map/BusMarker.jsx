@@ -4,7 +4,7 @@ import { criarIconeOnibusAoVivo } from '../../utils/mapIcons';
 
 const easeOutCubic = (valor) => 1 - (1 - valor) ** 3;
 
-export function BusMarker({ posicao, config, onClick }) {
+export function BusMarker({ posicao, config, opacity = 1, onClick }) {
   const markerRef = useRef(null);
   const animationFrameRef = useRef(null);
   const [posicaoInicial] = useState(() => [posicao.lat, posicao.lng]);
@@ -50,6 +50,17 @@ export function BusMarker({ posicao, config, onClick }) {
       }
     };
   }, [posicao.interpolationMs, posicao.lat, posicao.lng]);
+
+  useEffect(() => {
+    const marker = markerRef.current;
+    if (!marker) return;
+
+    marker.setOpacity(opacity);
+    const element = marker.getElement();
+    if (element) {
+      element.style.transition = 'opacity 700ms ease';
+    }
+  }, [opacity]);
 
   return (
     <Marker

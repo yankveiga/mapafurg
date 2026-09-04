@@ -23,6 +23,8 @@ O projeto é dividido em duas frentes:
 - painel com detalhes do local selecionado
 - geolocalização do usuário
 - atualização em tempo real do ônibus interno
+- interpolação visual do marcador entre posições reais recebidas
+- opacidade do marcador baseada na idade da última posição real
 - centralização manual no ônibus
 - indicação da última atualização recebida
 - suporte a PWA
@@ -79,6 +81,8 @@ npm run lint
 ## Rastreamento em tempo real
 
 O servidor WebSocket recebe mensagens de localização e retransmite o último estado válido para os clientes conectados.
+
+O frontend usa a posição recebida como coordenada real/oficial e aplica apenas uma interpolação visual no marcador do mapa. Nenhuma posição interpolada é enviada ao backend, retransmitida pelo WebSocket ou usada para aumentar a frequência do rastreador.
 
 Formato esperado:
 
@@ -260,9 +264,21 @@ O tratamento das atualizações fica em [`src/services/busTracking.js`](./src/se
 - ignora leituras com precisão superior a `40m`
 - ignora saltos que implicariam velocidade superior a `30m/s`
 - desconsidera deslocamentos menores que `2m`
-- interpola a posição entre atualizações
+- calcula a duração da interpolação visual entre posições reais
+- calcula a opacidade do marcador pela idade da última posição real
 
-O componente [`src/components/map/BusMarker.jsx`](./src/components/map/BusMarker.jsx) anima a posição entre as atualizações. O ícone permanece com orientação fixa. Os limites ficam centralizados em `BUS_TRACKING_CONFIG` para calibração durante os testes em campo.
+O componente [`src/components/map/BusMarker.jsx`](./src/components/map/BusMarker.jsx) anima a posição entre as atualizações com `requestAnimationFrame`. Quando uma nova posição chega antes do fim da animação anterior, a animação em andamento é cancelada e o marcador continua suavemente a partir da posição visual atual do Leaflet até a nova coordenada real.
+
+A duração da animação usa o intervalo entre timestamps recebidos, com limites em `BUS_TRACKING_CONFIG`. Como o intervalo de envio usado pelo rastreador é de `3s`, a interpolação fica limitada entre `900ms` e `2200ms`, evitando movimento indefinido quando novas posições param de chegar.
+
+A opacidade também fica centralizada em `BUS_TRACKING_CONFIG`:
+
+- até `10s` sem nova posição real: `100%`
+- entre `10s` e `30s`: redução gradual até cerca de `70%`
+- entre `30s` e `60s`: redução gradual até cerca de `30%`
+- acima de `60s` ou sem timestamp válido: marcador visível com cerca de `30%`
+
+Quando o servidor emite `bus_disconnected`, o hook [`src/hooks/useBusLocations.js`](./src/hooks/useBusLocations.js) preserva a última posição real conhecida e marca `disconnectedAt`. Assim, o marcador não desaparece: ele para de se mover, passa a ser tratado como offline na interface e segue ficando transparente conforme a posição envelhece. O ícone permanece com orientação fixa.
 
 ### Interface e comportamento do mapa
 

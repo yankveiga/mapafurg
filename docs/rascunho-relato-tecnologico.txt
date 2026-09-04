@@ -40,6 +40,8 @@ Para o acompanhamento do onibus interno, foi utilizado WebSocket, tecnologia que
 
 O rastreador foi desenvolvido como aplicativo Android em Kotlin e instalado em celulares antigos, reutilizados como dispositivos de localizacao. Esses aparelhos enviam dados de GPS ao servidor WebSocket, incluindo latitude, longitude, identificador do onibus e timestamp.
 
+No frontend, a representacao do onibus no mapa foi aprimorada com interpolacao visual entre posicoes reais recebidas e com opacidade baseada na idade da ultima localizacao. Essa estrategia melhora a percepcao de continuidade do movimento sem alterar o protocolo WebSocket, sem enviar coordenadas interpoladas ao servidor e sem aumentar a frequencia de envio do rastreador. Quando as atualizacoes param, o marcador permanece na ultima posicao real conhecida, deixa de se mover e fica progressivamente mais transparente, indicando que a informacao esta envelhecendo.
+
 As hospedagens utilizadas na fase de teste foram Vercel para o frontend e Render para o servidor WebSocket. Mesmo em planos gratuitos, os servicos suportaram os acessos durante o periodo de avaliacao inicial.
 
 ========================================================================
@@ -51,6 +53,8 @@ Como resultado, foi obtida uma aplicacao funcional do MapaFURG, publicada na web
 O sistema foi testado durante todo o mes de junho de 2026 com rastreamento em ambiente real. Apos reuniao formal com a Reitoria, tecnicos do CGTI e representantes de pro-reitorias, como PROINFRA e PROITI, foi obtida aprovacao institucional para instalar o rastreador em um onibus interno. Com recursos proprios de membros do PET Ciencias Computacionais, foi contratado um plano pre-pago de celular para manter a conectividade do dispositivo durante o mes de teste.
 
 Durante esse periodo, a arquitetura baseada em Vercel e Render demonstrou viabilidade para a operacao inicial do projeto, mesmo utilizando cotas gratuitas. O sistema se manteve acessivel para os usuarios e permitiu o acompanhamento do onibus interno por meio da interface web.
+
+Como melhoria de experiencia, a interface passou a suavizar a transicao do marcador entre coordenadas sucessivas e a indicar visualmente quando a ultima posicao recebida deixa de ser recente. A solucao preserva o marcador visivel mesmo em estado offline, evitando que o usuario perca a referencia da ultima localizacao conhecida.
 
 Tambem foi elaborado um estimador de consumo mensal do WebSocket, disponivel em scripts/estimar-consumo-ws.js, para avaliar a viabilidade de trafego da solucao. Considerando envio de localizacao a cada 3 segundos durante 30 dias, o estimador calcula 864.000 envios mensais por onibus. Com payload aproximado de 206 bytes do celular para o servidor e 202 bytes do servidor para cada mapa conectado, a estimativa e de aproximadamente 352,512 MB por mes para 1 onibus e 1 conexao, 8,904 GB por mes para 1 onibus e 50 conexoes, e 70,167 GB por mes para 2 onibus e 200 conexoes. Esses valores estimam apenas o JSON trafegado pela aplicacao, sem incluir todo o overhead de rede.
 

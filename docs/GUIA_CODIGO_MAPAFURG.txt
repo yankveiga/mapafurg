@@ -54,12 +54,15 @@ Passo 3: servidor faz broadcast
 Passo 4: src/hooks/useBusLocations.js recebe no navegador
 - ws.onmessage faz parse JSON;
 - se for bus_location valido, atualiza estado onibusPorId;
-- React renderiza/atualiza o marcador no Leaflet.
+- React renderiza/atualiza o marcador no Leaflet;
+- o marcador usa a coordenada recebida como posicao real e interpola apenas
+  a representacao visual no frontend.
 
 Passo 5: interface mostra status
 - "Ao vivo", "Offline", "Erro";
 - quantidade de onibus ativos;
-- "ultima atualizacao ha Xs".
+- "ultima atualizacao ha Xs";
+- opacidade do marcador conforme a idade da ultima posicao real recebida.
 
 ========================================================================
 3) EXPLICACAO ARQUIVO POR ARQUIVO
@@ -131,8 +134,10 @@ D) Render da interface
 - MapContainer com tiles OSM.
 - MarkerClusterGroup para predios.
 - marcador de onibus:
-  - sem onibus ativo -> mostra fallback em POSICAO_INICIAL_ONIBUS;
-  - com onibus ativo -> mostra marcadores dos onibus em tempo real.
+  - sem onibus conhecido -> mostra fallback em POSICAO_INICIAL_ONIBUS;
+  - com onibus conhecido -> mostra marcadores dos onibus em tempo real ou a
+    ultima posicao real preservada;
+  - calcula opacidade do marcador com calcularOpacidadeOnibus(timestamp, agoraMs).
 
 Observacao importante:
 - no estado atual, maxBounds esta comentado.
@@ -249,7 +254,8 @@ O que faz:
 - conecta ao servidor;
 - marca status conectando/conectado/erro/desconectado;
 - reconecta automaticamente em caso de queda;
-- trata bus_disconnected;
+- trata bus_disconnected preservando a ultima posicao real e marcando
+  disconnectedAt;
 - trata bus_location e encaminha a telemetria para busTracking.js;
 - devolve onibusPorId e statusWs para App.jsx.
 
@@ -268,7 +274,26 @@ Regras iniciais:
 - ignora accuracy acima de 40 metros;
 - ignora salto com velocidade calculada acima de 30 m/s;
 - desconsidera deslocamento inferior a 2 metros;
-- calcula duracao de interpolacao entre 600 e 2800 ms.
+- calcula duracao de interpolacao entre 900 e 2200 ms;
+- calcula opacidade pela idade da ultima posicao real.
+
+Interpolacao:
+- acontece somente no frontend;
+- nao altera o protocolo WebSocket;
+- nao envia posicoes interpoladas ao servidor;
+- nao aumenta a frequencia do rastreador;
+- usa o intervalo entre timestamps recebidos como base.
+
+Referencia atual:
+- o estimador de consumo e o README usam intervalo de envio de 3 segundos;
+- por isso a animacao fica limitada a 2200 ms, deixando margem antes da
+  proxima atualizacao esperada.
+
+Opacidade:
+- ate 10 segundos sem nova posicao real: 100%;
+- de 10 a 30 segundos: reducao gradual ate cerca de 70%;
+- de 30 a 60 segundos: reducao gradual ate cerca de 30%;
+- acima de 60 segundos, ou sem timestamp valido: cerca de 30%.
 
 Os valores ficam em BUS_TRACKING_CONFIG e devem ser calibrados em campo.
 
@@ -288,7 +313,9 @@ Arquivos:
 - PredioDrawer.jsx:
   painel inferior com descricao, projetos, horarios, interno e cardapio.
 - BusMarker.jsx:
-  interpola a posicao; o SVG permanece com orientacao fixa.
+  interpola a posicao com requestAnimationFrame, cancela animacao anterior
+  quando chega uma nova posicao e aplica opacidade ao marcador. O SVG
+  permanece com orientacao fixa.
 
 Por que foi separado:
 - App.jsx fica como orquestrador;
@@ -323,6 +350,12 @@ Responsabilidades:
    envia para todos os clientes conectados.
 6) close:
    remove onibus desconectado e emite bus_disconnected.
+
+Observacao:
+- o servidor emite bus_disconnected ao fechar a conexao do rastreador;
+- no frontend, essa mensagem nao remove imediatamente o marcador do mapa.
+  A ultima posicao real conhecida permanece visivel e fica mais transparente
+  conforme envelhece.
 
 Por que foi feito assim:
 - arquitetura simples, sem dependencia de banco.

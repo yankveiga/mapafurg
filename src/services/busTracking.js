@@ -11,6 +11,13 @@ export const BUS_TRACKING_CONFIG = {
   minInterpolationMs: 900,
   // Duracao maxima pensada para GPS a cada 3s: desliza e ainda sobra uma pausa visual.
   maxInterpolationMs: 2200,
+  // Mantem 100% enquanto o GPS esta dentro da janela normal de atualizacao.
+  freshPositionMs: 10_000,
+  // Abaixo deste ponto a posicao ja esta claramente envelhecida.
+  stalePositionMs: 30_000,
+  // Depois de 60s, preserva o marcador bem transparente, mas ainda visivel.
+  offlinePositionMs: 60_000,
+  minOfflineOpacity: 0.3,
 };
 
 /*
@@ -52,6 +59,28 @@ const obterTimestamp = (payload) => {
 };
 
 const limitar = (valor, minimo, maximo) => Math.min(maximo, Math.max(minimo, valor));
+
+export const calcularOpacidadeOnibus = (timestamp, agoraMs = Date.now()) => {
+  const timestampMs = Date.parse(timestamp ?? '');
+  if (!Number.isFinite(timestampMs)) return BUS_TRACKING_CONFIG.minOfflineOpacity;
+
+  const idadeMs = Math.max(0, agoraMs - timestampMs);
+  if (idadeMs <= BUS_TRACKING_CONFIG.freshPositionMs) return 1;
+
+  if (idadeMs <= BUS_TRACKING_CONFIG.stalePositionMs) {
+    const progresso = (idadeMs - BUS_TRACKING_CONFIG.freshPositionMs)
+      / (BUS_TRACKING_CONFIG.stalePositionMs - BUS_TRACKING_CONFIG.freshPositionMs);
+    return limitar(1 - progresso * 0.3, 0.7, 1);
+  }
+
+  if (idadeMs <= BUS_TRACKING_CONFIG.offlinePositionMs) {
+    const progresso = (idadeMs - BUS_TRACKING_CONFIG.stalePositionMs)
+      / (BUS_TRACKING_CONFIG.offlinePositionMs - BUS_TRACKING_CONFIG.stalePositionMs);
+    return limitar(0.7 - progresso * 0.4, BUS_TRACKING_CONFIG.minOfflineOpacity, 0.7);
+  }
+
+  return BUS_TRACKING_CONFIG.minOfflineOpacity;
+};
 
 export const processarAtualizacaoOnibus = (payload, anterior) => {
   if (!Number.isFinite(payload.lat) || !Number.isFinite(payload.lng)) return null;
@@ -106,5 +135,6 @@ export const processarAtualizacaoOnibus = (payload, anterior) => {
     speed,
     accuracy,
     interpolationMs,
+    disconnectedAt: null,
   };
 };

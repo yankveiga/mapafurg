@@ -16,6 +16,7 @@ import { avisoInicial } from './data/aviso';
 import { predios } from './data/predios';
 import { normalizarTextoBusca, traduzirBusca } from './utils/buscas';
 import { criarIconeCluster, criarIconeOnibusAoVivo, criarIconePredio } from './utils/mapIcons';
+import { calcularOpacidadeOnibus } from './services/busTracking';
 import {
   formatarTempoDecorrido,
   ID_PONTO_ONIBUS,
@@ -179,9 +180,14 @@ function App() {
   const rotuloResultadosBusca = totalResultadosBusca === 1
     ? '1 resultado'
     : `${totalResultadosBusca} resultados`;
-  const onibusAtivos = Object.entries(onibusPorId);
+  const onibusConhecidos = Object.entries(onibusPorId);
+  const onibusAtivos = onibusConhecidos.filter(([, posicao]) => !posicao.disconnectedAt);
   const onibusPrincipal = obterOnibusPrincipal(onibusPorId);
   const ultimaAtualizacao = formatarTempoDecorrido(onibusPrincipal.timestamp, agoraMs);
+  const statusOnibus = statusWs === 'conectado' && onibusConhecidos.length > 0 && onibusAtivos.length === 0
+    ? 'desconectado'
+    : statusWs;
+  const opacidadeOnibusInicial = calcularOpacidadeOnibus(null, agoraMs);
 
   return (
     <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
@@ -352,8 +358,8 @@ function App() {
       </div>
 
       <StatusOnibus
-        status={statusWs}
-        statusLabel={STATUS_WS[statusWs]}
+        status={statusOnibus}
+        statusLabel={STATUS_WS[statusOnibus]}
         quantidadeAtivos={onibusAtivos.length}
         ultimaAtualizacao={ultimaAtualizacao}
       />
@@ -361,7 +367,7 @@ function App() {
       <PredioDrawer
         predio={predioAbertoAtual}
         onClose={() => setPredioAberto(null)}
-        statusOnibus={STATUS_WS[statusWs]}
+        statusOnibus={STATUS_WS[statusOnibus]}
         onibusPrincipal={onibusPrincipal}
         ultimaAtualizacao={ultimaAtualizacao}
       />
@@ -404,10 +410,11 @@ function App() {
           ))}
         </MarkerClusterGroup>
 
-        {onibusAtivos.length === 0 ? (
+        {onibusConhecidos.length === 0 ? (
           <Marker
             position={[POSICAO_INICIAL_ONIBUS.lat, POSICAO_INICIAL_ONIBUS.lng]}
             icon={criarIconeOnibusAoVivo(obterConfigOnibus().icone)}
+            opacity={opacidadeOnibusInicial}
             zIndexOffset={1500}
             eventHandlers={{
               click: () => {
@@ -418,11 +425,12 @@ function App() {
             }}
           />
         ) : (
-          onibusAtivos.map(([busId, posicao]) => (
+          onibusConhecidos.map(([busId, posicao]) => (
             <BusMarker
               key={busId}
               posicao={posicao}
               config={obterConfigOnibus(busId)}
+              opacity={calcularOpacidadeOnibus(posicao.timestamp, agoraMs)}
               onClick={() => {
                 if (pontoInterno) {
                   setPredioAberto(pontoInterno);

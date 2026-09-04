@@ -44,9 +44,16 @@ export function useBusLocations(wsUrl) {
           if (payload.type === 'bus_disconnected') {
             if (typeof payload.busId !== 'string' || !payload.busId.trim()) return;
             setOnibusPorId((anterior) => {
-              const proximo = { ...anterior };
-              delete proximo[payload.busId];
-              return proximo;
+              const busId = payload.busId.trim();
+              if (!anterior[busId]) return anterior;
+
+              return {
+                ...anterior,
+                [busId]: {
+                  ...anterior[busId],
+                  disconnectedAt: payload.timestamp ?? new Date().toISOString(),
+                },
+              };
             });
             return;
           }

@@ -260,3 +260,53 @@ Para onibus novo:
 3. Fazer o app rastreador enviar o mesmo busId.
 4. Garantir que o servidor aceite esse busId.
 5. Testar no mapa.
+
+========================================================================
+4) MOVIMENTO E OPACIDADE DO ONIBUS ATUAL
+========================================================================
+
+Arquivos principais:
+- src/services/busTracking.js
+- src/components/map/BusMarker.jsx
+- src/hooks/useBusLocations.js
+- src/App.jsx
+
+Como funciona:
+- o app rastreador envia apenas posicoes reais via WebSocket;
+- o frontend recebe a coordenada real e calcula uma interpolacao visual;
+- nenhuma posicao interpolada e enviada ao servidor;
+- a frequencia do rastreador nao e alterada.
+
+Intervalo usado como referencia:
+- o rastreador envia localizacao a cada 3 segundos;
+- a animacao visual usa o intervalo entre timestamps recebidos;
+- os limites atuais ficam entre 900 ms e 2200 ms.
+
+Quando chega uma nova posicao durante uma animacao:
+- BusMarker cancela a animacao anterior;
+- le a posicao visual atual do marcador no Leaflet;
+- inicia uma nova animacao dali ate a nova coordenada real.
+
+Quando as atualizacoes param:
+- o marcador nao continua andando sozinho;
+- ele permanece na ultima posicao real conhecida;
+- a opacidade diminui conforme essa posicao envelhece.
+
+Limites de opacidade:
+- ate 10 segundos: 100%;
+- de 10 a 30 segundos: cai gradualmente ate cerca de 70%;
+- de 30 a 60 segundos: cai gradualmente ate cerca de 30%;
+- acima de 60 segundos: permanece visivel com cerca de 30%.
+
+Quando o servidor envia bus_disconnected:
+- useBusLocations preserva a ultima posicao real;
+- marca disconnectedAt;
+- App.jsx mostra o status como Offline quando so restou uma posicao antiga;
+- o marcador continua visivel, mas transparente.
+
+Para ajustar esses valores, altere BUS_TRACKING_CONFIG em:
+
+src/services/busTracking.js
+
+Evite criar regras paralelas em outros arquivos para nao gerar conflito entre
+status, movimento e opacidade.
