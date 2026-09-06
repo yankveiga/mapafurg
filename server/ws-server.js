@@ -179,6 +179,13 @@ wss.on('connection', (ws, req) => {
   // Ao conectar, entrega último estado conhecido para sincronizar o mapa.
   for (const localizacao of ultimasLocalizacoesPorBusId.values()) {
     enviarJson(ws, localizacao);
+    if (localizacao.disconnectedAt) {
+      enviarJson(ws, {
+        type: 'bus_disconnected',
+        busId: localizacao.busId,
+        timestamp: localizacao.disconnectedAt,
+      });
+    }
   }
 
   ws.on('message', (raw) => {
@@ -209,12 +216,17 @@ wss.on('connection', (ws, req) => {
       }
 
       if (meta && meta.busId !== mensagemNormalizada.busId) {
-        if (ultimasLocalizacoesPorBusId.has(meta.busId)) {
-          ultimasLocalizacoesPorBusId.delete(meta.busId);
+        const localizacaoMetaAnterior = ultimasLocalizacoesPorBusId.get(meta.busId);
+        if (localizacaoMetaAnterior) {
+          const disconnectedAt = new Date().toISOString();
+          ultimasLocalizacoesPorBusId.set(meta.busId, {
+            ...localizacaoMetaAnterior,
+            disconnectedAt,
+          });
           broadcast({
             type: 'bus_disconnected',
             busId: meta.busId,
-            timestamp: new Date().toISOString(),
+            timestamp: disconnectedAt,
           });
         }
         meta.busId = mensagemNormalizada.busId;
@@ -228,14 +240,21 @@ wss.on('connection', (ws, req) => {
 
   ws.on('close', () => {
     const meta = metaPorConexao.get(ws);
-    // Em modo auto-assign, remove ônibus desconectado da lista ativa.
+    // Em modo auto-assign, marca desconexao sem perder a ultima posicao real.
     if (AUTO_ASSIGN_BUS_ID && meta?.busId) {
-      ultimasLocalizacoesPorBusId.delete(meta.busId);
-      broadcast({
-        type: 'bus_disconnected',
-        busId: meta.busId,
-        timestamp: new Date().toISOString(),
-      });
+      const localizacaoAnterior = ultimasLocalizacoesPorBusId.get(meta.busId);
+      if (localizacaoAnterior) {
+        const disconnectedAt = new Date().toISOString();
+        ultimasLocalizacoesPorBusId.set(meta.busId, {
+          ...localizacaoAnterior,
+          disconnectedAt,
+        });
+        broadcast({
+          type: 'bus_disconnected',
+          busId: meta.busId,
+          timestamp: disconnectedAt,
+        });
+      }
     }
     liberarSlot(meta?.slot);
     metaPorConexao.delete(ws);
