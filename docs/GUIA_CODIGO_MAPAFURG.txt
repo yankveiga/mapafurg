@@ -207,7 +207,7 @@ O que contem:
   cadastro dos onibus conhecidos.
   Exemplos atuais:
   - onibus_amarelo
-  - onibus_branco
+  - interno_branco
   - onibus_teste
 - ONIBUS_PADRAO:
   fallback para ids genericos ou antigos, como bus-1.
@@ -371,7 +371,7 @@ Observacao sobre o app rastreador:
 - se WS_AUTH_TOKEN estiver configurado no servidor, o app rastreador tambem
   precisa enviar o mesmo token no payload.
 - o campo busId e opcional:
-  - apps novos podem enviar onibus_amarelo, onibus_branco ou onibus_teste;
+  - apps novos podem enviar interno, interno_branco ou onibus_teste;
   - apps antigos sem busId continuam funcionando com ids automaticos.
 
 -----------------------------------------------------------------------

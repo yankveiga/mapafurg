@@ -19,9 +19,9 @@ export const ONIBUS_CONFIG = {
     icone: '/map-icons/interno.svg',
     acessivel: true,
   },
-  onibus_branco: {
+  interno_branco: {
     nome: 'Interno Branco',
-    icone: '/map-icons/interno.svg',
+    icone: '/map-icons/interno_branco.svg',
     acessivel: false,
   },
   onibus_teste: {

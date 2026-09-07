@@ -104,7 +104,7 @@ Campos obrigatórios:
 - `lat`
 - `lng`
 
-O campo `busId` é opcional. Quando o app rastreador envia um `busId` válido, o servidor preserva esse identificador, por exemplo `onibus_amarelo`, `onibus_branco` ou `onibus_teste`. Quando o campo não é enviado, o servidor mantém compatibilidade com o modo antigo e atribui um ID automático, como `bus-1`.
+O campo `busId` é opcional. Quando o app rastreador envia um `busId` válido, o servidor preserva esse identificador, por exemplo `interno`, `interno_branco` ou `onibus_teste`. Quando o campo não é enviado, o servidor mantém compatibilidade com o modo antigo e atribui um ID automático, como `bus-1`.
 
 Variáveis de ambiente suportadas pelo servidor:
 
@@ -249,7 +249,7 @@ Nesse arquivo ficam:
 - `ID_PONTO_ONIBUS`: id do ponto informativo do ônibus em `src/data/predios.js`
 - `POSICAO_INICIAL_ONIBUS`: posição exibida quando não há ônibus online
 - `STATUS_WS`: rótulos de conexão exibidos na interface
-- `ONIBUS_CONFIG`: cadastro dos ônibus conhecidos, como `onibus_amarelo`, `onibus_branco` e `onibus_teste`
+- `ONIBUS_CONFIG`: cadastro dos ônibus conhecidos, como `interno_branco`, `onibus_amarelo` e `onibus_teste`
 - `ONIBUS_PADRAO`: fallback para IDs antigos ou genéricos, como `bus-1`
 
 Para trocar o ícone de um ônibus, coloque o arquivo em `public/map-icons/` e altere o campo `icone` em `ONIBUS_CONFIG`.

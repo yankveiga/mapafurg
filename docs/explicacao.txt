@@ -117,7 +117,7 @@ Importante:
 Hoje ja existe uma estrutura para:
 
 - onibus_amarelo
-- onibus_branco
+- interno_branco
 - onibus_teste
 
 Passo 1: cadastrar o onibus em src/data/onibus.js
@@ -130,9 +130,9 @@ export const ONIBUS_CONFIG = {
     icone: '/map-icons/interno.svg',
     acessivel: true,
   },
-  onibus_branco: {
+  interno_branco: {
     nome: 'Interno Branco',
-    icone: '/map-icons/interno.svg',
+    icone: '/map-icons/interno_branco.svg',
     acessivel: false,
   },
   onibus_teste: {
@@ -228,7 +228,7 @@ Assim, o sistema fica compativel com:
 
 - app antigo sem busId especifico;
 - app novo com onibus_amarelo;
-- app novo com onibus_branco;
+- app novo com interno_branco;
 - app de teste com onibus_teste.
 
 Passo 5: testar no mapa
