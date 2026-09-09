@@ -1,40 +1,29 @@
 # Mapa FURG
 
-Aplicação web para visualização interativa do Campus Carreiros da FURG, com busca por prédios, atalhos rápidos, geolocalização do usuário e suporte a rastreamento em tempo real do ônibus interno.
+Mapa interativo do Campus Carreiros da FURG, com busca por prédios, detalhes dos locais, geolocalização do usuário e rastreamento em tempo real do ônibus interno.
 
-O projeto é dividido em duas frentes:
+O projeto combina um frontend em React/Vite com um servidor WebSocket em Node.js. O mapa é uma PWA e usa Leaflet com dados do OpenStreetMap.
 
-- `frontend` em React + Vite, publicado como aplicação web/PWA
-- `backend` WebSocket em Node.js, responsável por distribuir coordenadas do ônibus para os clientes conectados
+## Funcionalidades
 
-## Tecnologias
+- Busca por prédios, siglas, aliases, salas e termos curados.
+- Painel com descrição, projetos, horários, cardápios e informações do ônibus interno.
+- Geolocalização do usuário no mapa.
+- Rastreamento em tempo real do ônibus via WebSocket.
+- Movimento suavizado do marcador entre posições reais recebidas.
+- Opacidade do marcador conforme a idade da última posição.
+- Cliente de teste WebSocket para simular envio de localização.
+
+## Stack
 
 - React
 - Vite
 - Leaflet + React Leaflet
 - Tailwind CSS
-- `ws` para WebSocket
+- Node.js + `ws`
 - Vite Plugin PWA
 
-## Funcionalidades
-
-- mapa interativo do campus com marcadores dos prédios
-- busca por nome, sigla, aliases e termos curados
-- painel com detalhes do local selecionado
-- geolocalização do usuário
-- atualização em tempo real do ônibus interno
-- interpolação visual do marcador entre posições reais recebidas
-- opacidade do marcador baseada na idade da última posição real
-- centralização manual no ônibus
-- indicação da última atualização recebida
-- suporte a PWA
-
-## Requisitos
-
-- Node.js `18+`
-- npm
-
-## Desenvolvimento local
+## Rodando Localmente
 
 Instale as dependências:
 
@@ -42,30 +31,31 @@ Instale as dependências:
 npm install
 ```
 
-Suba apenas o frontend:
+Frontend:
 
 ```bash
-  npm run dev
+npm run dev
 ```
 
-Suba apenas o servidor WebSocket:
+Servidor WebSocket:
 
 ```bash
 npm run ws:server
 ```
 
-Suba frontend e WebSocket em paralelo:
+Frontend e WebSocket juntos:
 
 ```bash
 npm run dev:all
 ```
 
-Por padrão:
+URLs padrão:
 
-- frontend: `http://localhost:5173`
-- WebSocket: `ws://0.0.0.0:8080`
+- Mapa: `http://localhost:5173`
+- WebSocket: `ws://localhost:8080`
+- Testador WebSocket: `http://localhost:5173/ws-tester.html`
 
-## Scripts disponíveis
+## Scripts
 
 ```bash
 npm run dev
@@ -78,13 +68,11 @@ npm run preview
 npm run lint
 ```
 
-## Rastreamento em tempo real
+## Rastreamento Do Ônibus
 
-O servidor WebSocket recebe mensagens de localização e retransmite o último estado válido para os clientes conectados.
+O rastreador externo envia mensagens `bus_location` para o servidor WebSocket. O servidor valida, normaliza e retransmite a última localização para os mapas conectados.
 
-O frontend usa a posição recebida como coordenada real/oficial e aplica apenas uma interpolação visual no marcador do mapa. Nenhuma posição interpolada é enviada ao backend, retransmitida pelo WebSocket ou usada para aumentar a frequência do rastreador.
-
-Formato esperado:
+Exemplo de payload:
 
 ```json
 {
@@ -104,225 +92,133 @@ Campos obrigatórios:
 - `lat`
 - `lng`
 
-O campo `busId` é opcional. Quando o app rastreador envia um `busId` válido, o servidor preserva esse identificador, por exemplo `interno`, `interno_branco` ou `onibus_teste`. Quando o campo não é enviado, o servidor mantém compatibilidade com o modo antigo e atribui um ID automático, como `bus-1`.
+O `busId` é opcional, mas recomendado. Hoje o projeto usa:
 
-Variáveis de ambiente suportadas pelo servidor:
+- `interno`: ônibus atual, mantido por compatibilidade.
+- `interno_branco`: ônibus branco.
+- `onibus_teste`: rastreador de teste.
+
+Se o rastreador não enviar `busId`, o servidor pode atribuir um ID automático, como `bus-1`, quando `AUTO_ASSIGN_BUS_ID=true`.
+
+## Movimento E Offline
+
+A posição recebida pelo GPS é sempre a posição real. A interpolação acontece só no frontend, para evitar saltos visuais no marcador. Nenhuma coordenada interpolada é enviada ao backend ou pelo WebSocket.
+
+O marcador:
+
+- anima entre uma posição real e a próxima;
+- cancela a animação anterior se uma nova posição chegar no meio do caminho;
+- para na última posição real quando as atualizações cessam;
+- fica mais transparente conforme a posição envelhece;
+- permanece visível mesmo offline.
+
+Limites atuais de opacidade:
+
+- até `10s`: `100%`
+- entre `10s` e `30s`: até cerca de `70%`
+- entre `30s` e `60s`: até cerca de `30%`
+- acima de `60s`: cerca de `30%`
+
+O intervalo de envio usado como referência é `3s`. A duração da interpolação fica entre `900ms` e `2200ms`.
+
+## Variáveis De Ambiente
+
+Frontend:
+
+- `VITE_WS_URL`: URL do WebSocket em produção. Sem ela, o mapa usa `ws://<host>:8080`.
+
+Servidor WebSocket:
 
 - `PORT`
 - `WS_PORT`
 - `WS_HOST`
 - `BUS_ID`
 - `BUS_ID_PREFIX`
-- `AUTO_ASSIGN_BUS_ID` (default: `true`)
+- `AUTO_ASSIGN_BUS_ID`
 - `WS_AUTH_TOKEN`
 
-Com `AUTO_ASSIGN_BUS_ID=true`, o servidor ainda aceita `busId` explícito. O autoassign é usado apenas quando o app não envia um identificador válido.
+## Testando O WebSocket
 
-O frontend pode consumir um endpoint WebSocket externo por meio de `VITE_WS_URL`. Quando essa variável não é definida, o projeto usa fallback para `ws://<host>:8080` em ambiente local.
-
-## Teste do WebSocket
-
-Para validar o fluxo sem celular, use o arquivo:
-
-- `public/ws-tester.html`
-
-Com o projeto rodando localmente, abra:
-
-- `http://localhost:5173/ws-tester.html`
-
-Esse utilitário permite conectar ao servidor WebSocket e enviar coordenadas de teste no formato esperado pelo mapa.
-
-## Estimativa de consumo do WebSocket
-
-Para estimar o tráfego mensal gerado pelo rastreamento, rode:
+Rode o frontend e o servidor:
 
 ```bash
-npm.cmd run estimate:ws
+npm run dev:all
 ```
 
-No Windows, `npm.cmd` evita bloqueios de política de execução do PowerShell. Em outros ambientes, `npm run estimate:ws` também funciona.
-
-O cálculo fica em [`scripts/estimar-consumo-ws.js`](./scripts/estimar-consumo-ws.js) e usa como base:
-
-- intervalo de envio do app rastreador: `3s`
-- payload do celular com `token`, `speed` e `accuracy`: `206 bytes`
-- payload retransmitido pelo servidor para cada mapa aberto: `202 bytes`
-- mês de referência: `30 dias`
-
-Exemplo de saída:
+Abra:
 
 ```text
-1 onibus - 1 conexao:     352.512 MB
-2 onibus - 1 conexao:     705.024 MB
-1 onibus - 50 conexoes:   8.904 GB
-2 onibus - 50 conexoes:   17.809 GB
-2 onibus - 200 conexoes:  70.167 GB
+http://localhost:5173/ws-tester.html
 ```
 
-Esses valores estimam o JSON trafegado pela aplicação. O consumo real de rede pode ser um pouco maior por overhead de WebSocket, TCP/IP e TLS em conexões `wss://`.
+O testador permite conectar ao servidor e enviar coordenadas sem depender do celular rastreador.
 
-## Rastreador externo
-
-Este repositório não inclui o aplicativo rastreador usado no celular ou no dispositivo instalado no ônibus.
-
-Para o rastreamento em tempo real funcionar, é necessário um app externo que:
-
-- obtenha a localização do aparelho
-- mantenha o envio ativo enquanto o rastreamento estiver ligado
-- conecte ao servidor WebSocket configurado para o projeto
-- envie mensagens `bus_location` no formato esperado pelo servidor
-- reconecte automaticamente em caso de queda de rede
-
-Esse app pode ser Android ou outra solução equivalente, desde que envie coordenadas válidas para o WebSocket do backend.
-
-## Estrutura do projeto
+## Estrutura
 
 ```text
-docs/
-  GUIA_CODIGO_MAPAFURG.txt   guia tecnico detalhado
-  explicacao.txt             guia rapido de manutencao
-
 src/
-  App.jsx                    orquestra a tela principal do mapa
-  main.jsx                   bootstrap da aplicacao React
-  index.css                  estilos globais
-  assets/
-    logos/                   logos importados pelo React
-    images/                  imagens usadas pela interface
+  App.jsx
+  main.jsx
+  index.css
   components/
-    map/                     componentes acoplados ao Leaflet/mapa
-    ui/                      paineis, avisos e status de interface
+    map/
+    ui/
   data/
-    predios.js               base de dados dos predios e pontos de interesse
-    aviso.js                 conteudo do aviso inicial
-    onibus.js                configuracao dos onibus rastreados e status
+    aviso.js
+    onibus.js
+    predios.js
   hooks/
-    useBusLocations.js       conexao WebSocket e estado dos onibus em tempo real
+    useBusLocations.js
   services/
-    busTracking.js           validacao e filtros da telemetria recebida
+    busTracking.js
   utils/
-    buscas.js                normalizacao e traducao da busca
-    mapIcons.js              criacao dos icones Leaflet
-
-public/
-  ws-tester.html             cliente simples para teste do WebSocket
-  map-icons/                 SVGs usados pelos marcadores do mapa
-  ...                        icones e assets do PWA
+    buscas.js
+    mapIcons.js
 
 server/
-  ws-server.js               servidor WebSocket / healthcheck HTTP
+  ws-server.js
+
+public/
+  ws-tester.html
+  map-icons/
 
 scripts/
-  estimar-consumo-ws.js      estimador de trafego mensal do WebSocket
+  estimar-consumo-ws.js
+
+docs/
+  GUIA_CODIGO_MAPAFURG.txt
+  explicacao.txt
+  rascunho-relato-tecnologico.txt
 ```
 
 ## Manutenção
 
-### Dados dos prédios
+Dados dos prédios ficam em [`src/data/predios.js`](./src/data/predios.js).
 
-Os pontos do mapa ficam em [`src/data/predios.js`](./src/data/predios.js).
+Regras de busca ficam em [`src/utils/buscas.js`](./src/utils/buscas.js).
 
-Cada item inclui, em geral:
+Configuração dos ônibus fica em [`src/data/onibus.js`](./src/data/onibus.js). Para trocar o ícone de um ônibus, coloque o SVG em `public/map-icons/` e ajuste o campo `icone`.
 
-- `id`
-- `nome`
-- `lat`
-- `lng`
-- `descricao`
-- `aliases`
-- `projetos`
+Filtros de telemetria, interpolação e opacidade ficam em [`src/services/busTracking.js`](./src/services/busTracking.js).
 
-Para adicionar um prédio, inclua um novo objeto no array `predios`. Se quiser que a busca encontre termos alternativos, preencha `aliases`. Se houver salas, laboratórios, horários ou cardápio, use os blocos opcionais já existentes como modelo.
+O servidor WebSocket fica em [`server/ws-server.js`](./server/ws-server.js).
 
-### Busca e atalhos
-
-As regras de normalização e tradução da busca ficam em [`src/utils/buscas.js`](./src/utils/buscas.js).
-
-Quando um novo prédio precisar responder a apelidos ou buscas especiais, adicione os termos em `src/utils/buscas.js` apontando para o `id` cadastrado em `src/data/predios.js`.
-
-### Ônibus rastreados
-
-A configuração visual e operacional dos ônibus rastreados fica em [`src/data/onibus.js`](./src/data/onibus.js).
-
-Nesse arquivo ficam:
-
-- `ID_PONTO_ONIBUS`: id do ponto informativo do ônibus em `src/data/predios.js`
-- `POSICAO_INICIAL_ONIBUS`: posição exibida quando não há ônibus online
-- `STATUS_WS`: rótulos de conexão exibidos na interface
-- `ONIBUS_CONFIG`: cadastro dos ônibus conhecidos, como `interno_branco`, `onibus_amarelo` e `onibus_teste`
-- `ONIBUS_PADRAO`: fallback para IDs antigos ou genéricos, como `bus-1`
-
-Para trocar o ícone de um ônibus, coloque o arquivo em `public/map-icons/` e altere o campo `icone` em `ONIBUS_CONFIG`.
-
-Para adicionar um novo ônibus, cadastre um novo item em `ONIBUS_CONFIG` e configure o app rastreador para enviar o mesmo `busId`.
-
-### Telemetria e movimento
-
-O tratamento das atualizações fica em [`src/services/busTracking.js`](./src/services/busTracking.js). O frontend:
-
-- descarta mensagens antigas pelo `timestamp`
-- ignora leituras com precisão superior a `40m`
-- ignora saltos que implicariam velocidade superior a `30m/s`
-- desconsidera deslocamentos menores que `2m`
-- calcula a duração da interpolação visual entre posições reais
-- calcula a opacidade do marcador pela idade da última posição real
-
-O componente [`src/components/map/BusMarker.jsx`](./src/components/map/BusMarker.jsx) anima a posição entre as atualizações com `requestAnimationFrame`. Quando uma nova posição chega antes do fim da animação anterior, a animação em andamento é cancelada e o marcador continua suavemente a partir da posição visual atual do Leaflet até a nova coordenada real.
-
-A duração da animação usa o intervalo entre timestamps recebidos, com limites em `BUS_TRACKING_CONFIG`. Como o intervalo de envio usado pelo rastreador é de `3s`, a interpolação fica limitada entre `900ms` e `2200ms`, evitando movimento indefinido quando novas posições param de chegar.
-
-A opacidade também fica centralizada em `BUS_TRACKING_CONFIG`:
-
-- até `10s` sem nova posição real: `100%`
-- entre `10s` e `30s`: redução gradual até cerca de `70%`
-- entre `30s` e `60s`: redução gradual até cerca de `30%`
-- acima de `60s` ou sem timestamp válido: marcador visível com cerca de `30%`
-
-Quando o servidor emite `bus_disconnected`, o hook [`src/hooks/useBusLocations.js`](./src/hooks/useBusLocations.js) preserva a última posição real conhecida e marca `disconnectedAt`. Assim, o marcador não desaparece: ele para de se mover, passa a ser tratado como offline na interface e segue ficando transparente conforme a posição envelhece. O ícone permanece com orientação fixa.
-
-### Interface e comportamento do mapa
-
-O fluxo principal da aplicação está em [`src/App.jsx`](./src/App.jsx), mas as responsabilidades maiores foram separadas:
-
-- [`src/hooks/useBusLocations.js`](./src/hooks/useBusLocations.js): conexão, reconexão e mensagens WebSocket
-- [`src/utils/mapIcons.js`](./src/utils/mapIcons.js): criação dos ícones do Leaflet
-- [`src/components/ui/PredioDrawer.jsx`](./src/components/ui/PredioDrawer.jsx): painel inferior de detalhes
-- [`src/components/map/BusMarker.jsx`](./src/components/map/BusMarker.jsx): marcador animado do ônibus
-- [`src/components/map/Localizador.jsx`](./src/components/map/Localizador.jsx): localização do usuário
-- [`src/components/map/Bussola.jsx`](./src/components/map/Bussola.jsx): foco em prédio selecionado
-- [`src/components/map/CentralizadorOnibus.jsx`](./src/components/map/CentralizadorOnibus.jsx): foco no ônibus
-
-## Build de produção
+## Build
 
 ```bash
 npm run build
 ```
 
-Os arquivos gerados ficam em `dist/`.
-
-Para validar localmente a build:
+Para testar a build localmente:
 
 ```bash
 npm run preview
 ```
 
-## Segurança e configuração
+## Estimativa De Tráfego
 
-Este repositório não deve expor:
+```bash
+npm run estimate:ws
+```
 
-- tokens de autenticação do WebSocket
-- URLs privadas de infraestrutura
-- credenciais de deploy
-
-Boas práticas recomendadas:
-
-- manter segredos em variáveis de ambiente
-- revisar as configurações do app rastreador antes de publicar ou instalar em produção
-- evitar commit de endpoints internos, túneis temporários e chaves reais
-
-## Observações
-
-- a base de prédios é estática no frontend
-- o WebSocket é usado exclusivamente para atualização em tempo real do ônibus
-- alterações em identificadores (`id`) podem exigir revisão de busca e atalhos
-- mudanças no PWA devem ser acompanhadas de revisão em `vite.config.js`
+O cálculo usa o intervalo de `3s` por rastreador e fica em [`scripts/estimar-consumo-ws.js`](./scripts/estimar-consumo-ws.js).
