@@ -17,6 +17,9 @@ dist-ssr
 
 # Local documentation drafts
 docs/perguntas-tecnicas.txt
+docs/perguntas-centro-ti.md
+docs/rascunho-relato-tecnologico.txt
+docs/explicacao.txt
 
 # Editor directories and files
 .vscode/*
