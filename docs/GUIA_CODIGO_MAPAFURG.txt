@@ -1,5 +1,5 @@
-GUIA COMPLETO DO CODIGO - MAPAFURG
-Versao: estado atual do diretorio /home/ssd/Documentos/Github/mapafurg
+GUIA DO CODIGO - MAPAFURG
+Versao: estado atual do diretorio C:\Users\Yan\Documents\Github\mapafurg
 
 ========================================================================
 1) RESUMO EM 1 MINUTO
@@ -18,15 +18,16 @@ Este projeto tem duas partes principais:
    - guarda a ultima posicao de cada onibus em memoria;
    - envia atualizacoes para todos os clientes conectados no mapa.
 
-Observacao sobre o rastreador:
+Sobre o rastreador:
 - este repositorio nao inclui o app do celular/dispositivo rastreador;
 - para o onibus aparecer em tempo real, um app externo precisa obter o GPS e
   enviar mensagens bus_location para o servidor WebSocket.
 
-Decisao de arquitetura:
+Arquitetura atual:
 - mapa no Vercel (site estatico);
 - WebSocket em servidor separado (Render, laboratorio, etc.).
-Motivo: Vercel nao e usado como servidor WS persistente nesse fluxo.
+O Vercel entra apenas como hospedagem estatica do mapa. O WebSocket precisa de
+um processo persistente em outro servidor.
 
 ========================================================================
 2) FLUXO TECNICO COMPLETO (DO CELULAR ATE O MAPA)
@@ -35,7 +36,7 @@ Passo 1: app rastreador externo envia JSON para o WS
 Exemplo:
 {
   "type": "bus_location",
-  "token": "SEU_TOKEN",
+  "token": "token",
   "lat": -32.07,
   "lng": -52.16,
   "timestamp": "2026-04-21T12:00:00.000Z"
@@ -76,7 +77,7 @@ Papel:
 - cria o <div id="root"> onde o React monta tudo.
 - referencia /src/main.jsx.
 
-Por que foi feito assim:
+Notas:
 - em Vite + React, index.html e o ponto de entrada da pagina.
 - minimiza complexidade e deixa o JS controlar a interface inteira.
 
@@ -91,7 +92,7 @@ Papel:
 Onde esta a logica principal:
 - registerSW({ immediate: true, onNeedRefresh() { updateSW(true) } })
 
-Por que foi feito assim:
+Notas:
 - garante update automatico da PWA para evitar versao velha em cache.
 
 -----------------------------------------------------------------------
@@ -139,7 +140,7 @@ D) Render da interface
     ultima posicao real preservada;
   - calcula opacidade do marcador com calcularOpacidadeOnibus(timestamp, agoraMs).
 
-Observacao importante:
+Nota:
 - no estado atual, maxBounds esta comentado.
 - portanto, nao ha bloqueio geografico rigido da navegacao.
 
@@ -163,7 +164,7 @@ Saida:
 - idsExtras: ids forcados.
 - termosBusca: termo para filtro textual complementar no App.jsx.
 
-Por que foi feito assim:
+Notas:
 - separa regra de negocio da busca do arquivo de interface.
 
 -----------------------------------------------------------------------
@@ -183,11 +184,11 @@ Exemplos de uso no App.jsx:
 - cardapio: RU
 - interno: horarios do onibus no drawer
 
-Por que foi feito assim:
+Notas:
 - modelo simples e direto no frontend.
 - sem banco de dados nesta versao.
 
-Ponto de atencao:
+Atencao:
 - ids devem permanecer estaveis, porque buscas e atalhos dependem deles.
 
 -----------------------------------------------------------------------
@@ -218,7 +219,7 @@ O que contem:
 - formatarTempoDecorrido(timestamp, agoraMs):
   gera textos como "agora", "ha 12s", "ha 3min".
 
-Por que foi separado:
+Notas:
 - facilita cadastrar onibus oficiais e de teste;
 - evita aumentar ainda mais App.jsx;
 - deixa a evolucao para onibus amarelo/branco/acessivel mais organizada.
@@ -239,7 +240,7 @@ Funcoes:
 - criarIconeCluster(cluster):
   marcador de agrupamento de predios.
 
-Por que foi separado:
+Notas:
 - icones Leaflet usam HTML manual;
 - separar isso deixa App.jsx mais legivel.
 
@@ -259,7 +260,7 @@ O que faz:
 - trata bus_location e encaminha a telemetria para busTracking.js;
 - devolve onibusPorId e statusWs para App.jsx.
 
-Por que foi separado:
+Notas:
 - a logica de rede deixa de ficar misturada com a interface;
 - facilita evoluir speed, accuracy, interpolacao e filtros.
 
@@ -317,7 +318,7 @@ Arquivos:
   quando chega uma nova posicao e aplica opacidade ao marcador. O SVG
   permanece com orientacao fixa.
 
-Por que foi separado:
+Notas:
 - App.jsx fica como orquestrador;
 - cada componente fica mais facil de revisar e testar visualmente.
 
@@ -351,20 +352,20 @@ Responsabilidades:
 6) close:
    remove onibus desconectado e emite bus_disconnected.
 
-Observacao:
+Nota:
 - o servidor emite bus_disconnected ao fechar a conexao do rastreador;
 - no frontend, essa mensagem nao remove imediatamente o marcador do mapa.
   A ultima posicao real conhecida permanece visivel e fica mais transparente
   conforme envelhece.
 
-Por que foi feito assim:
+Notas:
 - arquitetura simples, sem dependencia de banco.
 - baixa latencia para exibicao em tempo real.
 
-Limitacao conhecida:
+Limitacao:
 - estado em memoria (nao persiste apos restart).
 
-Observacao sobre o app rastreador:
+Sobre o app rastreador:
 - o servidor nao depende de uma pasta do rastreador dentro deste repositorio;
 - qualquer app ou dispositivo pode ser usado como rastreador, desde que envie
   o JSON bus_location no formato aceito pelo server/ws-server.js;
