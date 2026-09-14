@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Base estática de pontos de interesse do Campus Carreiros (FURG).
  *
  * Contrato mínimo de cada item:
@@ -22,11 +22,11 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-      segunda: "Feriado",
-      terca: "Arroz, Arroz integral, Feijão preto, Cubos bovinos ao molho shoyu, Peixe frito, Bolinho de Grão de bico, Omelete, Macarrão alho e óleo, Sopa de legumes, Mix de folhas, Repolho c/ abacaxi, Beterraba cozida, Laranja",
-      quarta: "Arroz, Arroz integral, Feijão carioca, Moída refogada ao sugo, Coxa sobrecoxa assada, Charuto de lentilha c/ legumes, Ovo frito, Polenta, Minestrone, Mix de folhas, Cenoura ralada, Abobrinha cozida, Banana",
-      quinta: "Arroz, Arroz integral, Feijão preto, Bisteca suína acebolada, Sassami ao molho portuguesa, Abobrinha recheada com PTS, Ovo cozido, Farofa de banana, Creme de milho, Mix de folhas, Beterraba ralada, Chuchu cozido, Salada de frutas",
-      sexta: "Arroz, Arroz integral c/ linhaça, Lentilha, Coxa sobrecoxa assada, Strogonoff bovino, Escondidinho de PTS, Ovo poché, Cenoura salteada, Sopa de feijão, Mix de folhas, Pepino, Mix de repolho cozido, Laranja"
+    segunda: "Arroz, Arroz integral, Feijão preto, Frango acebolado, Carne suína assada, PTS refogada com shoyu, Ovo cozido, Macarrão alho e óleo, Sopa de legumes, Mix de folhas, Pepino com tomate, Cenoura cozida, Banana",
+    terca: "Arroz, Arroz integral, Lentilha, Coxa/sobrecoxa na laranja, Carne de panela, Lasanha de abobrinha com grão de bico, Ovo poché, Polenta, Caldo de abóbora, Mix de folhas, Beterraba ralada, Mix de repolho cozido, Laranja",
+    quarta: "Arroz, Arroz integral, Feijão preto, Bisteca suína acebolada, Fricassê de frango, Pastel de legumes com cogumelos, Ovo cozido, Quibebe, Caldo verde, Alface, Rúcula, Abobrinha ralada, Mix de legumes cozidos, Maçã",
+    quinta: "Arroz, Arroz integral, Feijão preto, Almôndegas bovinas com molho, Peixe a milanesa, Escondidinho de grão de bico com legumes, Omelete, Macarrão com molho, Creme de ervilha, Mix de folhas, Repolho com laranja, Cenoura cozida, Ponka",
+    sexta: "Arroz, Arroz integral, Feijão carioca, Frango a parmegiana, Cubos bovinos acebolados, Bolinho de pts ao sugo, Ovo poché, Batata Sautee, Caldo verde, Mix de folhas, Beterraba ralada, Chuchu cozido, Banana"
     }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
@@ -37,13 +37,13 @@ export const predios = [
     lng: -52.166576, 
     descricao: "Segunda a Sexta:\n☕ Café: 07h15 às 09h00\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00\n\nSábados, Domingos e Feriados:\n☕ Café: 08h30 às 09h45\n☀️ Almoço: 12h00 às 13h45\n🌙 Jantar: 18h30 às 20h00",
     cardapio: {
-      segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Strogonoff de Carne Bovina, Cubos de Frango a Xadrez, Kibe de Proteína de Soja, Ovo Cozido, Espaguete ao Alho e Óleo, Alface, Chuchu com milho, Cenoura Ralada, Laranja, Canja",
-      terca: "Arroz Branco, Arroz Integral, Feijão Preto, Bife Bovino Acebolado, Rocambole de Frango com Frios ao Sugo, Bolinho de Lentilha, Ovo Pochê, Quibebe, Alface, Repolho Refogado, Tomate com Cebola, Maçã, Caldo Verde",
-      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Lasanha a bolonhesa, Peixe à Milanesa, Grão de Bico Acebolado, Ovo Cozido, Seleta de Legumes, Mix de Folhas, Beterraba Cozida, Salada Caico, Melão, Sopa de Legumes",
-      quinta: "Arroz Branco, Arroz Integral, Feijão Carioca, Carne de Panela, Fricasse de Frango, Legumes Salteados, Omelete, Batata Palha, Couve Chinesa, Cenoura Cozida com Ovos, Tabule, Banana, Creme de Ervilha",
-      sexta: "Arroz Branco, Arroz Integral, Feijão Preto, Cubos Suínos Assados no Forno, Bife de Frango Grelhado, Cogumelos Salteados com Alho e Cebola, Ovo Cozido, Batata Sautê, Alface, Berinjela Cozida com Tempero Verde, Salada Náutico, Laranja, Creme de Moranga",
-      sábado: "Arroz Branco, Arroz Integral, Feijão Carioca, Carré Suíno A Milanesa, Cubos de Frango a Xadrez, Hambúrguer de Grão de Bico, Ovo Pochê, Massa Parafuso ao Molho Branco, Mix de Folhas, Beterraba Cozida, Pepino, Banana, Creme de Milho",
-      domingo: "Arroz Branco, Arroz Integral, Lentilha, Bife Bovino ao Molho Madeira, Coxa com sobrecoxa assada, Almôndegas de PTS Ao Sugo, Ovo Cozido, Farofa com Legumes, Alface, Chuchu com Milho, Tomate com Cebola, Salada de Frutas, Sopa de Feijão Preto com Legumes"
+    segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Bife Bovino Acebolado, Filé de Frango à Milanesa, Hambúrguer de Lentilha, Ovo Cozido, Massa Parafuso ao Alho e Óleo, Alface, Cenoura Cozida, Salada Náutico, Maçã, Caldo Verde",
+    terca: "Arroz Branco, Arroz Integral, Feijão Preto, Cubos Suínos Ao Molho Ferrugem, Fricasse de Frango, Strogonoff de Proteína de Soja Graúda, Omelete, Batata Palha, Couve Chinesa, Cebola Cozida com Shoyu, Pepino com Tomate e Cebola, Melão, Creme de Moranga",
+    quarta: "Arroz Branco, Arroz Integral, Feijão Carioca, Carne de Panela, Peixe à Escabeche, Bolinho de Grão de Bico, Ovo Cozido, Purê de Batata, Mix de Folhas, Beterraba Cozida com Maçã, Repolho Misto, Laranja, Sopa Fantasia com Massa",
+    quinta: "Arroz Branco, Arroz Integral, Feijão Preto, Pastel de Carne, Lasanha de Frango, Abobrinha Recheada com PTS, Ovo Cozido, Jardineira de Legumes, Alface, Soja em Grão Refogada com Tempero Verde, Salpicão, Maçã, Creme de Ervilha",
+    sexta: "Arroz Branco, Arroz Integral, Lentilha, Bife Bovino à Milanesa, Coxa com sobrecoxa assada, Strogonoff de Cogumelos, Ovo Pochê, Massa ao Sugo, Alface, Abobrinha Cozida com Milho, Tabule, Banana, Creme de Aipim",
+    sábado: "Arroz Branco, Arroz Integral, Feijão Carioca, Cubos Suínos Ao Molho BBQ, Filé de Frango Crocante, Kibe de PTS, Ovo Cozido, Batata Sautê, Chicória, Cenoura Cozida, Repolho com Laranja, Creme de Baunilha com calda de Banana, Sopa de Legumes",
+    domingo: "Arroz Branco, Arroz Integral, Feijão Preto, Carne de Panela, Cubos de Frango a Xadrez, Hambúrguer de Grão de Bico, Ovo Cozido, Farofa com Legumes, Alface, Macarronese com Milho e Ervilha, Pepino, Bergamota, Sopa de Feijão Branco"
     }
   },  
     
@@ -222,8 +222,8 @@ export const predios = [
 
     // PROINFA - Pró-Reitoria de Infraestrutura
   { 
-    id: "proinfa", 
-    nome: "PROINFA - Pró-Reitoria de Infraestrutura", 
+    id: "proinfra", 
+    nome: "PROINFRA - Pró-Reitoria de Infraestrutura", 
     lat: -32.07481441043893,  
     lng: -52.16456266948454,
     descricao: "A Pró-Reitoria de Infraestrutura – PROINFRA é o órgão que coordena as ações relativas à implantação, manutenção e ampliação da infraestrutura necessária ao desenvolvimento das atividades de ensino, de pesquisa, de extensão e de administração, conservando e construindo seu patrimônio a partir de processos ambientalmente sustentáveis, em consonância com o disposto no Estatuto, no Regimento Geral e na Política Ambiental da Universidade.",
@@ -779,7 +779,7 @@ export const predios = [
   { nome: "Auditório", sala: "D08", link: "" },
   { nome: "Direção", sala: "D01", link: "" },
   { sigla: "CTTEB", nome: "Grupo de Trabalho Tutorial em Engenharia Bioquímica", sala: "S17", link: "" },
-  { sigla: "LACOM", nome: "Laboratório de Análise de Compostos Orgânicos e Metais", sala: "L15", link: "" },
+  { sigla: "LACOM", nome: "Laboratório de Análise de Compostos Orgânicos e Metais", sala: "L15", link: "https://instagram.com/lacom_furg" },
   { sigla: "LAI", nome: "Laboratório de Análise Instrumental", sala: "L13", link: "" },
   { sigla: "LASQ", nome: "Laboratório de Análise Sensorial e Controle de Qualidade", sala: "N17", link: "" },
   { sigla: "LAn", nome: "Laboratório de Análises", sala: "W07", link: "" },
