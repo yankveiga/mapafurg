@@ -29,6 +29,13 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
+            src: 'arvorepetvetorizada.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            // Usado por launchers que aplicam tema/cor ao ícone do app.
+            purpose: 'monochrome'
+          },
+          {
             src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
