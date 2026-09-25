@@ -4,6 +4,30 @@ Mapa interativo do Campus Carreiros da FURG, com busca por prédios, detalhes do
 
 O projeto combina um frontend em React/Vite com um servidor WebSocket em Node.js. O mapa é uma PWA e usa Leaflet com dados do OpenStreetMap.
 
+## Interface
+
+![Mapa geral do Campus Carreiros](docs/print_mapa.png)
+
+![Detalhes de um prédio selecionado](docs/print_predio.png)
+
+## Em um minuto
+
+| | |
+| --- | --- |
+| Problema | Encontrar locais no campus e acompanhar a localização do ônibus interno. |
+| Solução | Mapa com pesquisa, informações dos locais, localização do usuário e atualização do ônibus em tempo real. |
+| Minha participação | Desenvolvimento individual da aplicação. |
+| Código | [Explorar o frontend](src/) · [Servidor WebSocket](server/ws-server.js) |
+
+## Interface e experiência
+
+- A busca aceita nomes, siglas, salas e termos alternativos para ajudar quem não sabe o nome exato de um prédio.
+- O painel de detalhes reúne as informações do local selecionado sem tirar o usuário do mapa.
+- O marcador do ônibus indica quando a última posição está envelhecendo, para não apresentar um dado antigo como se fosse atual.
+- A aplicação oferece controles para localizar o usuário e centralizar o ônibus.
+
+> A localização em tempo real depende do servidor WebSocket e do rastreador estarem ativos.
+
 ## Funcionalidades
 
 - Busca por prédios, siglas, aliases, salas e termos curados.
@@ -23,7 +47,12 @@ O projeto combina um frontend em React/Vite com um servidor WebSocket em Node.js
 - Node.js + `ws`
 - Vite Plugin PWA
 
-## Rodando Localmente
+## Requisitos
+
+- Node.js
+- npm
+
+## Rodando localmente
 
 Instale as dependências:
 
@@ -68,7 +97,7 @@ npm run preview
 npm run lint
 ```
 
-## Rastreamento Do Ônibus
+## Rastreamento do ônibus
 
 O rastreador externo envia mensagens `bus_location` para o servidor WebSocket. O servidor valida, normaliza e retransmite a última localização para os mapas conectados.
 
@@ -100,7 +129,7 @@ O `busId` é opcional, mas recomendado. Hoje o projeto usa:
 
 Se o rastreador não enviar `busId`, o servidor pode atribuir um ID automático, como `bus-1`, quando `AUTO_ASSIGN_BUS_ID=true`.
 
-## Movimento E Offline
+## Movimento e offline
 
 A posição recebida pelo GPS é sempre a posição real. A interpolação acontece só no frontend, para evitar saltos visuais no marcador. Nenhuma coordenada interpolada é enviada ao backend ou pelo WebSocket.
 
@@ -121,7 +150,7 @@ Limites atuais de opacidade:
 
 O intervalo de envio usado como referência é `3s`. A duração da interpolação fica entre `900ms` e `2200ms`.
 
-## Variáveis De Ambiente
+## Variáveis de ambiente
 
 Frontend:
 
@@ -137,7 +166,7 @@ Servidor WebSocket:
 - `AUTO_ASSIGN_BUS_ID`
 - `WS_AUTH_TOKEN`
 
-## Testando O WebSocket
+## Testando o WebSocket
 
 Rode o frontend e o servidor:
 
@@ -215,7 +244,7 @@ Para testar a build localmente:
 npm run preview
 ```
 
-## Estimativa De Tráfego
+## Estimativa de tráfego
 
 ```bash
 npm run estimate:ws
