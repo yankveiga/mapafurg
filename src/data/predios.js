@@ -22,12 +22,12 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-    segunda: "Arroz, Arroz integral, Feijão preto, Frango acebolado, Carne suína assada, PTS refogada com shoyu, Ovo cozido, Macarrão alho e óleo, Sopa de legumes, Mix de folhas, Pepino com tomate, Cenoura cozida, Banana",
-    terca: "Arroz, Arroz integral, Lentilha, Coxa/sobrecoxa na laranja, Carne de panela, Lasanha de abobrinha com grão de bico, Ovo poché, Polenta, Caldo de abóbora, Mix de folhas, Beterraba ralada, Mix de repolho cozido, Laranja",
-    quarta: "Arroz, Arroz integral, Feijão preto, Bisteca suína acebolada, Fricassê de frango, Pastel de legumes com cogumelos, Ovo cozido, Quibebe, Caldo verde, Alface, Rúcula, Abobrinha ralada, Mix de legumes cozidos, Maçã",
-    quinta: "Arroz, Arroz integral, Feijão preto, Almôndegas bovinas com molho, Peixe a milanesa, Escondidinho de grão de bico com legumes, Omelete, Macarrão com molho, Creme de ervilha, Mix de folhas, Repolho com laranja, Cenoura cozida, Ponka",
-    sexta: "Arroz, Arroz integral, Feijão carioca, Frango a parmegiana, Cubos bovinos acebolados, Bolinho de pts ao sugo, Ovo poché, Batata Sautee, Caldo verde, Mix de folhas, Beterraba ralada, Chuchu cozido, Banana"
-    }
+      segunda: "Arroz, Arroz integral, Feijão preto, Carne de panela, Peixe Frito, PTS refogada, Omelete, Macarrão alho e óleo, Mix de folhas, Repolho ralado, Beterraba em rodelas, Laranja",
+      terca: "Arroz, Arroz integral, Feijão carioca, Iscas de pernil ao shoyu, Coxa sobrecoxa crocante, Almondegas de PTS, Ovo cozido, Polenta com molho, Mix de folhas, Beterraba ralada, Abobrinha cozida c/ cheiro verde, Salada de frutas",
+      quarta: "Arroz, Arroz integral c/ linhaça, Feijão preto, Torta de carne moída, Sassami ao molho de alho, Lasanha de abobrinha com PTS, Ovo mexido, Creme de milho, Mix de folhas, Cenoura ralada, Salada de chuchu c/ cheiro verde, Banana",
+      quinta: "Arroz, Arroz integral, Lentilha, Frango xadrez, Bisteca suína acebolada, Charuto de legumes com grão de bico, Ovo poché, Macarrão ao sugo, Mix de folhas, Mix de repolho ralado, Salada de cenoura, Ponka",
+      sexta: "Arroz, Arroz integral, Feijão preto, Lasanha a bolonhesa, Frango ao sugo, Abobrinha recheada com cogumelos e legumes, Omelete, Legumes sautee, Mix de folhas, Pepino com tomate, Abobrinha cozida, Laranja"
+      }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
   { 
@@ -37,13 +37,13 @@ export const predios = [
     lng: -52.166576, 
     descricao: "Segunda a Sexta:\n☕ Café: 07h15 às 09h00\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00\n\nSábados, Domingos e Feriados:\n☕ Café: 08h30 às 09h45\n☀️ Almoço: 12h00 às 13h45\n🌙 Jantar: 18h30 às 20h00",
     cardapio: {
-    segunda: "Arroz Branco, Arroz Integral, Feijão Preto, Bife Bovino Acebolado, Filé de Frango à Milanesa, Hambúrguer de Lentilha, Ovo Cozido, Massa Parafuso ao Alho e Óleo, Alface, Cenoura Cozida, Salada Náutico, Maçã, Caldo Verde",
-    terca: "Arroz Branco, Arroz Integral, Feijão Preto, Cubos Suínos Ao Molho Ferrugem, Fricasse de Frango, Strogonoff de Proteína de Soja Graúda, Omelete, Batata Palha, Couve Chinesa, Cebola Cozida com Shoyu, Pepino com Tomate e Cebola, Melão, Creme de Moranga",
-    quarta: "Arroz Branco, Arroz Integral, Feijão Carioca, Carne de Panela, Peixe à Escabeche, Bolinho de Grão de Bico, Ovo Cozido, Purê de Batata, Mix de Folhas, Beterraba Cozida com Maçã, Repolho Misto, Laranja, Sopa Fantasia com Massa",
-    quinta: "Arroz Branco, Arroz Integral, Feijão Preto, Pastel de Carne, Lasanha de Frango, Abobrinha Recheada com PTS, Ovo Cozido, Jardineira de Legumes, Alface, Soja em Grão Refogada com Tempero Verde, Salpicão, Maçã, Creme de Ervilha",
-    sexta: "Arroz Branco, Arroz Integral, Lentilha, Bife Bovino à Milanesa, Coxa com sobrecoxa assada, Strogonoff de Cogumelos, Ovo Pochê, Massa ao Sugo, Alface, Abobrinha Cozida com Milho, Tabule, Banana, Creme de Aipim",
-    sábado: "Arroz Branco, Arroz Integral, Feijão Carioca, Cubos Suínos Ao Molho BBQ, Filé de Frango Crocante, Kibe de PTS, Ovo Cozido, Batata Sautê, Chicória, Cenoura Cozida, Repolho com Laranja, Creme de Baunilha com calda de Banana, Sopa de Legumes",
-    domingo: "Arroz Branco, Arroz Integral, Feijão Preto, Carne de Panela, Cubos de Frango a Xadrez, Hambúrguer de Grão de Bico, Ovo Cozido, Farofa com Legumes, Alface, Macarronese com Milho e Ervilha, Pepino, Bergamota, Sopa de Feijão Branco"
+      segunda: "Arroz Branco, Arroz Integral com Linhaça, Feijão Preto, Bife Bovino Acebolado, Fricasse de Frango, Grão de Bico Acebolado, Omelete, Massa Parafuso com Tomate e Manjericão, Alface, Soja em Grão Refogada com Tempero Verde, Salada Caico, Laranja",
+      terca: "Arroz Branco, Arroz Integral, Feijão Carioca, Carré Suíno ao Molho Ferrugem, Cubos de Frango a Xadrez, PTS a Xadrez, Ovo Cozido, Moranga Caramelada, Mix de Folhas, Beterraba Cozida, Rabanete Ralado, Maçã",
+      quarta: "Arroz Branco, Arroz Integral, Feijão Preto, Strogonoff de Carne Bovina, Bife de Frango Grelhado, Strogonoff de Cogumelo, Ovo Cozido, Batata Palha, Alface, Cenoura Cozida, Pepino, Melão",
+      quinta: "Arroz Branco, Arroz Integral, Feijão Preto, Carne de Panela ao Molho Ferrugem, Coxa com sobrecoxa assada, Hambúrguer de Lentilha, Ovo Mexido, Farofa com Couve, Alface, Abobrinha Cozida com Milho, Beterraba Ralada, Laranja",
+      sexta: "Arroz Branco, Arroz Integral, Feijão Preto, Cubos Suínos Assados ao Molho Madeira, Filé de Frango ao Molho Mostarda, Charuto de Couve com PTS, Omelete, Massa ao Sugo, Alface, Berinjela Cozida com Tempero Verde, Salada Náutico, Banana",
+      sábado: "Arroz Branco, Arroz Integral, Lentilha, Bife Bovino Acebolado, Peixe a Escabeche, Bolinho de Grão de Bico, Ovo Pochê, Batata Sautê, Mix de Folhas, Repolho Refogado, Tabule, Maçã",
+      domingo: "Arroz Branco, Arroz Integral, Feijão Preto, Pastel de Carne, Lasanha de Frango, Canelone de Brócolis, Ovo Cozido, Jardineira de Legumes, Alface, Beterraba Cozida, Pepino, Creme de Coco com Calda de banana"
     }
   },  
     
