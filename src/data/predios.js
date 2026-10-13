@@ -22,12 +22,12 @@ export const predios = [
     lng: -52.16590916190858, 
     descricao: "Segunda a Sexta (exceto feriados):\n☀️ Almoço: 11h00 às 14h00\n🌙 Jantar: 18h00 às 21h00",
     cardapio: {
-      segunda: "-",
-      terca: "-",
-      quarta: "-",
-      quinta: "-",
-      sexta: "-"
-      }
+      segunda: "Feriado",
+      terca: "Arroz, Arroz integral, Feijão preto, Moída refogada, Frango a milanesa, Hamburguer de Grão de bico, Omelete, Macarrão alho e óleo, Mix de folhas, Repolho c/ abacaxi, Abobrinha cozida, Banana",
+      quarta: "Arroz, Arroz integral, Feijão preto, Cubos suínos ao molho barbecue, Coxa sobrecoxa no fubá, Charuto de couve c/ PTS, Ovo mexido, Abóbora caramelada, Mix de folhas, Cenoura ralada c/ cheiro verde, Beterraba cozida, Salada de frutas",
+      quinta: "Arroz, Arroz integral, Lentilha, Kibe assado recheado com cenoura, Sassami ao molho de ervas finas, PTS ao molho vermelho, Ovo cozido, Mandioca cozida com alho, Mix de folhas, Beterraba ralada, Chuchu cozido, Melancia",
+      sexta: "Arroz, Arroz integral c/ linhaça, Feijão preto, Costela bovina assada, Frango a pizzaiolo, Pastel de legumes com cogumelos, Ovo poché, Jardineira de legumes, Mix de folhas, Salada de massa, Cenoura cozida, Banana"
+    }
   },
   // Restaurante Universitário - CC - Requer atualização presencial semanal
   { 
