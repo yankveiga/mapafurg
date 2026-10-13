@@ -33,7 +33,7 @@ export function StatusOnibus({
 
   return (
     <div
-      className="absolute bottom-12 left-4 right-20 z-[9999] max-w-[360px] rounded-xl border border-white/70 bg-white/90 px-2.5 py-2 text-slate-800 shadow-lg backdrop-blur-xl md:left-6 md:right-auto md:rounded-2xl md:px-3.5 md:py-2.5"
+      className="animate-panel-in absolute bottom-12 left-4 right-20 z-[9999] max-w-[360px] rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-slate-800 shadow-[0_8px_24px_rgba(0,51,102,0.16)] md:left-6 md:right-auto md:rounded-2xl md:px-3.5 md:py-2.5"
       aria-live="polite"
     >
       <div className="flex min-w-0 items-center gap-1.5 md:gap-2">
@@ -41,7 +41,7 @@ export function StatusOnibus({
           className={`h-2 w-2 flex-shrink-0 rounded-full md:h-2.5 md:w-2.5 ${visual.dot}`}
           aria-hidden="true"
         />
-        <span className="text-[10px] font-black uppercase tracking-wide text-[#003366] md:text-[11px]">
+        <span className="text-[10px] font-black uppercase tracking-wide text-furg-navy md:text-[11px]">
           Onibus
         </span>
         <span className={`text-[10px] font-black md:ml-auto md:text-[11px] ${visual.label}`}>

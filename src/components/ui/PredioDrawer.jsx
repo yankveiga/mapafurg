@@ -18,10 +18,10 @@ const TabButton = ({ active, icon, label, count, onClick }) => (
     type="button"
     onClick={onClick}
     aria-pressed={active}
-    className={`flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-[11px] font-black uppercase tracking-wide transition-all ${
+    className={`flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-[11px] font-black uppercase tracking-wide transition-all duration-200 active:scale-[0.98] ${
       active
-        ? 'bg-[#003366] text-white shadow-md'
-        : 'bg-white/75 text-slate-600 hover:bg-white hover:text-[#003366]'
+        ? 'bg-furg-navy text-white shadow-md shadow-furg-navy/20'
+        : 'bg-white/75 text-slate-600 hover:bg-white hover:text-furg-navy'
     }`}
   >
     {icon}
@@ -39,12 +39,12 @@ const TabButton = ({ active, icon, label, count, onClick }) => (
 );
 
 const Section = ({ icon, title, children, note }) => (
-  <section className="rounded-2xl border border-slate-100 bg-slate-50/80 p-4 shadow-sm">
+  <section className="animate-panel-in rounded-2xl border border-slate-100 bg-slate-50/85 p-4 shadow-[0_4px_18px_rgba(0,51,102,0.05)]">
     <div className="mb-3 flex items-center gap-2">
-      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-[#003366] shadow-sm">
+      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-furg-navy shadow-sm">
         {icon}
       </span>
-      <h3 className="text-[12px] font-black uppercase tracking-wider text-[#003366]">
+      <h3 className="text-[12px] font-black uppercase tracking-wider text-furg-navy">
         {title}
       </h3>
     </div>
@@ -58,11 +58,11 @@ const Section = ({ icon, title, children, note }) => (
 );
 
 const InfoRow = ({ label, value }) => (
-  <div className="border-b border-slate-200/60 pb-2 last:border-0 last:pb-0">
+  <div className="rounded-xl border border-slate-200/70 bg-white px-3 py-2.5 last:border-slate-200/70">
     <span className="block text-[11px] font-black uppercase tracking-wide text-slate-500">
       {label}
     </span>
-    <span className="mt-0.5 block text-[13px] font-medium leading-snug text-slate-700">
+    <span className="mt-0.5 block text-[13px] font-semibold leading-snug text-slate-700">
       {value}
     </span>
   </div>
@@ -85,7 +85,7 @@ const ProjetoCard = ({ projeto, index }) => {
   const conteudo = (
     <>
       <div className="flex min-w-0 items-start justify-between gap-2">
-        <span className="min-w-0 truncate text-[13px] font-black leading-tight text-[#003366]">
+        <span className="min-w-0 truncate text-[13px] font-black leading-tight text-furg-navy">
           {titulo}
         </span>
         {temLink && (
@@ -117,7 +117,7 @@ const ProjetoCard = ({ projeto, index }) => {
     </>
   );
 
-  const className = 'min-h-[68px] rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#003366]/40 hover:shadow-md';
+  const className = 'min-h-[76px] rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-furg-navy/40 hover:shadow-md active:scale-[0.99]';
 
   return temLink ? (
     <a
@@ -184,14 +184,15 @@ export function PredioDrawer({
 
   return (
     <div
-      className={`absolute bottom-0 left-0 right-0 z-[10000] flex max-h-[85vh] flex-col rounded-t-3xl border-t border-white/60 bg-white/90 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] backdrop-blur-2xl transition-transform duration-300 ease-out md:left-1/2 md:max-w-[480px] md:-translate-x-1/2 ${predio ? 'translate-y-0' : 'translate-y-full'}`}
+      className={`absolute bottom-0 left-0 right-0 z-[10000] flex max-h-[86dvh] flex-col rounded-t-3xl border-t border-slate-200 bg-white shadow-[0_-14px_44px_rgba(0,51,102,0.18)] transition-transform duration-300 ease-out md:left-1/2 md:max-w-[500px] md:-translate-x-1/2 ${predio ? 'translate-y-0' : 'translate-y-full'}`}
     >
       {predio && (
-        <div className="flex min-h-0 flex-col">
-          <div className="z-10 border-b border-white/70 bg-white/95 px-5 pb-3 pt-3 backdrop-blur-2xl">
+        <div className="animate-drawer-spring flex min-h-0 flex-col">
+          <div className="z-10 border-b border-slate-200 bg-white px-5 pb-3 pt-2">
+            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-300/90" aria-hidden="true" />
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <h2 className="line-clamp-2 text-base font-black leading-tight text-[#003366]">
+                <h2 className="line-clamp-2 text-base font-black leading-tight text-furg-navy">
                   {predio.nome}
                 </h2>
                 <span className="mt-1 block text-[11px] font-bold uppercase tracking-widest text-slate-500">
@@ -201,7 +202,7 @@ export function PredioDrawer({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
+                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 transition-all duration-200 hover:bg-slate-200 hover:text-slate-900 active:scale-95"
                 aria-label="Fechar"
               >
                 <X size={17} strokeWidth={2.6} aria-hidden="true" />
@@ -209,7 +210,7 @@ export function PredioDrawer({
             </div>
 
             {abas.length > 1 && (
-              <div className="mt-3 flex gap-1.5 overflow-x-auto rounded-2xl bg-slate-100/80 p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="mt-3 flex gap-1.5 overflow-x-auto rounded-2xl bg-slate-100/80 p-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {abas.map((aba) => (
                   <TabButton
                     key={aba.id}
@@ -224,7 +225,10 @@ export function PredioDrawer({
             )}
           </div>
 
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 pb-8 pt-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div
+            key={`${predio.id}-${abaSelecionada}`}
+            className="animate-tab-content min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-4 sm:px-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
             {abaSelecionada === 'info' && (
               <Section icon={criarIconeSecao(Info)} title="Informacoes">
                 <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
@@ -235,7 +239,7 @@ export function PredioDrawer({
 
             {abaSelecionada === 'projetos' && predio.projetos?.length > 0 && (
               <Section icon={criarIconeSecao(ListChecks)} title="Projetos e Laboratorios">
-                <div className="mb-3 flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2 text-[11px] font-bold text-slate-600">
+                <div className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-slate-200/70 bg-white px-3 py-2 text-[11px] font-bold text-slate-600">
                   <span>{predio.projetos.length} itens cadastrados</span>
                   <span className="text-slate-500">Toque para abrir links</span>
                 </div>

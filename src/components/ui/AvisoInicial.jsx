@@ -4,21 +4,22 @@ export function AvisoInicial({ aviso, onClose }) {
   if (!aviso?.ativo || !aviso.mensagem?.trim()) return null;
 
   return (
-    <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-furg-navy/45 px-4 backdrop-blur-sm">
       <div
-        className="relative w-full max-w-[390px] overflow-hidden rounded-[18px] border-[3px] border-slate-950 bg-[#e8e8e8] shadow-[8px_8px_0_#020617]"
+        className="animate-soft-pop relative w-full max-w-[390px] overflow-hidden rounded-3xl border border-white/70 bg-white/95 shadow-[0_24px_70px_rgba(0,51,102,0.34)] backdrop-blur-2xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="aviso-inicial-titulo"
       >
-        <div className="flex h-11 items-center justify-between border-b-[3px] border-slate-950 bg-white px-4">
-          <div className="flex items-center gap-1.5" aria-hidden="true">
-            <span className="h-3 w-3 rounded-full border-2 border-slate-950 bg-red-400" />
-            <span className="h-3 w-3 rounded-full border-2 border-slate-950 bg-amber-300" />
-            <span className="h-3 w-3 rounded-full border-2 border-slate-950 bg-emerald-400" />
+        <div className="flex h-13 items-center justify-between border-b border-slate-200/80 bg-slate-50/80 px-5">
+          <div className="flex items-center gap-2 text-furg-navy" aria-hidden="true">
+            <BellRing size={18} strokeWidth={2.5} />
+            <span className="text-[11px] font-black uppercase tracking-[0.18em]">
+              Aviso
+            </span>
           </div>
 
-          <span className="rounded-full border-2 border-slate-950 bg-[#003366] px-3 py-1 text-[10px] font-black uppercase tracking-wide text-white">
+          <span className="rounded-full bg-furg-navy px-3 py-1 text-[10px] font-black uppercase tracking-wide text-white shadow-sm">
             Mapa FURG
           </span>
         </div>
@@ -26,7 +27,7 @@ export function AvisoInicial({ aviso, onClose }) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-[58px] z-10 flex h-9 w-9 items-center justify-center rounded-lg border-[3px] border-slate-950 bg-white text-slate-950 shadow-[3px_3px_0_#020617] transition-transform hover:-translate-y-0.5 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          className="absolute right-4 top-[64px] z-10 flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 transition-all duration-200 hover:bg-slate-200 hover:text-furg-navy active:scale-95"
           aria-label="Fechar aviso"
         >
           <X size={18} strokeWidth={3} aria-hidden="true" />
@@ -34,16 +35,16 @@ export function AvisoInicial({ aviso, onClose }) {
 
         <div className="relative px-5 pb-5 pt-6">
           <div className="mb-4 flex items-start gap-3 pr-12">
-            <div className="flex h-13 w-13 flex-shrink-0 items-center justify-center rounded-2xl border-[3px] border-slate-950 bg-amber-300 text-slate-950 shadow-[4px_4px_0_#020617]">
-              <BellRing size={25} strokeWidth={3} aria-hidden="true" />
+            <div className="flex h-13 w-13 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-700 shadow-inner">
+              <BellRing size={25} strokeWidth={2.5} aria-hidden="true" />
             </div>
 
-            <h2 id="aviso-inicial-titulo" className="pt-1 text-2xl font-black leading-tight text-slate-950">
+            <h2 id="aviso-inicial-titulo" className="pt-1 text-2xl font-black leading-tight text-furg-navy">
               {aviso.titulo}
             </h2>
           </div>
 
-          <div className="rounded-2xl border-[3px] border-slate-950 bg-white px-4 py-3 shadow-[4px_4px_0_#020617]">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/90 px-4 py-3">
             <p className="whitespace-pre-wrap text-sm font-bold leading-relaxed text-slate-800">
               {aviso.mensagem}
             </p>
@@ -52,7 +53,7 @@ export function AvisoInicial({ aviso, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="mt-5 flex min-h-12 w-full items-center justify-center rounded-2xl border-[3px] border-slate-950 bg-[#003366] px-4 py-3 text-sm font-black uppercase tracking-wide text-white shadow-[5px_5px_0_#020617] transition-transform hover:-translate-y-0.5 active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+            className="mt-5 flex min-h-12 w-full items-center justify-center rounded-2xl bg-furg-navy px-4 py-3 text-sm font-black uppercase tracking-wide text-white shadow-[0_10px_24px_rgba(0,51,102,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-furg-navy-soft active:translate-y-0 active:scale-[0.99]"
           >
             {aviso.botao || 'Entendi'}
           </button>

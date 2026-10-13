@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
-import { BusFront, LocateFixed } from 'lucide-react';
+import { BookOpen, BusFront, LocateFixed, Menu, Search, Utensils, X } from 'lucide-react';
 import { avisoInicial } from './data/aviso';
 import { predios } from './data/predios';
 import { normalizarTextoBusca, traduzirBusca } from './utils/buscas';
@@ -188,83 +188,101 @@ function App() {
     ? 'desconectado'
     : statusWs;
   const opacidadeOnibusInicial = calcularOpacidadeOnibus(null, agoraMs);
+  const menuRapido = [
+    { id: 'interno', label: 'Ônibus Interno', hint: 'Ponto e horários', icon: BusFront },
+    { id: 'ru_CC', label: 'RU - Centro de Conv.', hint: 'Restaurante universitário', icon: Utensils },
+    { id: 'ru_Lago', label: 'RU - Lago', hint: 'Restaurante universitário', icon: Utensils },
+    { id: 'sib', label: 'Biblioteca Central', hint: 'Acervo e estudos', icon: BookOpen },
+  ];
 
   return (
-    <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-slate-50">
+    <div className="h-[100dvh] w-full relative font-sans overflow-hidden bg-[#edf3f6]">
       <AvisoInicial aviso={avisoAberto ? avisoInicial : null} onClose={() => setAvisoAberto(false)} />
 
       
       {menuAberto && (
         <div 
           onClick={() => setMenuAberto(false)} 
-          className="absolute inset-0 bg-black/20 z-[11000] backdrop-blur-sm"
+          className="absolute inset-0 bg-furg-navy/25 z-[11000] backdrop-blur-sm transition-opacity duration-300"
         ></div>
       )}
 
       <div 
-        className={`absolute left-0 top-0 bottom-0 w-[280px] bg-white/95 backdrop-blur-2xl z-[12000] border-r border-white/50 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${menuAberto ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`absolute left-0 top-0 bottom-0 w-[min(86vw,310px)] bg-white z-[12000] border-r border-slate-200 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${menuAberto ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="p-6 pt-10 flex-grow overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <div className="flex justify-between items-center mb-8 border-b border-slate-200 pb-4">
-            <h3 className="text-xl font-black text-[#003366]">Acesso Rápido</h3>
+        <div className="flex-grow overflow-y-auto p-5 pt-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
+            <div>
+              <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
+                Mapa FURG
+              </span>
+              <h3 className="mt-1 text-xl font-black text-furg-navy">Acesso rápido</h3>
+            </div>
             <button
               type="button"
               onClick={() => setMenuAberto(false)}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-2xl font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 transition-all duration-200 hover:bg-slate-200 hover:text-slate-900 active:scale-95"
               aria-label="Fechar menu"
             >
-              ✕
+              <X size={19} strokeWidth={2.5} aria-hidden="true" />
             </button>
           </div>
           
-          <ul className="space-y-3">
-            <li>
-              <button onClick={() => selecionarItemCurado('interno')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
-                <span className="text-2xl">🚌</span>
-                <span className="text-sm font-bold text-slate-800">Ônibus Interno</span>
-              </button>
-            </li>
-            <li>
-              <button onClick={() => selecionarItemCurado('ru_CC')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
-                <span className="text-2xl">🍴</span>
-                <span className="text-sm font-bold text-slate-800">RU - Centro de Conv.</span>
-              </button>
-            </li>
-            <li>
-              <button onClick={() => selecionarItemCurado('ru_Lago')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
-                <span className="text-2xl">🍽️</span>
-                <span className="text-sm font-bold text-slate-800">RU - Lago</span>
-              </button>
-            </li>
-                        <li>
-              <button onClick={() => selecionarItemCurado('sib')} className="flex items-center gap-4 w-full text-left p-3 rounded-xl hover:bg-slate-100 transition-colors">
-                <span className="text-2xl">📚</span>
-                <span className="text-sm font-bold text-slate-800">Biblioteca Central</span>
-              </button>
-            </li>
+          <ul key={menuAberto ? 'menu-open' : 'menu-closed'} className="space-y-2.5">
+            {menuRapido.map((item, index) => {
+              const Icone = item.icon;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => selecionarItemCurado(item.id)}
+                    className="animate-menu-item group flex min-h-16 w-full items-center gap-3 rounded-2xl border border-slate-200/80 bg-white px-3.5 py-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-furg-navy/25 hover:shadow-md active:translate-y-px active:scale-[0.99]"
+                    style={{ animationDelay: `${70 + index * 38}ms` }}
+                  >
+                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-furg-navy/10 text-furg-navy transition-colors group-hover:bg-furg-navy group-hover:text-white">
+                      <Icone size={20} strokeWidth={2.25} aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-black text-slate-800">
+                        {item.label}
+                      </span>
+                      <span className="mt-0.5 block truncate text-[11px] font-semibold text-slate-500">
+                        {item.hint}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
 
-      <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-[480px] z-[9999]">
-        <div className="flex flex-row items-center gap-3 p-2.5 bg-white/50 backdrop-blur-xl shadow-lg rounded-2xl border border-white/60">
+      <div className="absolute left-3 right-3 top-3 z-[9999] sm:left-4 sm:right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-[520px]">
+        <div className="animate-panel-in flex flex-row items-center gap-2 rounded-2xl border border-white/80 bg-white/94 p-2 shadow-[0_10px_30px_rgba(0,51,102,0.16)] backdrop-blur-md sm:gap-2.5">
           
           <button 
             type="button"
             onClick={() => setMenuAberto(true)}
-            className="w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/50 hover:bg-white/70 text-[#003366] text-2xl active:scale-95 transition-all"
+            className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 text-furg-navy transition-all duration-200 hover:bg-slate-200 active:scale-95"
             aria-label="Abrir menu de acesso rapido"
           >
-            ☰
+            <Menu size={22} strokeWidth={2.35} aria-hidden="true" />
           </button>
 
-          <div className="flex flex-row items-center gap-2 pl-1">
+          <div className="hidden flex-row items-center gap-2 pl-0.5 min-[390px]:flex">
             <a href="https://petc3.vercel.app/" target="_blank" rel="noopener noreferrer" className="cursor-pointer block">
-              <img src={logoPet} alt="Logo PET C3" className="w-14 h-14 object-contain scale-110 hover:scale-125 transition-transform duration-300" onError={(e) => { e.target.style.display = 'none'; }} />
+              <img src={logoPet} alt="Logo PET C3" className="h-10 w-10 object-contain transition-transform duration-300 hover:scale-110 sm:h-12 sm:w-12" onError={(e) => { e.target.style.display = 'none'; }} />
             </a>
           </div>
-          <div className="h-8 w-px bg-slate-300/50" /> 
+          <div className="hidden h-8 w-px bg-slate-300/70 min-[390px]:block" /> 
           <div className="relative flex-grow">
+            <Search
+              size={17}
+              strokeWidth={2.35}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+              aria-hidden="true"
+            />
             <input 
               type="text" 
               placeholder="Buscar prédio..." 
@@ -274,21 +292,21 @@ function App() {
                 setBusca(e.target.value);
                 setPredioAberto(null);
               }}
-              className={`w-full bg-white/50 hover:bg-white/70 text-slate-900 px-3 py-3 pr-20 rounded-xl border outline-none focus:ring-2 focus:ring-[#003366]/40 transition-all duration-200 text-sm ${buscaAtiva ? 'border-[#003366]/40 shadow-sm' : 'border-white/60'}`}
+              className={`w-full rounded-xl border bg-white px-9 py-3 pr-12 text-sm font-semibold text-slate-900 outline-none transition-all duration-200 placeholder:font-medium placeholder:text-slate-500 focus:ring-2 focus:ring-furg-navy/35 ${buscaAtiva ? 'border-furg-navy/45 shadow-sm' : 'border-slate-200'}`}
             />
             {busca && (
               <button 
                 type="button"
                 onClick={() => setBusca('')} 
-                className="absolute right-2 top-1/2 min-h-8 -translate-y-1/2 rounded-full bg-white/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-slate-700 shadow-sm transition-colors hover:bg-white hover:text-slate-900 active:scale-95"
+                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-sm transition-all duration-200 hover:bg-white hover:text-furg-navy active:scale-95"
                 aria-label="Limpar busca"
                 title="Limpar busca"
               >
-                Limpar
+                <X size={15} strokeWidth={2.7} aria-hidden="true" />
               </button>
             )}
             {buscaAtiva && (
-              <div className="absolute left-0 right-0 top-[calc(100%+8px)] rounded-2xl border border-white/70 bg-white/95 px-3 py-2 text-[12px] font-bold text-slate-700 shadow-lg backdrop-blur-xl">
+              <div className="animate-panel-in absolute left-0 right-0 top-[calc(100%+8px)] rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[12px] font-bold text-slate-700 shadow-[0_10px_28px_rgba(0,51,102,0.14)]">
                 {totalResultadosBusca === 0 ? (
                   <div>
                     <span>Nenhum resultado encontrado.</span>
@@ -297,7 +315,7 @@ function App() {
                     </span>
                   </div>
                 ) : (
-                  <span className="text-[#003366]">
+                  <span className="text-furg-navy">
                     {rotuloResultadosBusca}
                   </span>
                 )}
@@ -314,7 +332,7 @@ function App() {
             mostrarFeedbackGps('buscando', 'Buscando sua localização...');
             setSolicitarGps(prev => prev + 1);
           }}
-          className="bg-white/65 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/80 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/90 hover:shadow-xl"
+          className="bg-white p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-slate-200 shadow-[0_8px_24px_rgba(0,51,102,0.18)] active:translate-y-px active:scale-90 transition-all duration-200 text-furg-navy hover:-translate-y-1 hover:shadow-xl"
           aria-label="Minha localização"
           title="Minha localização"
         >
@@ -331,10 +349,10 @@ function App() {
           aria-live="polite"
         >
           <div
-            className={`rounded-2xl border px-3.5 py-2 text-xs font-bold shadow-lg backdrop-blur-xl ${
+            className={`animate-soft-pop rounded-2xl border px-3.5 py-2 text-xs font-bold shadow-lg backdrop-blur-xl ${
               feedbackGps.tipo === 'erro'
                 ? 'border-amber-100 bg-amber-50/95 text-amber-800'
-                : 'border-white/70 bg-white/95 text-[#003366]'
+                : 'border-white/70 bg-white/95 text-furg-navy'
             }`}
           >
             {feedbackGps.texto}
@@ -346,7 +364,7 @@ function App() {
         <button
           type="button"
           onClick={() => setSolicitarOnibus(prev => prev + 1)}
-          className="bg-white/65 backdrop-blur-xl p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-white/80 shadow-lg active:scale-90 transition-all duration-200 text-[#003366] hover:-translate-y-1 hover:bg-white/90 hover:shadow-xl"
+          className="bg-white p-3 w-12 h-12 flex items-center justify-center rounded-2xl border border-slate-200 shadow-[0_8px_24px_rgba(0,51,102,0.18)] active:translate-y-px active:scale-90 transition-all duration-200 text-furg-navy hover:-translate-y-1 hover:shadow-xl"
           aria-label="Centralizar ônibus"
           title="Centralizar ônibus"
         >
@@ -402,7 +420,11 @@ function App() {
             <Marker 
               key={predio.id} 
               position={[predio.lat, predio.lng]} 
-              icon={criarIconePredio(predio.id)}
+              icon={criarIconePredio(predio.id, {
+                destacado: buscaAtiva,
+                selecionado: predioAbertoAtual?.id === predio.id,
+              })}
+              zIndexOffset={predioAbertoAtual?.id === predio.id ? 1200 : buscaAtiva ? 800 : 0}
               eventHandlers={{
                 click: () => setPredioAberto(predio),
               }}
@@ -446,3 +468,4 @@ function App() {
 }
 
 export default App;
+
